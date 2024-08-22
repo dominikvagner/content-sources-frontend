@@ -34,13 +34,14 @@ Alternativly, simply add these lines to your /etc/hosts:
 
 3. `npm install`
 
-4. `npm run start` to run against stage or prod environments. <br/>
-    OR <br/>
-  `npm run local` to run against a local backend running on port 8000.
+4. `npm run build`
 
-5.  With a browser, open URL listed in the terminal output
+5. `npm run start` to run against stage or prod environments. <br/>
+   OR <br/>
+   `npm run local` to run against a local backend running on port 8000. <br/>
+   (keep in mind that you have to be connected to the VPN for this to work, even in the offices)
 
- 
+6. With a browser, open URL listed in the terminal output
 
 
 Update `config/dev.webpack.config.js` according to your application URL. [Read more](https://github.com/RedHatInsights/frontend-components/tree/master/packages/config#useproxy).
