@@ -34,7 +34,7 @@ Alternativly, simply add these lines to your /etc/hosts:
 
 3. `npm install`
 
-4. `npm run build`
+4. `npm run build` (only required when setting up for the first time)
 
 5. `npm run start` to run against stage or prod environments. <br/>
    OR <br/>
