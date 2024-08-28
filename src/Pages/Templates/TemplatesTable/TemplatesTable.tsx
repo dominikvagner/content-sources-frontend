@@ -7,7 +7,6 @@ import {
   Pagination,
   PaginationVariant,
   Spinner,
-  Tooltip,
 } from '@patternfly/react-core';
 import {
   ActionsColumn,
@@ -33,7 +32,7 @@ import { useDeleteTemplateItemMutate, useTemplateList } from 'services/Templates
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import { useAppContext } from 'middleware/AppContext';
 import TemplateFilters from './components/TemplateFilters';
-import {formatDateDDMMMYYYY, formatDateUTC} from 'helpers';
+import { formatDateDDMMMYYYY, formatDateUTC } from 'helpers';
 import { useQueryClient } from 'react-query';
 import Header from 'components/Header/Header';
 import useRootPath from 'Hooks/useRootPath';
@@ -288,9 +287,14 @@ const TemplatesTable = () => {
                       <Td>{archesDisplay(arch)}</Td>
                       <Td>{versionDisplay(version)}</Td>
                       <Td>
-                        <Tooltip content={formatDateUTC(date)} position='top-start' enableFlip>
+                        <ConditionalTooltip
+                          show={!use_latest}
+                          content={formatDateUTC(date)}
+                          position='top-start'
+                          enableFlip
+                        >
                           <p>{use_latest ? 'Use latest' : formatDateDDMMMYYYY(date)}</p>
-                        </Tooltip>
+                        </ConditionalTooltip>
                       </Td>
                       <Td>
                         <ConditionalTooltip

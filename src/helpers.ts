@@ -15,27 +15,27 @@ export const objectToUrlParams = (obj: { [key: string]: string | undefined }): s
 };
 
 export const formatDateDDMMMYYYY = (date: string, withTime?: boolean): string => {
-  const d = dayjs(date)
+  const d = dayjs(date);
   if (d.isBefore(dayjs('0001-01-02'))) {
-    return `01 Jan 0001${withTime ? ' - 00:00:00' : ''}`
+    return `01 Jan 0001${withTime ? ' - 00:00:00' : ''}`;
   }
 
   return d.format(`DD MMM YYYY${withTime ? ' - HH:mm:ss' : ''}`);
-}
+};
 
 export const formatTemplateDate = (date: string): string =>
   dayjs(date).format('YYYY-MM-DDTHH:mm:ssZ');
 
 export const formatDateUTC = (date: string): string => {
-  const d = dayjs(date)
+  const d = dayjs(date);
   if (d.isBefore(dayjs('0001-01-02'))) {
-    return '01 Jan 0001 - 00:00:00 (UTC)'
+    return '01 Jan 0001 - 00:00:00 (UTC)';
   }
 
-  const offset = d.utcOffset()
+  const offset = d.utcOffset();
   const utc = d.subtract(offset, 'minutes');
   return utc.format('DD MMM YYYY - HH:mm:ss [(UTC)]');
-}
+};
 
 export const reduceStringToCharsWithEllipsis = (str: string, maxLength: number = 50) =>
   str.length > maxLength ? str.split('').slice(0, maxLength).join('') + '...' : str;
