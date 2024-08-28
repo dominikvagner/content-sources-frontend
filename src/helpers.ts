@@ -27,7 +27,7 @@ export const formatTemplateDate = (date: string): string =>
   dayjs(date).format('YYYY-MM-DDTHH:mm:ssZ');
 
 export const formatDateForPicker = (date: string | null | undefined): string => {
-  if (typeof date !== 'string') {
+  if (typeof date !== 'string' || date === '') {
     return '';
   }
 
