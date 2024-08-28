@@ -26,6 +26,19 @@ export const formatDateDDMMMYYYY = (date: string, withTime?: boolean): string =>
 export const formatTemplateDate = (date: string): string =>
   dayjs(date).format('YYYY-MM-DDTHH:mm:ssZ');
 
+export const formatDateForPicker = (date: string | null | undefined): string => {
+  if (typeof date !== 'string') {
+    return '';
+  }
+
+  const d = dayjs(date);
+  if (d.isBefore(dayjs('0001-01-02'))) {
+    return '0001-01-01';
+  }
+
+  return d.format('YYYY-MM-DD');
+};
+
 export const formatDateUTC = (date: string): string => {
   const d = dayjs(date);
   if (d.isBefore(dayjs('0001-01-02'))) {
