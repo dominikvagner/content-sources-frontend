@@ -8,6 +8,8 @@ import { ContentOrigin } from 'services/Content/ContentApi';
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { ChromeAPI } from '@redhat-cloud-services/types';
 import getRBAC from '@redhat-cloud-services/frontend-components-utilities/RBAC';
+import { Subscriptions } from 'services/Subscriptions/SubscriptionApi';
+import { useFetchSubscriptionsQuery } from 'services/Subscriptions/SubscriptionQueries';
 
 const getRegistry = _getRegistry as unknown as () => { register: ({ notifications }) => void };
 const { appname } = PackageJson.insights;
@@ -16,6 +18,8 @@ export interface AppContextInterface {
   rbac?: Record<string, boolean>;
   features: Features | null;
   isFetchingFeatures: boolean;
+  subscriptions: Subscriptions | null;
+  isFetchingSubscriptions: boolean;
   contentOrigin: ContentOrigin;
   setContentOrigin: (contentOrigin: ContentOrigin) => void;
   chrome?: ChromeAPI;
@@ -32,6 +36,8 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
   const chrome = useChrome();
   const [contentOrigin, setContentOrigin] = useState<ContentOrigin>(ContentOrigin.CUSTOM);
   const { fetchFeatures, isLoading: isFetchingFeatures } = useFetchFeaturesQuery();
+  const [subscriptions, setSubscriptions] = useState<Subscriptions | null>(null);
+  const { fetchSubscriptions, isLoading: isFetchingSubscriptions } = useFetchSubscriptionsQuery();
 
   useEffect(() => {
     // Get chrome and register app
@@ -58,6 +64,11 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
       const fetchedFeatures = await fetchFeatures();
       setFeatures(fetchedFeatures);
     })();
+
+    (async () => {
+      const fetchedSubscriptions = await fetchSubscriptions();
+      setSubscriptions(fetchedSubscriptions);
+    })();
   }, [!!chrome]);
 
   return (
@@ -66,6 +77,8 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
         rbac: rbac,
         features: features,
         isFetchingFeatures: isFetchingFeatures,
+        subscriptions: subscriptions,
+        isFetchingSubscriptions: isFetchingSubscriptions,
         contentOrigin,
         setContentOrigin,
         chrome: chrome as ChromeAPI,

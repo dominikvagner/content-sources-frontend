@@ -75,7 +75,7 @@ const TemplatesTable = () => {
   const classes = useStyles();
   const rootPath = useRootPath();
   const navigate = useNavigate();
-  const { rbac } = useAppContext();
+  const { rbac, subscriptions, isFetchingSubscriptions } = useAppContext();
   const storedPerPage = Number(localStorage.getItem(perPageKey)) || 20;
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(storedPerPage);
@@ -165,6 +165,14 @@ const TemplatesTable = () => {
 
   const countIsZero = count === 0;
 
+  const hasRHELSubscription = subscriptions?.RedHatEnterpriseLinux || false;
+  const isMissingRequirements = !rbac?.templateWrite || !hasRHELSubscription;
+  const missingRequirements: string = !rbac?.templateWrite
+    ? 'permission'
+    : !hasRHELSubscription
+      ? 'subscription (RHEL)'
+      : 'permission';
+
   if (countIsZero && notFiltered && !isLoading)
     return (
       <Bullseye data-ouia-component-id='content_template_list_page'>
@@ -175,8 +183,8 @@ const TemplatesTable = () => {
           notFilteredBody={notFilteredBody}
           notFilteredButton={
             <ConditionalTooltip
-              content='You do not have the required permissions to perform this action.'
-              show={!rbac?.templateWrite}
+              content={`You do not have the required ${missingRequirements} to perform this action.`}
+              show={isMissingRequirements}
               setDisabled
             >
               <Button
@@ -293,8 +301,8 @@ const TemplatesTable = () => {
                       </Td>
                       <Td>
                         <ConditionalTooltip
-                          content='You do not have the required permissions to perform this action.'
-                          show={!rbac?.templateWrite}
+                          content={`You do not have the required ${missingRequirements} to perform this action.`}
+                          show={isMissingRequirements}
                           setDisabled
                         >
                           <ActionsColumn
@@ -342,8 +350,8 @@ const TemplatesTable = () => {
             notFilteredBody={notFilteredBody}
             notFilteredButton={
               <ConditionalTooltip
-                content='You do not have the required permissions to perform this action.'
-                show={!rbac?.templateWrite}
+                content={`You do not have the required ${missingRequirements} to perform this action.`}
+                show={isMissingRequirements}
                 setDisabled
               >
                 <Button

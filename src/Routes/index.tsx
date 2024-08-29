@@ -42,7 +42,7 @@ import DeleteTemplateModal from 'Pages/Templates/TemplatesTable/components/Delet
 
 export default function RepositoriesRoutes() {
   const key = useMemo(() => Math.random(), []);
-  const { zeroState, features, rbac } = useAppContext();
+  const { zeroState, features, rbac, subscriptions } = useAppContext();
   return (
     <ErrorPage>
       <Routes key={key}>
@@ -117,7 +117,7 @@ export default function RepositoriesRoutes() {
           <Route path='*' element={<Navigate to={TEMPLATES_ROUTE} replace />} />
         </Route>
         <Route path={TEMPLATES_ROUTE} element={<TemplatesTable />}>
-          {rbac?.templateWrite ? (
+          {rbac?.templateWrite && subscriptions?.RedHatEnterpriseLinux ? (
             <>
               <Route key='1' path={ADD_ROUTE} element={<AddTemplate />} />
               <Route key='2' path={`:templateUUID/${EDIT_ROUTE}`} element={<AddTemplate />} />

@@ -51,7 +51,7 @@ export type Filters = 'Name' | 'Version' | 'Architecture';
 
 const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
   const classes = useStyles();
-  const { rbac } = useAppContext();
+  const { rbac, subscriptions } = useAppContext();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const filters = ['Name', 'Version', 'Architecture'];
@@ -64,6 +64,14 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
 
   const { distribution_arches = [], distribution_versions = [] } =
     queryClient.getQueryData<RepositoryParamsResponse>(REPOSITORY_PARAMS_KEY) || {};
+
+  const hasRHELSubscription = subscriptions?.RedHatEnterpriseLinux || false;
+  const isMissingRequirements = !rbac?.templateWrite || !hasRHELSubscription;
+  const missingRequirements: string = !rbac?.templateWrite
+    ? 'permission'
+    : !hasRHELSubscription
+      ? 'subscription (RHEL)'
+      : 'permission';
 
   const clearFilters = () => {
     setFilterType('Name');
@@ -210,8 +218,8 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
         </FlexItem>
         <FlexItem className={classes.repositoryActions}>
           <ConditionalTooltip
-            content='You do not have the required permissions to perform this action.'
-            show={!rbac?.templateWrite}
+            content={`You do not have the required ${missingRequirements} to perform this action.`}
+            show={isMissingRequirements}
             setDisabled
           >
             <Button

@@ -18,7 +18,7 @@ export default function TemplateActionDropdown() {
   const baseRoute = mainRoute + `${TEMPLATES_ROUTE}`;
   const navigate = useNavigate();
   const { templateUUID: uuid } = useParams();
-  const { rbac } = useAppContext();
+  const { rbac, subscriptions } = useAppContext();
 
   const onToggleClick = () => {
     setIsOpen(!isOpen);
@@ -40,6 +40,14 @@ export default function TemplateActionDropdown() {
     }
   };
 
+  const hasRHELSubscription = subscriptions?.RedHatEnterpriseLinux || false;
+  const isMissingRequirements = !rbac?.templateWrite || !hasRHELSubscription;
+  const missingRequirements: string = !rbac?.templateWrite
+    ? 'permission'
+    : !hasRHELSubscription
+      ? 'subscription (RHEL)'
+      : 'permission';
+
   return (
     <Dropdown
       isOpen={isOpen}
@@ -47,8 +55,8 @@ export default function TemplateActionDropdown() {
       onOpenChange={(isOpen: boolean) => setIsOpen(isOpen)}
       toggle={(toggleRef: React.Ref<MenuToggleElement>) => (
         <ConditionalTooltip
-          content='You do not have the required permissions to perform this action.'
-          show={!rbac?.templateWrite}
+          content={`You do not have the required ${missingRequirements} to perform this action.`}
+          show={isMissingRequirements}
           setDisabled
         >
           <MenuToggle ref={toggleRef} onClick={onToggleClick} isExpanded={isOpen}>
