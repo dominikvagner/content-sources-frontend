@@ -117,7 +117,7 @@ export default function RepositoriesRoutes() {
           <Route path='*' element={<Navigate to={TEMPLATES_ROUTE} replace />} />
         </Route>
         <Route path={TEMPLATES_ROUTE} element={<TemplatesTable />}>
-          {rbac?.templateWrite && subscriptions?.RedHatEnterpriseLinux ? (
+          {rbac?.templateWrite && subscriptions?.red_hat_enterprise_linux ? (
             <>
               <Route key='1' path={ADD_ROUTE} element={<AddTemplate />} />
               <Route key='2' path={`:templateUUID/${EDIT_ROUTE}`} element={<AddTemplate />} />

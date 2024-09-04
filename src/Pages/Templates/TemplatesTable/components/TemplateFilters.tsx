@@ -65,7 +65,7 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
   const { distribution_arches = [], distribution_versions = [] } =
     queryClient.getQueryData<RepositoryParamsResponse>(REPOSITORY_PARAMS_KEY) || {};
 
-  const hasRHELSubscription = subscriptions?.RedHatEnterpriseLinux || false;
+  const hasRHELSubscription = subscriptions?.red_hat_enterprise_linux || false;
   const isMissingRequirements = !rbac?.templateWrite || !hasRHELSubscription;
   const missingRequirements: string = !rbac?.templateWrite
     ? 'permission'

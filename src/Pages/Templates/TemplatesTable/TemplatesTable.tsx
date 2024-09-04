@@ -165,7 +165,7 @@ const TemplatesTable = () => {
 
   const countIsZero = count === 0;
 
-  const hasRHELSubscription = subscriptions?.RedHatEnterpriseLinux || false;
+  const hasRHELSubscription = subscriptions?.red_hat_enterprise_linux || false;
   const isMissingRequirements = !rbac?.templateWrite || !hasRHELSubscription;
   const missingRequirements: string = !rbac?.templateWrite
     ? 'permission'
