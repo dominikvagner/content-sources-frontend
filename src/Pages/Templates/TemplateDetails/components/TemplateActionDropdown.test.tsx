@@ -14,7 +14,10 @@ jest.mock('services/Templates/TemplateQueries', () => ({
 }));
 
 jest.mock('middleware/AppContext', () => ({
-  useAppContext: () => ({ rbac: { templateWrite: true }, subscriptions: { RedHatEnterpriseLinux: true } }),
+  useAppContext: () => ({
+    rbac: { templateWrite: true },
+    subscriptions: { red_hat_enterprise_linux: true },
+  }),
 }));
 
 it('expect TemplateActionDropdown to render all buttons', async () => {

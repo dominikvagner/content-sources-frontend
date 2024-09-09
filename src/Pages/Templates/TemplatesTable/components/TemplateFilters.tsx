@@ -65,13 +65,10 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
   const { distribution_arches = [], distribution_versions = [] } =
     queryClient.getQueryData<RepositoryParamsResponse>(REPOSITORY_PARAMS_KEY) || {};
 
-  const hasRHELSubscription = subscriptions?.red_hat_enterprise_linux || false;
+  const hasRHELSubscription = !!subscriptions?.red_hat_enterprise_linux;
   const isMissingRequirements = !rbac?.templateWrite || !hasRHELSubscription;
-  const missingRequirements: string = !rbac?.templateWrite
-    ? 'permission'
-    : !hasRHELSubscription
-      ? 'subscription (RHEL)'
-      : 'permission';
+  const missingRequirements =
+    rbac?.templateWrite && !hasRHELSubscription ? 'subscription (RHEL)' : 'permission';
 
   const clearFilters = () => {
     setFilterType('Name');

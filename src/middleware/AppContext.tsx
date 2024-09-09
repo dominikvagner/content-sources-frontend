@@ -17,9 +17,8 @@ const { appname } = PackageJson.insights;
 export interface AppContextInterface {
   rbac?: Record<string, boolean>;
   features: Features | null;
-  isFetchingFeatures: boolean;
-  subscriptions: Subscriptions | null;
-  isFetchingSubscriptions: boolean;
+  isFetchingPermissions: boolean;
+  subscriptions?: Subscriptions;
   contentOrigin: ContentOrigin;
   setContentOrigin: (contentOrigin: ContentOrigin) => void;
   chrome?: ChromeAPI;
@@ -36,8 +35,8 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
   const chrome = useChrome();
   const [contentOrigin, setContentOrigin] = useState<ContentOrigin>(ContentOrigin.CUSTOM);
   const { fetchFeatures, isLoading: isFetchingFeatures } = useFetchFeaturesQuery();
-  const [subscriptions, setSubscriptions] = useState<Subscriptions | null>(null);
-  const { fetchSubscriptions, isLoading: isFetchingSubscriptions } = useFetchSubscriptionsQuery();
+  const { fetchSubscriptions: subscriptions, isLoading: isFetchingSubscriptions } =
+    useFetchSubscriptionsQuery();
 
   useEffect(() => {
     // Get chrome and register app
@@ -64,11 +63,6 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
       const fetchedFeatures = await fetchFeatures();
       setFeatures(fetchedFeatures);
     })();
-
-    (async () => {
-      const fetchedSubscriptions = await fetchSubscriptions();
-      setSubscriptions(fetchedSubscriptions);
-    })();
   }, [!!chrome]);
 
   return (
@@ -76,9 +70,8 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
       value={{
         rbac: rbac,
         features: features,
-        isFetchingFeatures: isFetchingFeatures,
+        isFetchingPermissions: isFetchingFeatures || isFetchingSubscriptions,
         subscriptions: subscriptions,
-        isFetchingSubscriptions: isFetchingSubscriptions,
         contentOrigin,
         setContentOrigin,
         chrome: chrome as ChromeAPI,

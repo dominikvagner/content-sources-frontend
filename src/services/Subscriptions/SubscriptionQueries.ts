@@ -1,27 +1,27 @@
-import { useState } from 'react';
 import { Subscriptions, getSubscriptions } from './SubscriptionApi';
 import useErrorNotification from 'Hooks/useErrorNotification';
+import { useQuery } from 'react-query';
+
+const SUBSCRIPTION_CHECK_KEY = 'SUBSCRIPTION_CHECK_KEY';
 
 export const useFetchSubscriptionsQuery = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const errorNotifier = useErrorNotification();
-
-  const fetchSubscriptions = async (): Promise<Subscriptions | null> => {
-    setIsLoading(true);
-    let subscriptions: Subscriptions | null = null;
-    try {
-      subscriptions = await getSubscriptions();
-    } catch (err) {
-      errorNotifier(
-        'Error fetching subscriptions',
-        'An error occurred',
-        err,
-        'fetch-subscriptions-error',
-      );
-    }
-    setIsLoading(false);
-    return subscriptions;
-  };
+  const { data: fetchSubscriptions, isLoading } = useQuery<Subscriptions>(
+    [SUBSCRIPTION_CHECK_KEY],
+    () => getSubscriptions(),
+    {
+      keepPreviousData: true,
+      optimisticResults: true,
+      staleTime: 60000,
+      onError: (err) =>
+        errorNotifier(
+          'Error fetching subscriptions',
+          'An error occurred',
+          err,
+          'fetch-subscriptions-error',
+        ),
+    },
+  );
 
   return { fetchSubscriptions, isLoading };
 };

@@ -15,7 +15,7 @@ import { REPOSITORIES_ROUTE } from './Routes/constants';
 import usePageSafe from 'Hooks/usePageSafe';
 
 export default function App() {
-  const { rbac, isFetchingFeatures, zeroState, setZeroState } = useAppContext();
+  const { rbac, isFetchingPermissions, zeroState, setZeroState } = useAppContext();
   const storedPerPage = Number(localStorage.getItem(perPageKey)) || 20;
   const { pathname } = useLocation();
   const pageSafe = usePageSafe();
@@ -50,7 +50,7 @@ export default function App() {
     }
   }, [data.data.length]);
 
-  if (!rbac || isFetchingFeatures || isLoading) {
+  if (!rbac || isFetchingPermissions || isLoading) {
     return (
       <Bullseye>
         <div data-ouia-safe={false} />

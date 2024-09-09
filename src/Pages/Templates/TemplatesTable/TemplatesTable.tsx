@@ -75,7 +75,7 @@ const TemplatesTable = () => {
   const classes = useStyles();
   const rootPath = useRootPath();
   const navigate = useNavigate();
-  const { rbac, subscriptions, isFetchingSubscriptions } = useAppContext();
+  const { rbac, subscriptions } = useAppContext();
   const storedPerPage = Number(localStorage.getItem(perPageKey)) || 20;
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(storedPerPage);
@@ -165,13 +165,10 @@ const TemplatesTable = () => {
 
   const countIsZero = count === 0;
 
-  const hasRHELSubscription = subscriptions?.red_hat_enterprise_linux || false;
+  const hasRHELSubscription = !!subscriptions?.red_hat_enterprise_linux;
   const isMissingRequirements = !rbac?.templateWrite || !hasRHELSubscription;
-  const missingRequirements: string = !rbac?.templateWrite
-    ? 'permission'
-    : !hasRHELSubscription
-      ? 'subscription (RHEL)'
-      : 'permission';
+  const missingRequirements =
+    rbac?.templateWrite && !hasRHELSubscription ? 'subscription (RHEL)' : 'permission';
 
   if (countIsZero && notFiltered && !isLoading)
     return (
