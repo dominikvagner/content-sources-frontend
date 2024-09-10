@@ -18,4 +18,5 @@ it('expect TemplateDetailsTabs to render all tabs, and have Advisories selected'
   expect(queryByText('Advisories')).toBeInTheDocument();
   expect(queryByText('Systems')).toBeInTheDocument();
   expect(queryByText('Advisories')!.closest('button')).toHaveAttribute('aria-selected', 'true');
+  expect(queryByText('Repositories'))!.toBeInTheDocument();
 });

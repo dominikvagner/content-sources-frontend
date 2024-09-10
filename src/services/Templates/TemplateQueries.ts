@@ -15,15 +15,17 @@ import {
   type SnapshotRpmCollectionResponse,
   getTemplatePackages,
   getTemplateErrata,
+  getTemplateSnapshots,
 } from './TemplateApi';
 import useNotification from 'Hooks/useNotification';
 import { AlertVariant } from '@patternfly/react-core';
-import type { ErrataResponse } from 'services/Content/ContentApi';
+import { ErrataResponse, SnapshotListResponse } from 'services/Content/ContentApi';
 
 export const FETCH_TEMPLATE_KEY = 'FETCH_TEMPLATE_KEY';
 export const GET_TEMPLATES_KEY = 'GET_TEMPLATES_KEY';
 export const GET_TEMPLATE_PACKAGES_KEY = 'GET_TEMPLATE_PACKAGES_KEY';
 export const TEMPLATE_ERRATA_KEY = 'TEMPLATE_ERRATA_KEY';
+export const TEMPLATE_SNAPSHOTS_KEY = 'TEMPLATE_SNAPSHOTS_KEY';
 
 export const useEditTemplateQuery = (queryClient: QueryClient, request: EditTemplateRequest) => {
   const errorNotifier = useErrorNotification();
@@ -116,6 +118,32 @@ export const useFetchTemplateErrataQuery = (
           'An error occurred',
           err,
           'Template-errata-list-error',
+        );
+      },
+      keepPreviousData: true,
+      staleTime: 60000,
+    },
+  );
+};
+
+export const useFetchTemplateSnapshotsQuery = (
+  uuid: string,
+  page: number,
+  limit: number,
+  search: string,
+  sortBy: string,
+) => {
+  const errorNotifier = useErrorNotification();
+  return useQuery<SnapshotListResponse>(
+    [TEMPLATE_SNAPSHOTS_KEY, uuid, page, limit, search, sortBy],
+    () => getTemplateSnapshots(uuid, page, limit, search, sortBy),
+    {
+      onError: (err) => {
+        errorNotifier(
+          'Unable to find snapshots for the given template UUID.',
+          'An error occurred',
+          err,
+          'template-snapshots-list-error',
         );
       },
       keepPreviousData: true,

@@ -202,6 +202,8 @@ export interface SnapshotItem {
   content_counts: ContentCounts;
   added_counts: ContentCounts;
   removed_counts: ContentCounts;
+  repository_name: string;
+  repository_uuid: string;
 }
 
 export type SnapshotByDateResponse = {

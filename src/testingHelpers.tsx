@@ -224,6 +224,8 @@ export const defaultSnapshotItem: SnapshotItem = {
     'rpm.packageenvironment': 1,
     'rpm.packagegroup': 1,
   },
+  repository_name: 'SteveTheRepo',
+  repository_uuid: '053603c7-6ef0-4abe-8542-feacb8f7d575',
 };
 
 export const defaultContentItemWithSnapshot: ContentItem = {

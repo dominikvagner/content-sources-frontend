@@ -1,5 +1,11 @@
 import axios from 'axios';
-import { Links, Meta, type ErrataResponse, type PackageItem } from '../Content/ContentApi';
+import {
+  Links,
+  Meta,
+  type ErrataResponse,
+  type PackageItem,
+  SnapshotListResponse,
+} from '../Content/ContentApi';
 import { objectToUrlParams } from 'helpers';
 
 export interface TemplateRequest {
@@ -117,6 +123,30 @@ export const getTemplateErrata: (
       search,
       type: type.join(',').toLowerCase(),
       severity: severity.join(','),
+      sort_by: sortBy,
+    })}`,
+  );
+  return data;
+};
+
+export const getTemplateSnapshots: (
+  uuid: string,
+  page: number,
+  limit: number,
+  search: string,
+  sortBy: string,
+) => Promise<SnapshotListResponse> = async (
+  uuid: string,
+  page: number,
+  limit: number,
+  search: string,
+  sortBy: string,
+) => {
+  const { data } = await axios.get(
+    `/api/content-sources/v1/templates/${uuid}/snapshots/?${objectToUrlParams({
+      offset: ((page - 1) * limit).toString(),
+      limit: limit?.toString(),
+      repository_search: search,
       sort_by: sortBy,
     })}`,
   );
