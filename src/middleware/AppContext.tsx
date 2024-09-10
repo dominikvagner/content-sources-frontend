@@ -35,8 +35,7 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
   const chrome = useChrome();
   const [contentOrigin, setContentOrigin] = useState<ContentOrigin>(ContentOrigin.CUSTOM);
   const { fetchFeatures, isLoading: isFetchingFeatures } = useFetchFeaturesQuery();
-  const { fetchSubscriptions: subscriptions, isLoading: isFetchingSubscriptions } =
-    useFetchSubscriptionsQuery();
+  const { data: subscriptions, isLoading: isFetchingSubscriptions } = useFetchSubscriptionsQuery();
 
   useEffect(() => {
     // Get chrome and register app
