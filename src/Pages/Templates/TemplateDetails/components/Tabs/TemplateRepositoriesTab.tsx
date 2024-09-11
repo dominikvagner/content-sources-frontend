@@ -15,7 +15,7 @@ import {
   TextInput,
 } from '@patternfly/react-core';
 import { SearchIcon } from '@patternfly/react-icons';
-import { global_BackgroundColor_100, global_Color_200 } from '@patternfly/react-tokens';
+import { global_BackgroundColor_100 } from '@patternfly/react-tokens';
 
 import { useFetchTemplateSnapshotsQuery } from 'services/Templates/TemplateQueries';
 import TemplateRepositoriesTable from 'Pages/Templates/TemplateDetails/components/Tables/TemplateRepositoriesTable';
@@ -23,11 +23,6 @@ import TemplateRepositoriesTable from 'Pages/Templates/TemplateDetails/component
 import type { ThProps } from '@patternfly/react-table';
 
 const useStyles = createUseStyles({
-  description: {
-    paddingTop: '12px', // 4px on the title bottom padding makes this the "standard" 16 total padding
-    paddingBottom: '8px',
-    color: global_Color_200.value,
-  },
   mainContainer: {
     backgroundColor: global_BackgroundColor_100.value,
     display: 'flex',
@@ -123,7 +118,7 @@ export default function TemplateRepositoriesTab() {
           <TextInput
             id='search'
             ouiaId='name_search'
-            placeholder='Filter by repository name'
+            placeholder='Filter by name'
             value={searchQuery}
             onChange={(_event, value) => setSearchQuery(value)}
           />

@@ -25,14 +25,7 @@ import {
   ThProps,
   Tr,
 } from '@patternfly/react-table';
-import {
-  global_BackgroundColor_100,
-  global_danger_color_200,
-  global_success_color_200,
-} from '@patternfly/react-tokens';
-
-const red = global_danger_color_200.value;
-const green = global_success_color_200.value;
+import { global_BackgroundColor_100 } from '@patternfly/react-tokens';
 
 const useStyles = createUseStyles({
   mainContainer: {
@@ -41,13 +34,6 @@ const useStyles = createUseStyles({
     flexDirection: 'column',
     height: '100%',
   },
-  expansionBox: {
-    padding: '16px 0',
-  },
-  rightMargin: { marginRight: '6px' },
-  red: { extend: 'rightMargin', color: red },
-  green: { extend: 'rightMargin', color: green },
-  retainSpaces: { whiteSpace: 'pre-line' },
 });
 
 interface Props {

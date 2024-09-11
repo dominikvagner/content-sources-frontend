@@ -11,7 +11,10 @@ import {
 } from 'Routes/constants';
 
 type ContentTabType = typeof CONTENT_ROUTE | typeof SYSTEMS_ROUTE;
-type ContentSubTabType = typeof PACKAGES_ROUTE | typeof ADVISORIES_ROUTE;
+type ContentSubTabType =
+  | typeof PACKAGES_ROUTE
+  | typeof ADVISORIES_ROUTE
+  | typeof REPOSITORIES_ROUTE;
 
 export default function TemplateDetailsTabs() {
   const { pathname } = useLocation();
