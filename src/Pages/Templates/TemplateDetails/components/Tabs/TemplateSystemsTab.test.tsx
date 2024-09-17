@@ -26,7 +26,10 @@ jest.mock('services/Systems/SystemsQueries', () => ({
 
 jest.mock('middleware/AppContext');
 
-(useAppContext as jest.Mock).mockImplementation(() => ({ rbac: { templateWrite: true } }));
+(useAppContext as jest.Mock).mockImplementation(() => ({
+  rbac: { templateWrite: true },
+  subscriptions: { red_hat_enterprise_linux: true },
+}));
 
 (useListSystemsByTemplateId as jest.Mock).mockImplementation(() => ({
   isLoading: false,

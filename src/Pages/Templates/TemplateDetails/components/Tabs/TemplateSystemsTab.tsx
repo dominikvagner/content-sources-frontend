@@ -69,7 +69,7 @@ export default function TemplateSystemsTab() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { templateUUID: uuid } = useParams();
-  const { rbac } = useAppContext();
+  const { rbac, subscriptions } = useAppContext();
 
   const storedPerPage = Number(localStorage.getItem(perPageKey)) || 20;
   const [page, setPage] = useState(1);
@@ -183,6 +183,11 @@ export default function TemplateSystemsTab() {
         }
       : undefined;
 
+  const hasRHELSubscription = !!subscriptions?.red_hat_enterprise_linux;
+  const isMissingRequirements = !rbac?.templateWrite || !hasRHELSubscription;
+  const missingRequirements =
+    rbac?.templateWrite && !hasRHELSubscription ? 'subscription (RHEL)' : 'permission';
+
   if (isLoading) {
     return <Loader />;
   }
@@ -209,8 +214,8 @@ export default function TemplateSystemsTab() {
           </InputGroupItem>
           <FlexItem className={classes.ctions}>
             <ConditionalTooltip
-              content='You do not have the required permissions to perform this action.'
-              show={!rbac?.templateWrite}
+              content={`You do not have the required ${missingRequirements} to perform this action.`}
+              show={isMissingRequirements}
               setDisabled
             >
               <Button
@@ -225,8 +230,8 @@ export default function TemplateSystemsTab() {
             </ConditionalTooltip>
           </FlexItem>
           <ConditionalTooltip
-            content='You do not have the required permissions to perform this action.'
-            show={!rbac?.templateWrite}
+            content={`You do not have the required ${missingRequirements} to perform this action.`}
+            show={isMissingRequirements}
             setDisabled
           >
             <SystemsDeleteKebab
@@ -257,8 +262,8 @@ export default function TemplateSystemsTab() {
             notFilteredBody='To get started, add this template to a system.'
             notFilteredButton={
               <ConditionalTooltip
-                content='You do not have the required permissions to perform this action.'
-                show={!rbac?.templateWrite}
+                content={`You do not have the required ${missingRequirements} to perform this action.`}
+                show={isMissingRequirements}
                 setDisabled
               >
                 <Button
@@ -286,7 +291,7 @@ export default function TemplateSystemsTab() {
           systemsList={systemsList}
           sortParams={sortParams}
           selected={selectedList}
-          editAllowed={!!rbac?.templateWrite}
+          editAllowed={!isMissingRequirements}
           setSelected={(id) => handleSelectItem(id)}
         />
       </Hide>

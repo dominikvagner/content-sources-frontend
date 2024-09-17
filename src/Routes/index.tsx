@@ -112,9 +112,12 @@ export default function RepositoriesRoutes() {
             <Route path='*' element={<Navigate to={PACKAGES_ROUTE} replace />} />
           </Route>
           <Route path={SYSTEMS_ROUTE} element={<TemplateSystemsTab />}>
-            {rbac?.templateWrite ? <Route path={ADD_ROUTE} element={<AddSystemModal />} /> : ''}
+            {rbac?.templateWrite && subscriptions?.red_hat_enterprise_linux ? (
+              <Route path={ADD_ROUTE} element={<AddSystemModal />} />
+            ) : (
+              ''
+            )}
           </Route>
-          <Route path='*' element={<Navigate to={TEMPLATES_ROUTE} replace />} />
         </Route>
         <Route path={TEMPLATES_ROUTE} element={<TemplatesTable />}>
           {rbac?.templateWrite && subscriptions?.red_hat_enterprise_linux ? (
