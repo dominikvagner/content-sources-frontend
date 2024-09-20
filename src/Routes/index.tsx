@@ -130,6 +130,14 @@ export default function RepositoriesRoutes() {
                 element={<DeleteTemplateModal />}
               />
             </>
+          ) : rbac?.templateWrite ? (
+            <>
+              <Route
+                key='3'
+                path={`:templateUUID/${DELETE_ROUTE}`}
+                element={<DeleteTemplateModal />}
+              />
+            </>
           ) : (
             ''
           )}

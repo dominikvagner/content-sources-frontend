@@ -7,6 +7,7 @@ import {
   Pagination,
   PaginationVariant,
   Spinner,
+  TooltipPosition,
 } from '@patternfly/react-core';
 import {
   ActionsColumn,
@@ -66,6 +67,10 @@ const useStyles = createUseStyles({
   },
   leftPaddingZero: {
     paddingLeft: 0,
+  },
+  disabledButton: {
+    pointerEvents: 'auto',
+    cursor: 'default',
   },
 });
 
@@ -298,15 +303,28 @@ const TemplatesTable = () => {
                       </Td>
                       <Td>
                         <ConditionalTooltip
-                          content={`You do not have the required ${missingRequirements} to perform this action.`}
-                          show={isMissingRequirements}
+                          content='You do not have the required permission to perform this action.'
+                          show={!rbac?.templateWrite}
                           setDisabled
                         >
                           <ActionsColumn
                             items={[
                               {
+                                id: 'actions-column-edit',
+                                className: isMissingRequirements ? classes.disabledButton : '',
                                 title: 'Edit',
                                 onClick: () => navigate(`${uuid}/edit`),
+                                isDisabled: isMissingRequirements,
+                                tooltipProps: isMissingRequirements
+                                  ? {
+                                      isVisible: isMissingRequirements,
+                                      content: `You do not have the required ${missingRequirements} to perform this action.`,
+                                      position: TooltipPosition.left,
+                                      triggerRef: () =>
+                                        document.getElementById('actions-column-edit') ||
+                                        document.body,
+                                    }
+                                  : undefined,
                               },
                               { isSeparator: true },
                               {
