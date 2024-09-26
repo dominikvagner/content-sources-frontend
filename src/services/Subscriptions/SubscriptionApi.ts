@@ -9,3 +9,11 @@ export const getSubscriptions: () => Promise<Subscriptions> = async () => {
 
   return data;
 };
+
+export const getEphemeralSubscriptions: () => Promise<Subscriptions> = async () => {
+  const ephemeralSubscriptions: Subscriptions = {
+    red_hat_enterprise_linux: true,
+  };
+
+  return Promise.resolve(ephemeralSubscriptions);
+};
