@@ -132,6 +132,7 @@ export default function DeleteContentModal() {
     version: '',
     search: '',
     repository_uuids: uuids.join(','),
+    snapshot_uuids: '',
   };
 
   const {

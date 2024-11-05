@@ -39,11 +39,19 @@ import {
   type EditContentRequestItem,
   type ValidateContentRequestItem,
   addUploads,
-  type AddUploadRequest, getLatestRepoConfigFile,
+  type AddUploadRequest,
+  deleteSnapshots,
+  getLatestRepoConfigFile,
 } from './ContentApi';
 import { ADMIN_TASK_LIST_KEY } from '../AdminTasks/AdminTaskQueries';
 import useErrorNotification from 'Hooks/useErrorNotification';
 import useNotification from 'Hooks/useNotification';
+import {
+  GET_TEMPLATE_PACKAGES_KEY,
+  TEMPLATE_ERRATA_KEY,
+  TEMPLATE_SNAPSHOTS_KEY,
+  TEMPLATES_FOR_SNAPSHOTS,
+} from '../Templates/TemplateQueries';
 
 export const CONTENT_LIST_KEY = 'CONTENT_LIST_KEY';
 export const POPULAR_REPOSITORIES_LIST_KEY = 'POPULAR_REPOSITORIES_LIST_KEY';
@@ -758,7 +766,6 @@ export const useIntrospectRepositoryMutate = (
         });
       }
       queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
     },
     // If the mutation fails, use the context returned from onMutate to roll back
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -815,4 +822,69 @@ export const useGetLatestRepoConfigFileQuery = (repo_uuid: string) => {
         },
       },
   );
+};
+
+export const useBulkDeleteSnapshotsMutate = (
+  queryClient: QueryClient,
+  repoUuid: string,
+  selected: Set<string>,
+) => {
+  const uuids = Array.from(selected);
+  const snapshotListKeyArray = [LIST_SNAPSHOTS_KEY, repoUuid];
+  const errorNotifier = useErrorNotification();
+
+  return useMutation(() => deleteSnapshots(repoUuid, uuids), {
+    onMutate: async (checkedSnapshots: Set<string>) => {
+      await queryClient.cancelQueries(snapshotListKeyArray);
+      const previousData: Partial<SnapshotListResponse> =
+        queryClient.getQueryData(snapshotListKeyArray) || {};
+
+      const newMeta = previousData.meta
+        ? {
+            ...previousData.meta,
+            count: previousData.meta.count ? previousData.meta.count - checkedSnapshots.size : 1,
+          }
+        : undefined;
+
+      queryClient.setQueryData(snapshotListKeyArray, () => ({
+        ...previousData,
+        data: previousData.data?.filter((data) => !checkedSnapshots.has(data.uuid)),
+        meta: newMeta,
+      }));
+      return { previousData, newMeta, queryClient };
+    },
+    onSuccess: (_data, _variables, context) => {
+      const { newMeta } = context as {
+        newMeta: Meta;
+      };
+      queryClient.setQueriesData(LIST_SNAPSHOTS_KEY, (data: Partial<SnapshotListResponse> = {}) => {
+        if (data?.meta?.count) {
+          data.meta.count = newMeta?.count;
+        }
+        return data;
+      });
+      queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
+      queryClient.invalidateQueries(TEMPLATE_SNAPSHOTS_KEY);
+      queryClient.invalidateQueries(TEMPLATES_FOR_SNAPSHOTS);
+      queryClient.invalidateQueries(TEMPLATE_ERRATA_KEY);
+      queryClient.invalidateQueries(GET_TEMPLATE_PACKAGES_KEY);
+      queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
+      queryClient.invalidateQueries(SNAPSHOT_ERRATA_KEY);
+      queryClient.invalidateQueries(SNAPSHOT_PACKAGES_KEY);
+    },
+    onError: (err: { response?: { data: ErrorResponse } }, _newData, context) => {
+      if (context) {
+        const { previousData } = context as {
+          previousData: SnapshotListResponse;
+        };
+        queryClient.setQueryData(snapshotListKeyArray, previousData);
+      }
+      errorNotifier(
+        'Error deleting snapshot from the snapshot list',
+        'An error occured',
+        err,
+        'bulk-delete-error',
+      );
+    },
+  });
 };

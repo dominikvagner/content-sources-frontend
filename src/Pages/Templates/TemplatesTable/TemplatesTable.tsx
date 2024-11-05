@@ -110,6 +110,7 @@ const TemplatesTable = () => {
     version: '',
     search: '',
     repository_uuids: '',
+    snapshot_uuids: '',
   };
 
   const [filterData, setFilterData] = useState<TemplateFilterData>(defaultValues);

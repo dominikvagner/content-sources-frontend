@@ -29,6 +29,7 @@ it('Render loading state (disabled)', async () => {
         version: '',
         arch: '',
         repository_uuids: '',
+        snapshot_uuids: '',
       }}
     />,
   );
@@ -46,6 +47,7 @@ it('Select a filter of each type and ensure chips are present', async () => {
         version: '',
         arch: '',
         repository_uuids: '',
+        snapshot_uuids: '',
       }}
     />,
   );

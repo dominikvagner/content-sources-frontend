@@ -60,6 +60,7 @@ export type TemplateFilterData = {
   version: string;
   search: string;
   repository_uuids: string;
+  snapshot_uuids: string;
 };
 
 export const getTemplates: (
@@ -71,7 +72,7 @@ export const getTemplates: (
   page,
   limit,
   sortBy,
-  { search, arch, version, repository_uuids },
+  { search, arch, version, repository_uuids, snapshot_uuids },
 ) => {
   const { data } = await axios.get(
     `/api/content-sources/v1/templates/?${objectToUrlParams({
@@ -82,6 +83,7 @@ export const getTemplates: (
       version,
       sort_by: sortBy,
       repository_uuids: repository_uuids,
+      snapshot_uuids: snapshot_uuids,
     })}`,
   );
   return data;
@@ -156,6 +158,23 @@ export const getTemplateSnapshots: (
     })}`,
   );
   return data;
+};
+
+export const getTemplatesForSnapshots: (
+  snapshotUuids: string[],
+) => Promise<Map<string, TemplateItem[]>> = async (snapshotUuids: string[]) => {
+  const map = new Map<string, TemplateItem[]>();
+  for (const s of snapshotUuids) {
+    const { data: templateResp } = await axios.get<TemplateCollectionResponse>(
+      `/api/content-sources/v1/templates/?${objectToUrlParams({
+        offset: '0',
+        limit: '-1',
+        snapshot_uuids: s,
+      })}`,
+    );
+    map.set(s, templateResp.data);
+  }
+  return map;
 };
 
 export const EditTemplate: (request: EditTemplateRequest) => Promise<void> = async (request) => {

@@ -16,6 +16,7 @@ import {
   getTemplatePackages,
   getTemplateErrata,
   getTemplateSnapshots,
+  getTemplatesForSnapshots,
 } from './TemplateApi';
 import useNotification from 'Hooks/useNotification';
 import { AlertVariant } from '@patternfly/react-core';
@@ -26,6 +27,7 @@ export const GET_TEMPLATES_KEY = 'GET_TEMPLATES_KEY';
 export const GET_TEMPLATE_PACKAGES_KEY = 'GET_TEMPLATE_PACKAGES_KEY';
 export const TEMPLATE_ERRATA_KEY = 'TEMPLATE_ERRATA_KEY';
 export const TEMPLATE_SNAPSHOTS_KEY = 'TEMPLATE_SNAPSHOTS_KEY';
+export const TEMPLATES_FOR_SNAPSHOTS = 'TEMPLATES_BY_SNAPSHOTS';
 
 const TEMPLATE_LIST_POLLING_TIME = 15000; // 15 seconds
 const TEMPLATE_FETCH_POLLING_TIME = 5000; // 5 seconds
@@ -45,6 +47,7 @@ export const useEditTemplateQuery = (queryClient: QueryClient, request: EditTemp
       queryClient.invalidateQueries(FETCH_TEMPLATE_KEY);
       queryClient.invalidateQueries(GET_TEMPLATE_PACKAGES_KEY);
       queryClient.invalidateQueries(TEMPLATE_ERRATA_KEY);
+      queryClient.invalidateQueries(TEMPLATES_FOR_SNAPSHOTS);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
@@ -156,6 +159,26 @@ export const useFetchTemplateSnapshotsQuery = (
       },
       keepPreviousData: true,
       staleTime: 60000,
+    },
+  );
+};
+
+export const useFetchTemplatesForSnapshots = (repoUuid: string, snapshotUuids: string[]) => {
+  const errorNotifier = useErrorNotification();
+  return useQuery<Map<string, TemplateItem[]>>(
+    [TEMPLATES_FOR_SNAPSHOTS, repoUuid, ...snapshotUuids],
+    () => getTemplatesForSnapshots(snapshotUuids),
+    {
+      onError: (err) => {
+        errorNotifier(
+          'Unable to find templates for the given snapshots.',
+          'An error occurred',
+          err,
+          'template-for-snapshots-error',
+        );
+      },
+      keepPreviousData: true,
+      staleTime: 20000,
     },
   );
 };

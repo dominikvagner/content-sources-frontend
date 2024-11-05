@@ -41,6 +41,7 @@ import ViewPayloadModal from 'Pages/Repositories/AdminTaskTable/components/ViewP
 import DeleteTemplateModal from 'Pages/Templates/TemplatesTable/components/DeleteTemplateModal';
 import TemplateRepositoriesTab from 'Pages/Templates/TemplateDetails/components/Tabs/TemplateRepositoriesTab';
 import UploadContent from 'Pages/Repositories/ContentListTable/components/UploadContent/UploadContent';
+import DeleteSnapshotsModal from 'Pages/Repositories/ContentListTable/components/SnapshotListModal/DeleteSnapshotsModal/DeleteSnapshotsModal';
 
 export default function RepositoriesRoutes() {
   const key = useMemo(() => Math.random(), []);
@@ -75,7 +76,17 @@ export default function RepositoriesRoutes() {
                   key={`:repoUUID/${SNAPSHOTS_ROUTE}`}
                   path={`:repoUUID/${SNAPSHOTS_ROUTE}`}
                   element={<SnapshotListModal />}
-                />
+                >
+                  {rbac?.repoWrite ? (
+                    <Route
+                      key={DELETE_ROUTE}
+                      path={DELETE_ROUTE}
+                      element={<DeleteSnapshotsModal />}
+                    />
+                  ) : (
+                    ''
+                  )}
+                </Route>
                 <Route
                   key={`:repoUUID/${SNAPSHOTS_ROUTE}/:snapshotUUID`}
                   path={`:repoUUID/${SNAPSHOTS_ROUTE}/:snapshotUUID`}

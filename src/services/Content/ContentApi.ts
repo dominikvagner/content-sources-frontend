@@ -353,6 +353,17 @@ export const deleteContentListItems: (uuids: string[]) => Promise<void> = async 
   return data;
 };
 
+export const deleteSnapshots: (repoUuid: string, uuids: string[]) => Promise<void> = async (
+  repoUuid: string,
+  uuids: string[],
+) => {
+  const { data } = await axios.post(
+    `/api/content-sources/v1/repositories/${repoUuid}/snapshots/bulk_delete/`,
+    { uuids },
+  );
+  return data;
+};
+
 export const getSnapshotsByDate = async (
   uuids: string[],
   date: string,

@@ -73,7 +73,7 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
     setSearchQuery('');
     setSelectedVersion('');
     setSelectedArch('');
-    setFilterData({ search: '', version: '', arch: '', repository_uuids: '' });
+    setFilterData({ search: '', version: '', arch: '', repository_uuids: '', snapshot_uuids: '' });
   };
 
   useEffect(() => {
@@ -108,6 +108,7 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
       version: getLabels('version', debouncedSelectedVersion),
       arch: getLabels('arch', debouncedSelectedArch),
       repository_uuids: '',
+      snapshot_uuids: '',
     });
   }, [debouncedSearchQuery, debouncedSelectedVersion, debouncedSelectedArch]);
 
