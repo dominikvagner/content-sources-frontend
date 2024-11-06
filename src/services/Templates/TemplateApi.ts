@@ -163,18 +163,25 @@ export const getTemplateSnapshots: (
 export const getTemplatesForSnapshots: (
   snapshotUuids: string[],
 ) => Promise<Map<string, TemplateItem[]>> = async (snapshotUuids: string[]) => {
-  const map = new Map<string, TemplateItem[]>();
-  for (const s of snapshotUuids) {
-    const { data: templateResp } = await axios.get<TemplateCollectionResponse>(
+  const requests = snapshotUuids.map((s) =>
+    axios.get<TemplateCollectionResponse>(
       `/api/content-sources/v1/templates/?${objectToUrlParams({
         offset: '0',
         limit: '-1',
         snapshot_uuids: s,
       })}`,
-    );
-    map.set(s, templateResp.data);
-  }
-  return map;
+    ),
+  );
+
+  return axios.all(requests).then(
+    (responses) =>
+      new Map<string, TemplateItem[]>(
+        responses.map((response) => {
+          const uuid: string = response.request.responseURL.split('=').pop() ?? '';
+          return [uuid, response.data.data];
+        }),
+      ),
+  );
 };
 
 export const EditTemplate: (request: EditTemplateRequest) => Promise<void> = async (request) => {

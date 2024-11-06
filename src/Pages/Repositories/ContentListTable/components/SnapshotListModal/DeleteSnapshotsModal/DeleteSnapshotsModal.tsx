@@ -112,8 +112,11 @@ export default function DeleteSnapshotsModal() {
 
   useEffect(() => {
     if (snapshots && templates) {
-      if (templates.values().some((t) => t.length)) {
-        setAffectsTemplates(true);
+      for (const t of templates.values()) {
+        if (t.length) {
+          setAffectsTemplates(true);
+          break;
+        }
       }
       setIsLoading(false);
     }

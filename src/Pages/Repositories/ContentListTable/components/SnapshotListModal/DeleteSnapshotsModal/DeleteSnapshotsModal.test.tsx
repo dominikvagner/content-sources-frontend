@@ -1,16 +1,17 @@
 import { render } from '@testing-library/react';
 import {
   ReactQueryTestWrapper,
+  defaultContentItemWithSnapshot,
   defaultSnapshotItem,
   defaultTemplateItem,
   defaultTemplateItem2,
 } from 'testingHelpers';
 import DeleteSnapshotsModal from './DeleteSnapshotsModal';
-import {DELETE_ROUTE} from 'Routes/constants';
-import {useGetSnapshotList} from 'services/Content/ContentQueries';
-import {useFetchTemplatesForSnapshots} from 'services/Templates/TemplateQueries';
-import { TemplateItem } from 'services/Templates/TemplateApi'
-import {formatDateDDMMMYYYY} from 'helpers';
+import { DELETE_ROUTE } from 'Routes/constants';
+import { useGetSnapshotList } from 'services/Content/ContentQueries';
+import { useFetchTemplatesForSnapshots } from 'services/Templates/TemplateQueries';
+import { TemplateItem } from 'services/Templates/TemplateApi';
+import { formatDateDDMMMYYYY } from 'helpers';
 
 jest.mock('react-query', () => ({
   ...jest.requireActual('react-query'),
@@ -19,6 +20,7 @@ jest.mock('react-query', () => ({
 
 jest.mock('react-router-dom', () => ({
   useNavigate: jest.fn(),
+  useParams: () => ({ repoUUID: defaultContentItemWithSnapshot.uuid }),
   useLocation: () => ({
     search: `${DELETE_ROUTE}?snapshotUUID=${defaultSnapshotItem.uuid}`,
   }),
@@ -29,7 +31,7 @@ jest.mock('../SnapshotListModal', () => ({
   useSnapshotListOutletContext: () => ({
     clearCheckedRepositories: () => undefined,
     deletionContext: {
-      checkedRepositories: new Set<string>(defaultSnapshotItem.uuid),
+      checkedSnapshots: new Set<string>([defaultSnapshotItem.uuid]),
     },
   }),
 }));
@@ -52,8 +54,8 @@ jest.mock('middleware/AppContext', () => ({
   }),
 }));
 
-//
-it('Render delete modal where repo is not included in any templates', () => {
+
+it('Render delete modal where snapshot is not included in any templates', () => {
   (useGetSnapshotList as jest.Mock).mockImplementation(() => ({
     data: {
       isLoading: false,
@@ -61,9 +63,8 @@ it('Render delete modal where repo is not included in any templates', () => {
     },
   }));
   (useFetchTemplatesForSnapshots as jest.Mock).mockImplementation(() => ({
-    data: {
-      data: new Map<string, TemplateItem[]>([[defaultSnapshotItem.uuid, []]]),
-    },
+    isError: false,
+    data: new Map<string, TemplateItem[]>([[defaultSnapshotItem.uuid, []]]),
   }));
 
   const { queryByText } = render(
@@ -72,8 +73,33 @@ it('Render delete modal where repo is not included in any templates', () => {
     </ReactQueryTestWrapper>,
   );
 
-  expect(queryByText(formatDateDDMMMYYYY(defaultSnapshotItem.created_at))).toBeInTheDocument();
+  expect(queryByText(formatDateDDMMMYYYY(defaultSnapshotItem.created_at, true))).toBeInTheDocument();
   expect(queryByText(defaultTemplateItem.name)).not.toBeInTheDocument();
   expect(queryByText(defaultTemplateItem2.name)).not.toBeInTheDocument();
   expect(queryByText('None')).toBeInTheDocument();
+});
+
+it('Render delete modal where snapshot is included in templates', () => {
+  (useGetSnapshotList as jest.Mock).mockImplementation(() => ({
+    data: {
+      isLoading: false,
+      data: [defaultSnapshotItem],
+    },
+  }));
+  (useFetchTemplatesForSnapshots as jest.Mock).mockImplementation(() => ({
+    isError: false,
+    data: new Map<string, TemplateItem[]>([[defaultSnapshotItem.uuid, [defaultTemplateItem, defaultTemplateItem2]]]),
+  }));
+
+  const { queryByText } = render(
+    <ReactQueryTestWrapper>
+      <DeleteSnapshotsModal />
+    </ReactQueryTestWrapper>,
+  );
+
+  expect(queryByText(formatDateDDMMMYYYY(defaultSnapshotItem.created_at, true))).toBeInTheDocument();
+  expect(queryByText(defaultTemplateItem.name)).toBeInTheDocument();
+  expect(queryByText(defaultTemplateItem2.name)).toBeInTheDocument();
+  expect(queryByText('Some snapshots have associated templates.')).toBeInTheDocument();
+  expect(queryByText('None')).not.toBeInTheDocument();
 });
