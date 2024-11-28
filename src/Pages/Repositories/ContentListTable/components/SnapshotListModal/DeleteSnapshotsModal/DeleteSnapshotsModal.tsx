@@ -112,11 +112,8 @@ export default function DeleteSnapshotsModal() {
 
   useEffect(() => {
     if (snapshots && templates) {
-      for (const t of templates.values()) {
-        if (t.length) {
-          setAffectsTemplates(true);
-          break;
-        }
+      if (templates.data.length) {
+        setAffectsTemplates(true);
       }
       setIsLoading(false);
     }
@@ -215,7 +212,10 @@ export default function DeleteSnapshotsModal() {
                   }: SnapshotItem,
                   index,
                 ) => {
-                  const templatesForSnapshot = templates?.get(snap_uuid) ?? [];
+                  const templatesForSnapshot =
+                    templates?.data.filter(
+                      (t) => t.snapshots.filter((s) => s.uuid == snap_uuid).length > 0,
+                    ) ?? [];
                   return (
                     <Tr key={snap_uuid + index}>
                       <Td>{formatDateDDMMMYYYY(created_at, true)}</Td>

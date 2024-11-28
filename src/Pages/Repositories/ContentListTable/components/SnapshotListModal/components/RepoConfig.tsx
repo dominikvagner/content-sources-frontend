@@ -2,7 +2,10 @@ import { Button, Flex, FlexItem, Icon } from '@patternfly/react-core';
 import { createUseStyles } from 'react-jss';
 import { global_disabled_color_100 } from '@patternfly/react-tokens';
 
-import { useGetRepoConfigFileQuery, useGetLatestRepoConfigFileQuery } from 'services/Content/ContentQueries';
+import {
+  useGetRepoConfigFileQuery,
+  useGetLatestRepoConfigFileQuery,
+} from 'services/Content/ContentQueries';
 
 import { CopyIcon, DownloadIcon } from '@patternfly/react-icons';
 
@@ -25,7 +28,9 @@ interface Props {
 const RepoConfig = ({ repoUUID, snapUUID, latest }: Props) => {
   const classes = useStyles();
 
-  const { mutateAsync } = latest ? useGetLatestRepoConfigFileQuery(repoUUID) : useGetRepoConfigFileQuery(repoUUID, snapUUID);
+  const { mutateAsync } = latest
+    ? useGetLatestRepoConfigFileQuery(repoUUID)
+    : useGetRepoConfigFileQuery(repoUUID, snapUUID);
 
   const copyConfigFile = async () => {
     const data = await mutateAsync();

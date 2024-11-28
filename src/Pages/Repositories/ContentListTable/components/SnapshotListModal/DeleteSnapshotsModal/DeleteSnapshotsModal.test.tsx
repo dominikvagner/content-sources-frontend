@@ -10,7 +10,6 @@ import DeleteSnapshotsModal from './DeleteSnapshotsModal';
 import { DELETE_ROUTE } from 'Routes/constants';
 import { useGetSnapshotList } from 'services/Content/ContentQueries';
 import { useFetchTemplatesForSnapshots } from 'services/Templates/TemplateQueries';
-import { TemplateItem } from 'services/Templates/TemplateApi';
 import { formatDateDDMMMYYYY } from 'helpers';
 
 jest.mock('react-query', () => ({
@@ -54,7 +53,6 @@ jest.mock('middleware/AppContext', () => ({
   }),
 }));
 
-
 it('Render delete modal where snapshot is not included in any templates', () => {
   (useGetSnapshotList as jest.Mock).mockImplementation(() => ({
     data: {
@@ -64,7 +62,11 @@ it('Render delete modal where snapshot is not included in any templates', () => 
   }));
   (useFetchTemplatesForSnapshots as jest.Mock).mockImplementation(() => ({
     isError: false,
-    data: new Map<string, TemplateItem[]>([[defaultSnapshotItem.uuid, []]]),
+    data: {
+      data: [],
+      meta: { limit: 10, offset: 0, count: 0 },
+      isLoading: false,
+    },
   }));
 
   const { queryByText } = render(
@@ -73,7 +75,9 @@ it('Render delete modal where snapshot is not included in any templates', () => 
     </ReactQueryTestWrapper>,
   );
 
-  expect(queryByText(formatDateDDMMMYYYY(defaultSnapshotItem.created_at, true))).toBeInTheDocument();
+  expect(
+    queryByText(formatDateDDMMMYYYY(defaultSnapshotItem.created_at, true)),
+  ).toBeInTheDocument();
   expect(queryByText(defaultTemplateItem.name)).not.toBeInTheDocument();
   expect(queryByText(defaultTemplateItem2.name)).not.toBeInTheDocument();
   expect(queryByText('None')).toBeInTheDocument();
@@ -88,7 +92,11 @@ it('Render delete modal where snapshot is included in templates', () => {
   }));
   (useFetchTemplatesForSnapshots as jest.Mock).mockImplementation(() => ({
     isError: false,
-    data: new Map<string, TemplateItem[]>([[defaultSnapshotItem.uuid, [defaultTemplateItem, defaultTemplateItem2]]]),
+    data: {
+      data: [defaultTemplateItem, defaultTemplateItem2],
+      meta: { limit: 10, offset: 0, count: 2 },
+      isLoading: false,
+    },
   }));
 
   const { queryByText } = render(
@@ -97,7 +105,9 @@ it('Render delete modal where snapshot is included in templates', () => {
     </ReactQueryTestWrapper>,
   );
 
-  expect(queryByText(formatDateDDMMMYYYY(defaultSnapshotItem.created_at, true))).toBeInTheDocument();
+  expect(
+    queryByText(formatDateDDMMMYYYY(defaultSnapshotItem.created_at, true)),
+  ).toBeInTheDocument();
   expect(queryByText(defaultTemplateItem.name)).toBeInTheDocument();
   expect(queryByText(defaultTemplateItem2.name)).toBeInTheDocument();
   expect(queryByText('Some snapshots have associated templates.')).toBeInTheDocument();

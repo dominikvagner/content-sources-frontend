@@ -488,12 +488,8 @@ export const getRepoConfigFile: (snapshot_uuid: string) => Promise<string> = asy
   return data;
 };
 
-export const getLatestRepoConfigFile: (repoUUID: string) => Promise<string> = async (
-    repoUUID,
-) => {
-  const { data } = await axios.get(
-      `/api/content-sources/v1/repositories/${repoUUID}/config.repo`,
-  );
+export const getLatestRepoConfigFile: (repoUUID: string) => Promise<string> = async (repoUUID) => {
+  const { data } = await axios.get(`/api/content-sources/v1/repositories/${repoUUID}/config.repo`);
   return data;
 };
 

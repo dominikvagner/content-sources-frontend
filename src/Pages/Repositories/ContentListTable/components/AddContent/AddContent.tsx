@@ -493,7 +493,11 @@ const AddContent = ({ isEdit = false }: Props) => {
                   }
                 />
               </Hide>
-              <Hide hide={(isInProd && !isInBeta) || (isEdit && contentOrigin === ContentOrigin.EXTERNAL)}>
+              <Hide
+                hide={
+                  (isInProd && !isInBeta) || (isEdit && contentOrigin === ContentOrigin.EXTERNAL)
+                }
+              >
                 <ConditionalTooltip
                   show={isEdit && contentOrigin === ContentOrigin.UPLOAD}
                   setDisabled={isEdit && contentOrigin === ContentOrigin.UPLOAD}

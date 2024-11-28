@@ -5,6 +5,7 @@ import {
   type ErrataResponse,
   type PackageItem,
   SnapshotListResponse,
+  SnapshotItem,
 } from '../Content/ContentApi';
 import { objectToUrlParams } from 'helpers';
 import { AdminTask } from 'services/AdminTasks/AdminTaskApi';
@@ -29,6 +30,7 @@ export interface TemplateItem {
   org_id: string;
   description: string;
   repository_uuids: string[];
+  snapshots: SnapshotItem[];
   arch: string;
   version: string;
   date: string;
@@ -162,26 +164,15 @@ export const getTemplateSnapshots: (
 
 export const getTemplatesForSnapshots: (
   snapshotUuids: string[],
-) => Promise<Map<string, TemplateItem[]>> = async (snapshotUuids: string[]) => {
-  const requests = snapshotUuids.map((s) =>
-    axios.get<TemplateCollectionResponse>(
-      `/api/content-sources/v1/templates/?${objectToUrlParams({
-        offset: '0',
-        limit: '-1',
-        snapshot_uuids: s,
-      })}`,
-    ),
+) => Promise<TemplateCollectionResponse> = async (snapshotUuids: string[]) => {
+  const { data } = await axios.get<TemplateCollectionResponse>(
+    `/api/content-sources/v1/templates/?${objectToUrlParams({
+      offset: '0',
+      limit: '-1',
+      snapshot_uuids: snapshotUuids.join(','),
+    })}`,
   );
-
-  return axios.all(requests).then(
-    (responses) =>
-      new Map<string, TemplateItem[]>(
-        responses.map((response) => {
-          const uuid: string = response.request.responseURL.split('=').pop() ?? '';
-          return [uuid, response.data.data];
-        }),
-      ),
-  );
+  return data;
 };
 
 export const EditTemplate: (request: EditTemplateRequest) => Promise<void> = async (request) => {

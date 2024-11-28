@@ -808,19 +808,19 @@ export const useGetRepoConfigFileQuery = (repo_uuid: string, snapshot_uuid: stri
 export const useGetLatestRepoConfigFileQuery = (repo_uuid: string) => {
   const errorNotifier = useErrorNotification();
   return useMutation<string>(
-      [LATEST_REPO_CONFIG_FILE_KEY, repo_uuid],
-      async () => await getLatestRepoConfigFile(repo_uuid),
-      {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        onError: (err: any) => {
-          errorNotifier(
-              'Unable to find config.repo with the given UUID.',
-              'An error occurred',
-              err,
-              'repo-config-error',
-          );
-        },
+    [LATEST_REPO_CONFIG_FILE_KEY, repo_uuid],
+    async () => await getLatestRepoConfigFile(repo_uuid),
+    {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onError: (err: any) => {
+        errorNotifier(
+          'Unable to find config.repo with the given UUID.',
+          'An error occurred',
+          err,
+          'repo-config-error',
+        );
       },
+    },
   );
 };
 
@@ -871,6 +871,8 @@ export const useBulkDeleteSnapshotsMutate = (
       queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
       queryClient.invalidateQueries(SNAPSHOT_ERRATA_KEY);
       queryClient.invalidateQueries(SNAPSHOT_PACKAGES_KEY);
+      queryClient.invalidateQueries(REPO_CONFIG_FILE_KEY);
+      queryClient.invalidateQueries(LATEST_REPO_CONFIG_FILE_KEY);
     },
     onError: (err: { response?: { data: ErrorResponse } }, _newData, context) => {
       if (context) {

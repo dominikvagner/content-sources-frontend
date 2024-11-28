@@ -165,7 +165,7 @@ export const useFetchTemplateSnapshotsQuery = (
 
 export const useFetchTemplatesForSnapshots = (repoUuid: string, snapshotUuids: string[]) => {
   const errorNotifier = useErrorNotification();
-  return useQuery<Map<string, TemplateItem[]>>(
+  return useQuery<TemplateCollectionResponse>(
     [TEMPLATES_FOR_SNAPSHOTS, repoUuid, ...snapshotUuids],
     () => getTemplatesForSnapshots(snapshotUuids),
     {

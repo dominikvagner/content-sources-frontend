@@ -275,7 +275,7 @@ const SnapshotListModal = () => {
                   </Hide>
                 </FlexItem>
                 <FlexItem>
-                  <LatestRepoConfig repoUUID={uuid}/>
+                  <LatestRepoConfig repoUUID={uuid} />
                 </FlexItem>
                 <FlexItem>
                   <Pagination
@@ -391,7 +391,7 @@ const SnapshotListModal = () => {
                           </Button>
                         </Td>
                         <Td>
-                          <RepoConfig repoUUID={uuid} snapUUID={snap_uuid} latest={false}/>
+                          <RepoConfig repoUUID={uuid} snapUUID={snap_uuid} latest={false} />
                         </Td>
                         <Hide hide={!rowActions(snap_uuid)?.length}>
                           <Td isActionCell>
