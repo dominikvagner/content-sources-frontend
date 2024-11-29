@@ -13,7 +13,7 @@ const LatestRepoConfig = ({ repoUUID }: Props) => (
       </TextContent>
     </FlexItem>
     <FlexItem>
-      <RepoConfig repoUUID={repoUUID} snapUUID='' latest={true} />
+      <RepoConfig repoUUID={repoUUID} snapUUID='' latest />
     </FlexItem>
   </Flex>
 );

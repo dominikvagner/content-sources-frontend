@@ -25,17 +25,9 @@ import { useSnapshotListOutletContext } from '../SnapshotListModal';
 import useRootPath from 'Hooks/useRootPath';
 import { REPOSITORIES_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
 import { SnapshotItem } from 'services/Content/ContentApi';
-import {
-  CONTENT_LIST_KEY,
-  LIST_SNAPSHOTS_KEY,
-  useBulkDeleteSnapshotsMutate,
-  useGetSnapshotList,
-} from 'services/Content/ContentQueries';
+import { useBulkDeleteSnapshotsMutate, useGetSnapshotList } from 'services/Content/ContentQueries';
 import { TemplateItem } from 'services/Templates/TemplateApi';
-import {
-  GET_TEMPLATES_KEY,
-  useFetchTemplatesForSnapshots,
-} from 'services/Templates/TemplateQueries';
+import { useFetchTemplatesForSnapshots } from 'services/Templates/TemplateQueries';
 import { formatDateDDMMMYYYY } from 'helpers';
 import ChangedArrows from '../components/ChangedArrows';
 import { SnapshotDetailTab } from '../../SnapshotDetailsModal/SnapshotDetailsModal';
@@ -97,9 +89,6 @@ export default function DeleteSnapshotsModal() {
     deleteSnapshots(snapshotsToDelete).then(() => {
       onClose();
       clearCheckedSnapshots();
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
-      queryClient.invalidateQueries(GET_TEMPLATES_KEY);
-      queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
     });
   };
 

@@ -47,6 +47,7 @@ import { ADMIN_TASK_LIST_KEY } from '../AdminTasks/AdminTaskQueries';
 import useErrorNotification from 'Hooks/useErrorNotification';
 import useNotification from 'Hooks/useNotification';
 import {
+  GET_TEMPLATES_KEY,
   GET_TEMPLATE_PACKAGES_KEY,
   TEMPLATE_ERRATA_KEY,
   TEMPLATE_SNAPSHOTS_KEY,
@@ -863,6 +864,8 @@ export const useBulkDeleteSnapshotsMutate = (
         }
         return data;
       });
+      queryClient.invalidateQueries(CONTENT_LIST_KEY);
+      queryClient.invalidateQueries(GET_TEMPLATES_KEY);
       queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
       queryClient.invalidateQueries(TEMPLATE_SNAPSHOTS_KEY);
       queryClient.invalidateQueries(TEMPLATES_FOR_SNAPSHOTS);

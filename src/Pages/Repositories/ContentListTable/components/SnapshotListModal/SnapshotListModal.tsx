@@ -245,8 +245,8 @@ const SnapshotListModal = () => {
           <Grid className={classes.mainContainer}>
             <Hide hide={loadingOrZeroCount}>
               <Flex className={classes.topContainer}>
-                <FlexItem>
-                  <Hide hide={isRedHatRepository}>
+                <Hide hide={isRedHatRepository}>
+                  <FlexItem>
                     <ConditionalTooltip
                       content='You do not have the required permissions to perform this action.'
                       show={!rbac?.repoWrite}
@@ -272,8 +272,8 @@ const SnapshotListModal = () => {
                             : `Remove ${checkedSnapshots.size} snapshots`}
                       </Button>
                     </ConditionalTooltip>
-                  </Hide>
-                </FlexItem>
+                  </FlexItem>
+                </Hide>
                 <FlexItem>
                   <LatestRepoConfig repoUUID={uuid} />
                 </FlexItem>
