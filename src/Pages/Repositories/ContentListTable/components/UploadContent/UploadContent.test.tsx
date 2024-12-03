@@ -20,7 +20,7 @@ it('Render base upload modal', async () => {
 
   jest
     .spyOn(React, 'useState')
-    .mockImplementationOnce(() => realUseState([{ sha256: 'string', uuid: 'string' }] as unknown))
+    .mockImplementationOnce(() => realUseState([{ sha256: 'string', uuid: 'string', href: '' }] as unknown))
     .mockImplementationOnce(() => realUseState(true as unknown));
 
   const { queryByText } = render(<UploadContent />);
