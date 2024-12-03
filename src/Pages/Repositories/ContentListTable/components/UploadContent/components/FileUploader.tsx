@@ -9,7 +9,7 @@ import UploadStatusItem from './UploadStatusItem';
 import StatusIcon from 'Pages/Repositories/AdminTaskTable/components/StatusIcon';
 import { getFileChecksumSHA256, type Chunk, type FileInfo } from './helpers';
 import { createUseStyles } from 'react-jss';
-import { createUpload, uploadChunk } from 'services/Content/ContentApi';
+import { createUpload, searchUploads, uploadChunk } from 'services/Content/ContentApi';
 import Loader from 'components/Loader';
 import { UploadIcon } from '@patternfly/react-icons';
 
@@ -27,7 +27,9 @@ export const BATCH_SIZE = 5;
 export const MAX_RETRY_COUNT = 3;
 
 interface Props {
-  setFileUUIDs: React.Dispatch<React.SetStateAction<{ sha256: string; uuid: string }[]>>;
+  setFileUUIDs: React.Dispatch<
+    React.SetStateAction<{ sha256: string; uuid: string; href: string }[]>
+  >;
   isLoading: boolean;
 }
 
@@ -53,9 +55,10 @@ export default function FileUploader({ setFileUUIDs, isLoading }: Props) {
 
   useEffect(() => {
     if (completedCount === fileCount) {
-      const items = Object.values(currentFiles).map(({ uuid, checksum }) => ({
+      const items = Object.values(currentFiles).map(({ uuid, checksum, artifactHref }) => ({
         sha256: checksum,
         uuid,
+        href: artifactHref ?? '',
       }));
 
       setFileUUIDs(items);
@@ -181,7 +184,7 @@ export default function FileUploader({ setFileUUIDs, isLoading }: Props) {
       chunks.push({ start, end, queued: false, completed: false, retryCount: 0 });
     }
 
-    let checksum: string;
+    let checksum: string = '';
     let error: string | undefined = undefined;
 
     try {
@@ -192,18 +195,38 @@ export default function FileUploader({ setFileUUIDs, isLoading }: Props) {
 
     let uuid: string = '';
     let created: string = '';
+    let artifactHref: string | undefined = undefined;
     if (!error) {
-      try {
-        const res = await createUpload(file.size);
-        uuid = res.upload_uuid;
-        created = res.created;
-      } catch (err) {
-        error = 'Failed to create upload file: ' + (err as Error).message;
+      const res = await searchUploads({ sha256: [checksum] });
+      const href = res.found.get(checksum);
+      if (href !== undefined) {
+        artifactHref = href;
+        for (const ch of chunks) {
+          ch.completed = true;
+        }
+      } else {
+        try {
+          const res = await createUpload(file.size);
+          uuid = res.upload_uuid;
+          created = res.created;
+        } catch (err) {
+          error = 'Failed to create upload file: ' + (err as Error).message;
+        }
       }
     }
 
     setCurrentFiles((prev) => {
-      prev[file.name] = { uuid, created, chunks, file, checksum, error, failed: !!error };
+      prev[file.name] = {
+        uuid,
+        created,
+        chunks: chunks,
+        file,
+        checksum,
+        artifactHref,
+        completed: !!artifactHref,
+        error,
+        failed: !!error,
+      };
       return { ...prev };
     });
   };

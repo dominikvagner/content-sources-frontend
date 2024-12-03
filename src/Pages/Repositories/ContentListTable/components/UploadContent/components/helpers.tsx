@@ -40,6 +40,7 @@ export type FileInfo = {
   created: string;
   chunks: Chunk[];
   checksum: string;
+  artifactHref?: string;
   error?: string;
   completed?: boolean;
   failed?: boolean;

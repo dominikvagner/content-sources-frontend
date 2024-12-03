@@ -25,7 +25,7 @@ const useStyles = createUseStyles({
 const UploadContent = () => {
   const classes = useStyles();
   const { repoUUID: uuid } = useParams();
-  const [fileUUIDs, setFileUUIDs] = useState<{ sha256: string; uuid: string }[]>([]);
+  const [fileUUIDs, setFileUUIDs] = useState<{ sha256: string; uuid: string; href: string }[]>([]);
   const [confirmModal, setConfirmModal] = useState(false);
 
   const rootPath = useRootPath();
@@ -37,7 +37,18 @@ const UploadContent = () => {
 
   const { mutateAsync: uploadItems, isLoading } = useAddUploadsQuery({
     repoUUID: uuid!,
-    uploads: fileUUIDs,
+    uploads: fileUUIDs
+      .filter((f) => f.href.length == 0)
+      .map((f) => ({
+        sha256: f.sha256,
+        uuid: f.uuid,
+      })),
+    artifacts: fileUUIDs
+      .filter((f) => f.href.length > 0)
+      .map((f) => ({
+        sha256: f.sha256,
+        href: f.href,
+      })),
   });
 
   return (

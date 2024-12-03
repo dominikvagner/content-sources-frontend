@@ -258,6 +258,7 @@ export interface UploadChunkRequest {
 
 export interface AddUploadRequest {
   uploads: { sha256: string; uuid: string }[];
+  artifacts: { sha256: string; href: string }[];
   repoUUID: string;
 }
 
@@ -272,6 +273,15 @@ export interface AddUploadResponse {
   object_type: string;
   object_name: string;
   object_uuid: string;
+}
+
+export interface SearchUploadsRequest {
+  sha256: string[];
+}
+
+export interface SearchUploadsResponse {
+  found: Map<string, string>;
+  missing: string[];
 }
 
 export const getPopularRepositories: (
@@ -561,11 +571,25 @@ export const uploadChunk: (chunkRequest: UploadChunkRequest) => Promise<UploadRe
 
 export const addUploads: (chunkRequest: AddUploadRequest) => Promise<AddUploadResponse> = async ({
   uploads,
+  artifacts,
   repoUUID,
 }) => {
   const { data } = await axios.post(
     `/api/content-sources/v1.0/repositories/${repoUUID}/add_uploads/`,
-    { uploads },
+    {
+      uploads: uploads,
+      artifacts: artifacts,
+    },
   );
+  return data;
+};
+
+export const searchUploads: (
+  searchRequest: SearchUploadsRequest,
+) => Promise<SearchUploadsResponse> = async (hashes) => {
+  const { data } = await axios.post('/api/content-sources/v1/repositories/uploads/search', {
+    sha256: hashes.sha256,
+  });
+  data.found = new Map<string, string>(Object.entries(data.found));
   return data;
 };
