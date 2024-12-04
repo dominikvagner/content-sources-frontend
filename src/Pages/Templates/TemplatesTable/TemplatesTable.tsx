@@ -5,6 +5,7 @@ import {
   Flex,
   FlexItem,
   Grid,
+  Icon,
   Pagination,
   PaginationVariant,
   Spinner,
@@ -45,6 +46,7 @@ import {
 import useArchVersion from 'Hooks/useArchVersion';
 import { useTemplateList } from 'services/Templates/TemplateQueries';
 import StatusIcon from './components/StatusIcon';
+import { ExclamationTriangleIcon } from '@patternfly/react-icons';
 
 const useStyles = createUseStyles({
   mainContainer: {
@@ -190,7 +192,7 @@ const TemplatesTable = () => {
       : undefined;
 
   const columnHeaders: { title: string; width?: BaseCellProps['width'] }[] = [
-    { title: 'Name', width: 10 },
+    { title: 'Name', width: 15 },
     { title: 'Description' },
     { title: 'Architecture', width: 10 },
     { title: 'Version', width: 10 },
@@ -331,20 +333,44 @@ const TemplatesTable = () => {
                       use_latest,
                       last_update_snapshot_error,
                       last_update_task,
+                      to_be_deleted_snapshots,
                     }: TemplateItem,
                     index,
                   ) => (
                     <Tr key={uuid + index}>
                       <Td>
-                        <Button
-                          className={classes.leftPaddingZero}
-                          variant='link'
-                          onClick={() =>
-                            navigate(`${rootPath}/${TEMPLATES_ROUTE}/${uuid}/${DETAILS_ROUTE}`)
-                          }
-                        >
-                          {name}
-                        </Button>
+                        <Flex gap={{ default: 'gapXs' }}>
+                          <FlexItem>
+                            <Button
+                              className={classes.leftPaddingZero}
+                              variant='link'
+                              onClick={() =>
+                                navigate(`${rootPath}/${TEMPLATES_ROUTE}/${uuid}/${DETAILS_ROUTE}`)
+                              }
+                            >
+                              {name}
+                            </Button>
+                          </FlexItem>
+                          <Hide
+                            hide={!(to_be_deleted_snapshots && to_be_deleted_snapshots.length > 0)}
+                          >
+                            <FlexItem>
+                              <ConditionalTooltip
+                                id={`to_be_deleted_snapshot_warning_for_repo_${name}`}
+                                show={to_be_deleted_snapshots && to_be_deleted_snapshots.length > 0}
+                                position='right'
+                                content={
+                                  'This template contains snapshots that are going to be deleted in the next 14 days. If you don\'t edit the template manually, it will be updated automatically to use the next available snapshot.'
+                                }
+                                enableFlip
+                              >
+                                <Icon status='warning' isInline>
+                                  <ExclamationTriangleIcon />
+                                </Icon>
+                              </ConditionalTooltip>
+                            </FlexItem>
+                          </Hide>
+                        </Flex>
                       </Td>
                       <Td>{description}</Td>
                       <Td>{archesDisplay(arch)}</Td>

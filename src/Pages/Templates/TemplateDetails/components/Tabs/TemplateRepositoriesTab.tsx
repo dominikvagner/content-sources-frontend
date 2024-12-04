@@ -17,7 +17,10 @@ import {
 import { SearchIcon } from '@patternfly/react-icons';
 import { global_BackgroundColor_100 } from '@patternfly/react-tokens';
 
-import { useFetchTemplateSnapshotsQuery } from 'services/Templates/TemplateQueries';
+import {
+  useFetchTemplate,
+  useFetchTemplateSnapshotsQuery,
+} from 'services/Templates/TemplateQueries';
 import TemplateRepositoriesTable from 'Pages/Templates/TemplateDetails/components/Tables/TemplateRepositoriesTable';
 
 import type { ThProps } from '@patternfly/react-table';
@@ -68,6 +71,14 @@ export default function TemplateRepositoriesTab() {
   );
 
   const {
+    isLoading: isLoadingTemplate,
+    isFetching: isFetchingTemplate,
+    isError: isErrorTemplate,
+    error: templateError,
+    data: template,
+  } = useFetchTemplate(uuid as string);
+
+  const {
     isLoading,
     isFetching,
     isError,
@@ -88,7 +99,7 @@ export default function TemplateRepositoriesTab() {
     meta: { count = 0 },
   } = data;
 
-  const fetchingOrLoading = isFetching || isLoading;
+  const fetchingOrLoading = isFetching || isLoading || isLoadingTemplate || isFetchingTemplate;
   const loadingOrZeroCount = fetchingOrLoading || !count;
 
   const sortParams = (columnIndex: number): ThProps['sort'] => ({
@@ -104,11 +115,14 @@ export default function TemplateRepositoriesTab() {
     columnIndex,
   });
 
-  if (isLoading) {
+  if (isLoading || isLoadingTemplate) {
     return <Loader />;
   }
   if (isError) {
     throw error;
+  }
+  if (isErrorTemplate) {
+    throw templateError;
   }
 
   return (
@@ -141,6 +155,7 @@ export default function TemplateRepositoriesTab() {
         isFetchingOrLoading={fetchingOrLoading}
         isLoadingOrZeroCount={loadingOrZeroCount}
         snapshotList={snapshotList}
+        toBeDeletedSnapshots={template?.to_be_deleted_snapshots ?? []}
         clearSearch={() => setSearchQuery('')}
         perPage={perPage}
         sortParams={sortParams}

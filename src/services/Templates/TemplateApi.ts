@@ -31,6 +31,7 @@ export interface TemplateItem {
   description: string;
   repository_uuids: string[];
   snapshots: SnapshotItem[];
+  to_be_deleted_snapshots: SnapshotItem[];
   arch: string;
   version: string;
   date: string;

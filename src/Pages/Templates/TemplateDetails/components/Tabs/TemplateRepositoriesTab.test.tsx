@@ -1,14 +1,15 @@
 import { render } from '@testing-library/react';
 
-import { defaultSnapshotItem } from 'testingHelpers';
+import { defaultSnapshotItem, defaultTemplateItem } from 'testingHelpers';
 import TemplateRepositoriesTab from './TemplateRepositoriesTab';
-import { useFetchTemplateSnapshotsQuery } from 'services/Templates/TemplateQueries';
+import {
+  useFetchTemplate,
+  useFetchTemplateSnapshotsQuery,
+} from 'services/Templates/TemplateQueries';
 import type { SnapshotItem } from 'services/Content/ContentApi';
 
-const bananaUUID = 'banana-uuid';
-
 jest.mock('react-router-dom', () => ({
-  useParams: () => ({ templateUUID: bananaUUID }),
+  useParams: () => ({ templateUUID: defaultTemplateItem.uuid }),
   useNavigate: jest.fn(),
   Outlet: () => <></>,
 }));
@@ -25,6 +26,7 @@ jest.mock('react-query');
 
 jest.mock('services/Templates/TemplateQueries', () => ({
   useFetchTemplateSnapshotsQuery: jest.fn(),
+  useFetchTemplate: jest.fn(),
 }));
 
 (useFetchTemplateSnapshotsQuery as jest.Mock).mockImplementation(() => ({
@@ -37,6 +39,12 @@ jest.mock('services/Templates/TemplateQueries', () => ({
     })),
     meta: { count: 15, limit: 20, offset: 0 },
   },
+}));
+
+(useFetchTemplate as jest.Mock).mockImplementation(() => ({
+  isLoading: false,
+  isFetching: false,
+  data: defaultTemplateItem,
 }));
 
 it('expect TemplateRepositoriesTab to render 15 items', async () => {

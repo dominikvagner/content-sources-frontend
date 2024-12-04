@@ -1,3 +1,4 @@
+import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import EmptyTableState from 'components/EmptyTableState/EmptyTableState';
 import Hide from 'components/Hide/Hide';
 import { formatDateDDMMMYYYY } from 'helpers';
@@ -13,7 +14,7 @@ import { REPOSITORIES_ROUTE } from 'Routes/constants';
 import { SnapshotItem } from 'services/Content/ContentApi';
 
 import { SkeletonTable } from '@patternfly/react-component-groups';
-import { Button, Grid } from '@patternfly/react-core';
+import { Button, Flex, FlexItem, Grid, Icon } from '@patternfly/react-core';
 import {
   BaseCellProps,
   Table,
@@ -26,6 +27,7 @@ import {
   Tr,
 } from '@patternfly/react-table';
 import { global_BackgroundColor_100 } from '@patternfly/react-tokens';
+import { ExclamationTriangleIcon } from '@patternfly/react-icons';
 
 const useStyles = createUseStyles({
   mainContainer: {
@@ -40,6 +42,7 @@ interface Props {
   isFetchingOrLoading: boolean;
   isLoadingOrZeroCount: boolean;
   snapshotList: SnapshotItem[];
+  toBeDeletedSnapshots: SnapshotItem[];
   clearSearch: () => void;
   perPage: number;
   sortParams: (columnIndex: number) => ThProps['sort'];
@@ -50,6 +53,7 @@ export default function TemplateRepositoriesTable({
   isFetchingOrLoading,
   isLoadingOrZeroCount,
   snapshotList,
+  toBeDeletedSnapshots,
   clearSearch,
   perPage,
   sortParams,
@@ -127,18 +131,36 @@ export default function TemplateRepositoriesTable({
               <Tbody key={uuid + rowIndex + '-column'}>
                 <Tr>
                   <Td>
-                    <Button
-                      variant='link'
-                      ouiaId='repository_edit_button'
-                      isInline
-                      onClick={() =>
-                        navigate(
-                          `${rootPath}/${REPOSITORIES_ROUTE}/edit?repoUUIDS=${repository_uuid}`,
-                        )
-                      }
-                    >
-                      {repository_name}
-                    </Button>
+                    <Flex gap={{ default: 'gapSm' }}>
+                      <FlexItem>
+                        <Button
+                          variant='link'
+                          ouiaId='repository_edit_button'
+                          isInline
+                          onClick={() =>
+                            navigate(
+                              `${rootPath}/${REPOSITORIES_ROUTE}/edit?repoUUIDS=${repository_uuid}`,
+                            )
+                          }
+                        >
+                          {repository_name}
+                        </Button>
+                      </FlexItem>
+                      <Hide hide={!toBeDeletedSnapshots.find((s) => s.uuid == uuid)}>
+                        <FlexItem>
+                          <ConditionalTooltip
+                            show={!!toBeDeletedSnapshots.find((s) => s.uuid == uuid)}
+                            position='right'
+                            content='The snapshot used in this template coming from this repository is going to be deleted in the next 14 days.'
+                            enableFlip
+                          >
+                            <Icon status='warning' isInline>
+                              <ExclamationTriangleIcon />
+                            </Icon>
+                          </ConditionalTooltip>
+                        </FlexItem>
+                      </Hide>
+                    </Flex>
                   </Td>
                   <Td>{formatDateDDMMMYYYY(created_at, true)}</Td>
                   <Td>
