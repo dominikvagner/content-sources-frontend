@@ -151,8 +151,9 @@ export default function TemplateDetails() {
                 title='Template contains soon to be deleted snapshots.'
               >
                 This template contains snapshots that are going to be deleted in the next 14 days.
-                If you don&#39;t edit the template manually, it will be updated automatically to use
-                the next available snapshot.
+                At that time the template will be updated automatically to use the next available
+                snapshot. Editing the template and selecting a more recent snapshot date will ensure
+                the template is not changing unexpectedly.
               </Alert>
             </StackItem>
           </Hide>

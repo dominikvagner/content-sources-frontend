@@ -151,7 +151,7 @@ export default function TemplateRepositoriesTable({
                           <ConditionalTooltip
                             show={!!toBeDeletedSnapshots.find((s) => s.uuid == uuid)}
                             position='right'
-                            content='The snapshot used in this template coming from this repository is going to be deleted in the next 14 days.'
+                            content='The snapshot of this repository used by this template is going to be deleted in the next 14 days.'
                             enableFlip
                           >
                             <Icon status='warning' isInline>

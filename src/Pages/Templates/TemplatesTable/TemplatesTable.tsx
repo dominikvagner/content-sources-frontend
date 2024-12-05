@@ -359,9 +359,7 @@ const TemplatesTable = () => {
                                 id={`to_be_deleted_snapshot_warning_for_repo_${name}`}
                                 show={to_be_deleted_snapshots && to_be_deleted_snapshots.length > 0}
                                 position='right'
-                                content={
-                                  'This template contains snapshots that are going to be deleted in the next 14 days. If you don\'t edit the template manually, it will be updated automatically to use the next available snapshot.'
-                                }
+                                content='This template contains snapshots that are going to be deleted in the next 14 days. At that time the template will be updated automatically to use the next available snapshot. Editing the template and selecting a more recent snapshot date will ensure the template is not changing unexpectedly.'
                                 enableFlip
                               >
                                 <Icon status='warning' isInline>
