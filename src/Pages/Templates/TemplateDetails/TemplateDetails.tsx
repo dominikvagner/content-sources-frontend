@@ -153,7 +153,7 @@ export default function TemplateDetails() {
                 This template contains snapshots that are going to be deleted in the next 14 days.
                 At that time the template will be updated automatically to use the next available
                 snapshot. Editing the template and selecting a more recent snapshot date will ensure
-                the template is not changing unexpectedly.
+                the template does not change unexpectedly.
               </Alert>
             </StackItem>
           </Hide>
