@@ -124,7 +124,7 @@ export default function AdvisoriesTable({
               </Tr>
             </Thead>
           </Hide>
-          {errataList.map(
+          {[...new Map(errataList.map(e => [e.errata_id, e])).values()].map(
             (
               {
                 errata_id,
