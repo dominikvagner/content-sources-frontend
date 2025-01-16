@@ -47,7 +47,7 @@ export default function SetUpDateStep() {
   useEffect(() => {
     setTemplateRequest({
       ...templateRequest,
-      date: templateRequest ? formatDateForPicker(templateRequest.date) : '',
+      date: templateRequest.date ? formatDateForPicker(templateRequest.date) : '',
     });
   }, []);
 
@@ -146,7 +146,6 @@ export default function SetUpDateStep() {
           onChange={(_, val) => {
             setTemplateRequest((prev) => ({ ...prev, date: val }));
           }}
-          // defaultValue={templateRequest.date ?? undefined}
         />
       </FormGroup>
       <Hide hide={!hasIsAfter || !dateIsValid}>

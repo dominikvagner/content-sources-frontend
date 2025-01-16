@@ -60,7 +60,7 @@ export const AddTemplateContextProvider = ({ children }: { children: ReactNode }
       arch && version,
       !!selectedRedhatRepos.size,
       true,
-      (!!date || use_latest) && isDateValid(date ?? ''),
+      use_latest || isDateValid(date ?? ''),
       !!name && name.length < 256,
     ] as boolean[];
   }, [templateRequest, selectedRedhatRepos.size]);
