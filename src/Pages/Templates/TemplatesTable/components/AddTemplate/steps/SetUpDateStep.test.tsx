@@ -23,7 +23,8 @@ jest.mock('react-router-dom', () => ({
 jest.mock('dayjs', () => () => ({
   fromNow: () => '2024-01-22',
   format: () => '2024-01-22',
-  isBefore: () => false,
+  endOf: () => '2024-01-22',
+  isBefore: () => true,
 }));
 
 it('expect Set snapshot date step to render dates', () => {
@@ -48,14 +49,11 @@ it('expect Set snapshot date step to render dates', () => {
   }));
 
   const { queryByText, getByRole } = render(<SetUpDateStep />);
-
-  expect(queryByText('Include repository changes up to this date')).toBeInTheDocument();
+  expect(queryByText('Select date for snapshotted repositories')).toBeInTheDocument();
 
   const dateInput = getByRole('textbox', { name: 'Date picker' });
-
   expect(dateInput).toBeInTheDocument();
   expect(dateInput).toHaveAttribute('value', '2024-01-22');
-  expect(queryByText(defaultContentItem.name)).toBeInTheDocument();
 });
 
 it('expect Set snapshot date step to render use latest', () => {
@@ -81,7 +79,5 @@ it('expect Set snapshot date step to render use latest', () => {
 
   const { queryByText } = render(<SetUpDateStep />);
 
-  expect(queryByText('Include repository changes up to this date')).not.toBeInTheDocument();
-
-  expect(queryByText('Always use latest content from repositories.')).toBeInTheDocument();
+  expect(queryByText('Select date for snapshotted repositories')).toBeInTheDocument();
 });

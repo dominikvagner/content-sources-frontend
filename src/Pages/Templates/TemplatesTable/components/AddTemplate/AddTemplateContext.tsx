@@ -15,6 +15,7 @@ import { hardcodeRedHatReposByArchAndVersion } from '../templateHelpers';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFetchTemplate } from 'services/Templates/TemplateQueries';
 import useRootPath from 'Hooks/useRootPath';
+import { isDateValid } from 'helpers';
 
 export interface AddTemplateContextInterface {
   queryClient: QueryClient;
@@ -59,7 +60,7 @@ export const AddTemplateContextProvider = ({ children }: { children: ReactNode }
       arch && version,
       !!selectedRedhatRepos.size,
       true,
-      !!date || use_latest,
+      (!!date || use_latest) && isDateValid(date ?? ''),
       !!name && name.length < 256,
     ] as boolean[];
   }, [templateRequest, selectedRedhatRepos.size]);

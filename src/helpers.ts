@@ -50,6 +50,10 @@ export const formatDateUTC = (date: string): string => {
   return utc.format('DD MMM YYYY - HH:mm:ss [(UTC)]');
 };
 
+export const isDateValid = (date: string): boolean =>
+  RegExp(/^\d{4}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[01])$/).test(date) &&
+  dayjs(date).isBefore(dayjs().endOf('day'));
+
 export const reduceStringToCharsWithEllipsis = (str: string, maxLength: number = 50) =>
   str.length > maxLength ? str.split('').slice(0, maxLength).join('') + '...' : str;
 

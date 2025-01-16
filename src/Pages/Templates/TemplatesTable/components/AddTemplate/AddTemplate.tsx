@@ -153,7 +153,7 @@ const AddTemplateBase = () => {
             ]}
           />
           <WizardStep
-            name='Set snapshot date'
+            name='Set up date'
             id='set_up_date_step'
             isDisabled={checkIfCurrentStepValid(3)}
             footer={{ ...sharedFooterProps, isNextDisabled: checkIfCurrentStepValid(4) }}
