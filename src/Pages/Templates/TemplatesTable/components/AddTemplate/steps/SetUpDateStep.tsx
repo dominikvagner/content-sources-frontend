@@ -133,9 +133,10 @@ export default function SetUpDateStep() {
           }}
         />
         <DatePicker
+          id='use-snapshot-date-picker'
           value={templateRequest.date ?? ''}
-          required
-          requiredDateOptions={{ isRequired: true }}
+          required={!templateRequest.use_latest}
+          requiredDateOptions={{ isRequired: !templateRequest.use_latest }}
           style={{ paddingLeft: '20px' }}
           validators={dateValidators}
           popoverProps={{
@@ -160,7 +161,7 @@ export default function SetUpDateStep() {
                 const { name } = current;
                 if (index != 0 && index + 1 === array.length) {
                   acc += `and "${name}" `;
-                } else if (array.length === 1) {
+                } else if (array.length === 1 || index === array.length - 2) {
                   acc += `"${name}" `;
                 } else {
                   acc += `"${name}", `;
