@@ -1,11 +1,15 @@
 import {
   Alert,
   DatePicker,
+  ExpandableSection,
   FormAlert,
   FormGroup,
   Grid,
   Radio,
   Text,
+  TextContent,
+  TextList,
+  TextListItem,
   TextVariants,
   Title,
 } from '@patternfly/react-core';
@@ -132,22 +136,24 @@ export default function SetUpDateStep() {
             }
           }}
         />
-        <DatePicker
-          id='use-snapshot-date-picker'
-          value={templateRequest.date ?? ''}
-          required={!templateRequest.use_latest}
-          requiredDateOptions={{ isRequired: !templateRequest.use_latest }}
-          style={{ paddingLeft: '20px' }}
-          validators={dateValidators}
-          popoverProps={{
-            position: 'right',
-            enableFlip: true,
-            flipBehavior: ['right', 'right-start', 'right-end', 'top-start', 'top'],
-          }}
-          onChange={(_, val) => {
-            setTemplateRequest((prev) => ({ ...prev, date: val }));
-          }}
-        />
+        <Hide hide={templateRequest.use_latest ?? false}>
+          <DatePicker
+            id='use-snapshot-date-picker'
+            value={templateRequest.date ?? ''}
+            required={!templateRequest.use_latest}
+            requiredDateOptions={{ isRequired: !templateRequest.use_latest }}
+            style={{ paddingLeft: '20px' }}
+            validators={dateValidators}
+            popoverProps={{
+              position: 'right',
+              enableFlip: true,
+              flipBehavior: ['right', 'right-start', 'right-end', 'top-start', 'top'],
+            }}
+            onChange={(_, val) => {
+              setTemplateRequest((prev) => ({ ...prev, date: val }));
+            }}
+          />
+        </Hide>
       </FormGroup>
       <Hide hide={!hasIsAfter || !dateIsValid}>
         <FormAlert>
@@ -172,8 +178,27 @@ export default function SetUpDateStep() {
                   acc += 'will be included anyway.';
                 }
                 return acc;
-              }, 'The content of the ')}
+              }, 'The snapshots of the ')}
             </Hide>
+            <ExpandableSection
+              toggleText='What does this mean?'
+              aria-label='quickStart-expansion'
+              data-ouia-component-id='quickstart_expand'
+              className={classes.whatDoesItMean}
+            >
+              <TextContent>
+                <TextList>
+                  <TextListItem>
+                    No snapshots exist for these repositories on the specified date or before it.
+                  </TextListItem>
+                  <TextListItem>The closest snapshots after that date will be used.</TextListItem>
+                  <TextListItem>
+                    Depending on the repository and time difference, this could cause a dependency
+                    issue.
+                  </TextListItem>
+                </TextList>
+              </TextContent>
+            </ExpandableSection>
           </Alert>
         </FormAlert>
       </Hide>
