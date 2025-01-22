@@ -111,7 +111,7 @@ export default function SetUpDateStep() {
           ouiaId='use-latest-snapshot-radio'
           name='use-latest-snapshot'
           label='Use latest content'
-          description='Always use latest content from repositories. Snapshots may be updated daily.'
+          description='Always use latest content from repositories. Snapshots might be updated daily.'
           isChecked={templateRequest.use_latest}
           onChange={() => {
             if (!templateRequest.use_latest) {
@@ -153,7 +153,7 @@ export default function SetUpDateStep() {
         <FormAlert>
           <Alert
             variant='warning'
-            title='Selected date doesn’t include the only snapshot of some selected repositories.'
+            title='Selected date does not include the only snapshot of some selected repositories.'
             isInline
           >
             <Hide hide={isLoading}>
