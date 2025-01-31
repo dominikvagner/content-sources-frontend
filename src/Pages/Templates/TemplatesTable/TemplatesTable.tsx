@@ -441,13 +441,10 @@ const TemplatesTable = () => {
                   icon={<ExternalLinkAltIcon />}
                   iconPosition='end'
                   isInline
-                  onClick={() =>
-                    navigate(
-                      `https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/deploying_and_managing_rhel_systems_in_hybrid_clouds/managing-content-templates_host-management-services`,
-                    )
-                  }
                 >
-                  Learn more about templates
+                  <a href='https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/deploying_and_managing_rhel_systems_in_hybrid_clouds/managing-content-templates_host-management-services'>
+                    Learn more about templates
+                  </a>
                 </Button>
               </>
             }
