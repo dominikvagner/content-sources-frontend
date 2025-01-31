@@ -17,6 +17,8 @@ const useStyles = createUseStyles({
   },
   emptyStateBody: {
     marginBottom: '16px',
+    textWrap: 'wrap',
+    maxWidth: '500px',
   },
 });
 
