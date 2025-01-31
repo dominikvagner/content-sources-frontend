@@ -39,7 +39,7 @@ import { DELETE_ROUTE, DETAILS_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
 import useArchVersion from 'Hooks/useArchVersion';
 import { useTemplateList } from 'services/Templates/TemplateQueries';
 import StatusIcon from './components/StatusIcon';
-import { ExclamationTriangleIcon } from '@patternfly/react-icons';
+import { ExclamationTriangleIcon, ExternalLinkAltIcon } from '@patternfly/react-icons';
 
 const useStyles = createUseStyles({
   mainContainer: {
@@ -73,6 +73,9 @@ const useStyles = createUseStyles({
   },
   bannerContainer: {
     padding: '24px 24px 0px',
+  },
+  templateDocLink: {
+    marginTop: '20px',
   },
 });
 
@@ -204,7 +207,8 @@ const TemplatesTable = () => {
   } = data;
 
   const itemName = 'templates';
-  const notFilteredBody = 'To get started, create a content template';
+  const notFilteredBody =
+    'Control the scope of packages and advisory updates to be installed on selected systems with templates. To get started, create a template.';
 
   const countIsZero = count === 0;
 
@@ -414,21 +418,38 @@ const TemplatesTable = () => {
             itemName={itemName}
             notFilteredBody={notFilteredBody}
             notFilteredButton={
-              <ConditionalTooltip
-                content={`You do not have the required ${missingRequirements} to perform this action.`}
-                show={isMissingRequirements}
-                setDisabled
-              >
-                <Button
-                  id='createContentTemplateButton'
-                  ouiaId='create_content_template'
-                  variant='primary'
-                  isDisabled={isLoading}
-                  onClick={() => navigate('add')}
+              <>
+                <ConditionalTooltip
+                  content={`You do not have the required ${missingRequirements} to perform this action.`}
+                  show={isMissingRequirements}
+                  setDisabled
                 >
-                  Add template
+                  <Button
+                    id='createContentTemplateButton'
+                    ouiaId='create_content_template'
+                    variant='primary'
+                    isDisabled={isLoading}
+                    onClick={() => navigate('add')}
+                  >
+                    Create a template
+                  </Button>
+                </ConditionalTooltip>
+                <Button
+                  className={classes.templateDocLink}
+                  variant='link'
+                  ouiaId='snapshot_package_count_button'
+                  icon={<ExternalLinkAltIcon />}
+                  iconPosition='end'
+                  isInline
+                  onClick={() =>
+                    navigate(
+                      `https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/deploying_and_managing_rhel_systems_in_hybrid_clouds/managing-content-templates_host-management-services`,
+                    )
+                  }
+                >
+                  Learn more about templates
                 </Button>
-              </ConditionalTooltip>
+              </>
             }
           />
         </Hide>

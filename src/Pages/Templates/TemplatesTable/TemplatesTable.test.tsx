@@ -48,7 +48,11 @@ it('expect TemplatesTable to render empty state', () => {
   );
 
   expect(queryByText('No templates')).toBeInTheDocument();
-  expect(queryByText('To get started, create a content template')).toBeInTheDocument();
+  expect(
+    queryByText(
+      'Control the scope of packages and advisory updates to be installed on selected systems with templates. To get started, create a template.',
+    ),
+  ).toBeInTheDocument();
 });
 
 it('expect TemplatesTable to render a single row', () => {
