@@ -14,3 +14,11 @@ export const closePopupsIfExist = async (page: Page) => {
     });
   }
 };
+
+export const getRowByName = async (page: Page, name: string) => {
+  if (await page.getByRole('button', { name: 'Clear filters' }).isVisible()) {
+    await page.getByRole('button', { name: 'Clear filters' }).click();
+  }
+  await page.getByPlaceholder(/^Filter by name.*$/).fill(name);
+  return page.getByRole('row').filter({ has: page.getByText(name) });
+};

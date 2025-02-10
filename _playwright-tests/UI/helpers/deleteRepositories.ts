@@ -1,8 +1,8 @@
 import { expect, type Page } from '@playwright/test';
 
-export const deleteAllRepos = async ({ request }: Page) => {
+export const deleteAllRepos = async ({ request }: Page, filter?: string) => {
   const response = await request.get(
-    '/api/content-sources/v1/repositories/?origin=external,upload',
+    `/api/content-sources/v1/repositories/?origin=external,upload${filter}`,
   );
 
   // Ensure the request was successful
@@ -32,7 +32,5 @@ export const deleteAllRepos = async ({ request }: Page) => {
       console.error('Failed to delete repositories:', error);
       throw error; // Optionally re-throw the error if you need to fail the test
     }
-  } else {
-    console.log('No repositories to delete.');
   }
 };
