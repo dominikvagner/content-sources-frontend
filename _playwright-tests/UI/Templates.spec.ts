@@ -1,9 +1,8 @@
-import { describe } from 'node:test';
 import { test } from '@playwright/test';
 import { navigateToTemplates } from './helpers/navHelpers';
 import { closePopupsIfExist } from './helpers/helpers';
 
-describe('Templates', () => {
+test.describe('Templates', () => {
   test('Navigate to templates, make sure the Add content template button can be clicked', async ({
     page,
   }) => {
