@@ -47,7 +47,6 @@ const useStyles = createUseStyles({
     display: 'flex',
     flexDirection: 'column',
     margin: '24px',
-    minHeight: '50%',
   },
   topContainer: {
     justifyContent: 'space-between',
