@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 export const closePopupsIfExist = async (page: Page) => {
   const locatorsToCheck = [
@@ -14,11 +14,22 @@ export const closePopupsIfExist = async (page: Page) => {
     });
   }
 };
+export const filterByName = async (page: Page, name: string) => {
+  await page.getByPlaceholder(/^Filter by name.*$/).fill(name);
+};
+
+export const clearFilters = async (page: Page) => {
+  try {
+    await page.getByRole('button', { name: 'Clear filters' }).waitFor({ timeout: 5000 });
+  } catch {
+    return Promise<void>;
+  }
+
+  await page.getByRole('button', { name: 'Clear filters' }).click();
+};
 
 export const getRowByName = async (page: Page, name: string) => {
-  if (await page.getByRole('button', { name: 'Clear filters' }).isVisible()) {
-    await page.getByRole('button', { name: 'Clear filters' }).click();
-  }
-  await page.getByPlaceholder(/^Filter by name.*$/).fill(name);
+  await clearFilters(page);
+  await filterByName(page, name);
   return page.getByRole('row').filter({ has: page.getByText(name) });
 };
