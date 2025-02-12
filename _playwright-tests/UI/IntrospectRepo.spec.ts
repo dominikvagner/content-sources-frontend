@@ -56,6 +56,7 @@ test.describe('Introspect Repositories', () => {
       const row = await getRowByName(page, repoName);
       await row.getByRole('gridcell', { name: repoPackageCount, exact: true }).locator('a').click();
       await expect(page.getByText('View list of packages')).toBeVisible();
+      await expect(page.getByText('Version').first()).toBeVisible();
     });
 
     await test.step('Check the modal for expected content', async () => {
