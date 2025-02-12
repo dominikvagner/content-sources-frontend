@@ -10,6 +10,7 @@ test.describe('Introspect Repositories', () => {
   const repoVersion = '0.3';
   const repoRelease = '0.8';
   const repoArch = 'noarch';
+  const testPackage = 'cheetah';
 
   test.beforeEach(async ({ page }) => {
     await test.step('Navigate to the repository page', async () => {
@@ -60,12 +61,13 @@ test.describe('Introspect Repositories', () => {
     });
 
     await test.step('Check the modal for expected content', async () => {
+      const row = page.getByRole('row').filter({ has: page.getByText(testPackage) });
       await Promise.all([
         expect(page.getByText(repoArch)).toHaveCount(8),
-        expect(page.getByText('cheetah')).toBeVisible(),
-        expect(page.getByText(repoVersion).first()).toBeVisible(),
-        expect(page.getByText(repoRelease).first()).toBeVisible(),
-        expect(page.getByText(repoArch).first()).toBeVisible(),
+        expect(row.getByText(testPackage)).toBeVisible(),
+        expect(row.getByText(repoVersion)).toBeVisible(),
+        expect(row.getByText(repoRelease)).toBeVisible(),
+        expect(row.getByText(repoArch)).toBeVisible(),
       ]);
     });
   });
