@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { navigateToRepositories } from './helpers/navHelpers';
-import { clearFilters, closePopupsIfExist, getRowByName } from './helpers/helpers';
+import { closePopupsIfExist, getRowByName, getRowCellByHeader } from './helpers/helpers';
 import { deleteAllRepos } from './helpers/deleteRepositories';
 
 test.describe('Introspect Repositories', () => {
@@ -44,9 +44,7 @@ test.describe('Introspect Repositories', () => {
         expect(page.getByText('Add custom repositories')).not.toBeVisible(),
       ]);
     });
-  });
 
-  test('Wait for valid introspection status', async ({ page }) => {
     await test.step('Wait for status to be "Valid"', async () => {
       const row = await getRowByName(page, repoName);
       await expect(row.getByText('Valid')).toBeVisible();
@@ -64,10 +62,10 @@ test.describe('Introspect Repositories', () => {
       const row = page.getByRole('row').filter({ has: page.getByText(testPackage) });
       await Promise.all([
         expect(page.getByText(repoArch)).toHaveCount(8),
-        expect(row.getByText(testPackage)).toBeVisible(),
-        expect(row.getByText(repoVersion)).toBeVisible(),
-        expect(row.getByText(repoRelease)).toBeVisible(),
-        expect(row.getByText(repoArch)).toBeVisible(),
+        expect((await getRowCellByHeader(row, 'Name')).getByText(testPackage)).toBeVisible(),
+        expect((await getRowCellByHeader(row, 'Version')).getByText(repoVersion)).toBeVisible(),
+        expect((await getRowCellByHeader(row, 'Release')).getByText(repoRelease)).toBeVisible(),
+        expect((await getRowCellByHeader(row, 'Arch')).getByText(repoArch)).toBeVisible(),
       ]);
     });
   });
@@ -87,8 +85,9 @@ test.describe('Introspect Repositories', () => {
         page.getByRole('button', { name: 'Remove' }).click(),
       ]);
 
-      await clearFilters(page);
-      await expect(page.getByText(repoName)).not.toBeVisible();
+      await expect(
+        page.getByText('No custom repositories match the filter criteria'),
+      ).toBeVisible();
     });
   });
 });

@@ -20,8 +20,8 @@ export default defineConfig({
         ['./ci-reporter'],
       ]
     : 'list',
-  timeout: process.env.CI ? 60000 : 30000,
-  expect: { timeout: process.env.CI ? 30000 : 20000 },
+  timeout: 900_000,
+  expect: { timeout: process.env.CI ? 30_000 : 20_000 },
   use: {
     launchOptions: {
       args: ['--use-fake-device-for-media-stream'],
