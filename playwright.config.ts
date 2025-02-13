@@ -20,9 +20,12 @@ export default defineConfig({
         ['./ci-reporter'],
       ]
     : 'list',
-  timeout: 900_000,
+  globalTimeout: 29.5 * 60 * 1000, // Set because of codebuild, we want PW to timeout before CB to get the results.
+  timeout: 10 * 60 * 1000,
   expect: { timeout: process.env.CI ? 30_000 : 20_000 },
   use: {
+    actionTimeout: 30_000,
+    navigationTimeout: 30_000,
     launchOptions: {
       args: ['--use-fake-device-for-media-stream'],
     },

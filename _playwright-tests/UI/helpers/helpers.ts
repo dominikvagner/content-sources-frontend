@@ -22,7 +22,7 @@ export const clearFilters = async (page: Page) => {
   try {
     await page.getByRole('button', { name: 'Clear filters' }).waitFor({ timeout: 5000 });
   } catch {
-    return Promise<void>;
+    return;
   }
 
   await page.getByRole('button', { name: 'Clear filters' }).click();
