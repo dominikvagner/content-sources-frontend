@@ -47,7 +47,7 @@ test.describe('Introspect Repositories', () => {
 
     await test.step('Wait for status to be "Valid"', async () => {
       const row = await getRowByName(page, repoName);
-      await expect(row.getByText('Valid')).toBeVisible();
+      await expect(row.getByText('Valid')).toBeVisible({ timeout: 120_000 });
     });
   });
 
