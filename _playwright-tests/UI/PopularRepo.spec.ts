@@ -51,7 +51,7 @@ test.describe('Popular Repositories', () => {
       ).toBeVisible();
     });
 
-    await test.step('Move to Custom repo tab', async () => { 
+    await test.step('Move to Custom repo tab', async () => {
       await page.getByRole('link', { name: 'Your repositories' }).click();
       await expect(page.getByTestId('custom_repositories_table')).toBeVisible();
     });

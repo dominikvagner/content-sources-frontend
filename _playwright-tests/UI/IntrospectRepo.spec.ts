@@ -9,7 +9,7 @@ import {
   waitForTaskPickup,
 } from './helpers/helpers';
 
-test.describe.serial('Introspect Repositories', () => {
+test.describe('Introspect Repositories', () => {
   const repoName = 'introspection-test';
   const repoUrl = 'https://fedorapeople.org/groups/katello/fakerepos/zoo/';
   const repoPackageCount = '8';

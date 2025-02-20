@@ -75,13 +75,14 @@ export const waitForTaskPickup = async ({ request }: Page, repoUrl: string, type
   while (true) {
     const response = await request.get(
       `/api/content-sources/v1/tasks/?repository_uuid=${repoUuid}&type=${type}&status=pending&limit=1`,
+      { timeout: 60_000 },
     );
     const body = await response.json();
     const data = Array.from(body.data);
     if (data.length === 0) {
       break;
     }
-    await sleep(3000);
+    await sleep(5000);
   }
 
   return;
