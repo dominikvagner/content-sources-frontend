@@ -1,9 +1,15 @@
 import { test, expect } from '@playwright/test';
 import { navigateToRepositories } from './helpers/navHelpers';
-import { closePopupsIfExist, getRowByName, getRowCellByHeader } from './helpers/helpers';
 import { deleteAllRepos } from './helpers/deleteRepositories';
+import {
+  closePopupsIfExist,
+  getRowByName,
+  getRowCellByHeader,
+  retry,
+  waitForTaskPickup,
+} from './helpers/helpers';
 
-test.describe('Introspect Repositories', () => {
+test.describe.serial('Introspect Repositories', () => {
   const repoName = 'introspection-test';
   const repoUrl = 'https://fedorapeople.org/groups/katello/fakerepos/zoo/';
   const repoPackageCount = '8';
@@ -14,7 +20,7 @@ test.describe('Introspect Repositories', () => {
 
   test.beforeEach(async ({ page }) => {
     await test.step('Navigate to the repository page', async () => {
-      await navigateToRepositories(page);
+      await retry(page, navigateToRepositories);
       await closePopupsIfExist(page);
     });
   });
@@ -46,8 +52,9 @@ test.describe('Introspect Repositories', () => {
     });
 
     await test.step('Wait for status to be "Valid"', async () => {
+      await waitForTaskPickup(page, repoUrl, 'introspect');
       const row = await getRowByName(page, repoName);
-      await expect(row.getByText('Valid')).toBeVisible({ timeout: 120_000 });
+      await expect(row.getByText('Valid')).toBeVisible({ timeout: 60_000 });
     });
   });
 

@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export const closePopupsIfExist = async (page: Page) => {
   const locatorsToCheck = [
@@ -10,7 +10,11 @@ export const closePopupsIfExist = async (page: Page) => {
 
   for (const locator of locatorsToCheck) {
     await page.addLocatorHandler(locator, async () => {
-      await locator.first().click(); // There can be multiple toast pop-ups
+      try {
+        await locator.first().click(); // There can be multiple toast pop-ups
+      } catch {
+        return;
+      }
     });
   }
 };
@@ -55,4 +59,50 @@ export const getRowCellByHeader = async (row: Locator, name: string) => {
   }
 
   return row.getByRole('gridcell').nth(index);
+};
+
+export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const waitForTaskPickup = async ({ request }: Page, repoUrl: string, type: string) => {
+  const response = await request.get(`/api/content-sources/v1/repositories/?url=${repoUrl}`);
+  expect(response.status()).toBe(200);
+  const body = await response.json();
+  expect(Array.isArray(body.data)).toBeTruthy();
+  const uuidList = body.data.map((data: { uuid: string }) => data.uuid) as string[];
+  expect(uuidList.length).toEqual(1);
+
+  const repoUuid = uuidList[0];
+  while (true) {
+    const response = await request.get(
+      `/api/content-sources/v1/tasks/?repository_uuid=${repoUuid}&type=${type}&status=pending&limit=1`,
+    );
+    const body = await response.json();
+    const data = Array.from(body.data);
+    if (data.length === 0) {
+      break;
+    }
+    await sleep(3000);
+  }
+
+  return;
+};
+
+export const retry = async (page: Page, callback: (page: Page) => Promise<void>, retries = 3) => {
+  let rc = retries;
+  while (rc >= 0) {
+    rc -= 1;
+
+    if (rc === 0) {
+      return await callback(page);
+    } else {
+      try {
+        await callback(page);
+      } catch {
+        continue;
+      }
+      break;
+    }
+  }
+
+  return;
 };
