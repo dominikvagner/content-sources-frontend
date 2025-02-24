@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { navigateToRepositories } from './helpers/navHelpers';
 import { deleteAllRepos } from './helpers/deleteRepositories';
-import { closePopupsIfExist } from './helpers/helpers';
+import { closePopupsIfExist, retry } from './helpers/helpers';
 
 test.describe('Custom Repositories', () => {
   test('Clean - Delete any current repos that exist', async ({ page }) => {
@@ -9,7 +9,7 @@ test.describe('Custom Repositories', () => {
   });
 
   test('Create two custom repositories', async ({ page }) => {
-    await navigateToRepositories(page);
+    await retry(page, navigateToRepositories);
     await closePopupsIfExist(page);
     const nameList = ['one', 'current'];
 
@@ -24,7 +24,7 @@ test.describe('Custom Repositories', () => {
   });
 
   test('Delete one custom repository', async ({ page }) => {
-    await navigateToRepositories(page);
+    await retry(page, navigateToRepositories);
     await closePopupsIfExist(page);
 
     if (await page.getByLabel('Kebab toggle').first().isDisabled())

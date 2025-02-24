@@ -1,13 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { navigateToRepositories } from './helpers/navHelpers';
-import { closePopupsIfExist } from './helpers/helpers';
+import { closePopupsIfExist, retry } from './helpers/helpers';
 
 test.describe('Red Hat Repositories', () => {
   const smallRHRepo = 'Red Hat Ansible Engine 2 for RHEL 8 x86_64 (RPMs)';
 
   test.beforeEach(async ({ page }) => {
     await test.step('Navigate to repositories page', async () => {
-      await navigateToRepositories(page);
+      await retry(page, navigateToRepositories);
       await closePopupsIfExist(page);
     });
     await test.step('Navigate to Red Hat repositories', async () => {

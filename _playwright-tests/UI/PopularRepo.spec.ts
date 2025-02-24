@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { navigateToRepositories } from './helpers/navHelpers';
-import { closePopupsIfExist } from './helpers/helpers';
+import { closePopupsIfExist, retry } from './helpers/helpers';
 import { deleteAllPopularRepos } from './helpers/deletePopularRepositories';
 
 test.describe('Popular Repositories', () => {
@@ -8,7 +8,7 @@ test.describe('Popular Repositories', () => {
     // Ensure no popular repos are selected.
     await deleteAllPopularRepos(page);
 
-    await navigateToRepositories(page);
+    await retry(page, navigateToRepositories);
     await closePopupsIfExist(page);
     await expect(page).toHaveTitle('Repositories - Content | RHEL');
 

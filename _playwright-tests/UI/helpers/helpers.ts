@@ -88,8 +88,8 @@ export const waitForTaskPickup = async ({ request }: Page, repoUrl: string, type
   return;
 };
 
-export const retry = async (page: Page, callback: (page: Page) => Promise<void>, retries = 3) => {
-  let rc = retries;
+export const retry = async (page: Page, callback: (page: Page) => Promise<void>, tries = 3) => {
+  let rc = tries;
   while (rc >= 0) {
     rc -= 1;
 

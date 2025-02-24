@@ -1,12 +1,12 @@
 import { test, expect } from '@playwright/test';
 import { navigateToTemplates } from './helpers/navHelpers';
-import { closePopupsIfExist } from './helpers/helpers';
+import { closePopupsIfExist, retry } from './helpers/helpers';
 
 test.describe('Templates', () => {
   test('Navigate to templates, make sure the Add content template button can be clicked', async ({
     page,
   }) => {
-    await navigateToTemplates(page);
+    await retry(page, navigateToTemplates);
     await closePopupsIfExist(page);
 
     const AddButton = page.locator('[data-ouia-component-id="create_content_template"]');
@@ -32,7 +32,7 @@ test.describe('Templates', () => {
     });
 
     await test.step('Navigate to the templates page', async () => {
-      await navigateToTemplates(page);
+      await retry(page, navigateToTemplates);
       await closePopupsIfExist(page);
     });
 

@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { navigateToRepositories } from './helpers/navHelpers';
 import path from 'path';
-import { closePopupsIfExist } from './helpers/helpers';
+import { closePopupsIfExist, retry } from './helpers/helpers';
 import { deleteAllRepos } from './helpers/deleteRepositories';
 
 test.describe('Upload Repositories', () => {
@@ -11,7 +11,7 @@ test.describe('Upload Repositories', () => {
 
   test('Create upload repository', async ({ page }) => {
     await closePopupsIfExist(page);
-    await navigateToRepositories(page);
+    await retry(page, navigateToRepositories);
 
     // Click 'Add repositories' button
     await page.getByRole('button', { name: 'Add repositories' }).first().click();
@@ -70,7 +70,7 @@ test.describe('Upload Repositories', () => {
   });
 
   test('Delete one upload repository', async ({ page }) => {
-    await navigateToRepositories(page);
+    await retry(page, navigateToRepositories);
     await closePopupsIfExist(page);
 
     // Check if the 'Kebab toggle' button is disabled
