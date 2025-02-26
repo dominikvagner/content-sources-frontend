@@ -192,9 +192,9 @@ jobs:
         working-directory: content-sources-backend
         run: OPTIONS_REPOSITORY_IMPORT_FILTER=small make repos-import
 
-      - name: Run nightly job to trigger snapshot for redhat repos
+      - name: Run snapshot for redhat repo
         working-directory: content-sources-backend
-        run: go run cmd/external-repos/main.go process-repos
+        run: go run cmd/external-repos/main.go snapshot https://cdn.redhat.com/content/dist/layered/rhel8/x86_64/ansible/2/os/
 
       - name: Backend run
         working-directory: content-sources-backend
