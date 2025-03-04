@@ -63,10 +63,10 @@ test.describe('Introspect Repositories', () => {
       const row = page.getByRole('row').filter({ has: page.getByText(testPackage) });
       await Promise.all([
         expect(page.getByText(repoArch)).toHaveCount(8),
-        expect((await getRowCellByHeader(row, 'Name')).getByText(testPackage)).toBeVisible(),
-        expect((await getRowCellByHeader(row, 'Version')).getByText(repoVersion)).toBeVisible(),
-        expect((await getRowCellByHeader(row, 'Release')).getByText(repoRelease)).toBeVisible(),
-        expect((await getRowCellByHeader(row, 'Arch')).getByText(repoArch)).toBeVisible(),
+        expect((await getRowCellByHeader(page, row, 'Name')).getByText(testPackage)).toBeVisible(),
+        expect((await getRowCellByHeader(page, row, 'Version')).getByText(repoVersion)).toBeVisible(),
+        expect((await getRowCellByHeader(page, row, 'Release')).getByText(repoRelease)).toBeVisible(),
+        expect((await getRowCellByHeader(page, row, 'Arch')).getByText(repoArch)).toBeVisible(),
       ]);
     });
   });

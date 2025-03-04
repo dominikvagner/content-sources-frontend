@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 export const closePopupsIfExist = async (page: Page) => {
   const locatorsToCheck = [
@@ -34,7 +34,8 @@ export const getRowByName = async (page: Page, name: string) => {
   return page.getByRole('row').filter({ has: page.getByText(name) });
 };
 
-export const getRowCellByHeader = async (row: Locator, name: string) => {
+export const getRowCellByHeader = async (page: Page, row: Locator, name: string) => {
+  await expect(page.getByRole('columnheader', { name: name })).toBeVisible()
   const table = row.locator('xpath=ancestor::*[@role="grid" or @role="table"][1]');
   const headers = table.getByRole('columnheader');
   const headerCount = await headers.count();
