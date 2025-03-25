@@ -155,7 +155,7 @@ export default function SetUpDateStep() {
           />
         </Hide>
       </FormGroup>
-      <Hide hide={!hasIsAfter || !dateIsValid}>
+      <Hide hide={templateRequest.use_latest || !hasIsAfter || !dateIsValid}>
         <FormAlert>
           <Alert
             variant='warning'
