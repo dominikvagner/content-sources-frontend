@@ -20,6 +20,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          submodules: recursive
+
+      - name: Set up sparse checkout
+        run: |
+          cd _playwright-tests/test-utils/
+          git sparse-checkout init --cone
+          git sparse-checkout set _playwright-tests/test-utils/
+          cd -
 
       - name: Create front-end .env file
         run: |
