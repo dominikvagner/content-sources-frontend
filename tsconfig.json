@@ -1,28 +1,29 @@
 {
-    "compilerOptions": {
-      "baseUrl": "src",
-      "module": "CommonJS",
-      "target": "ESNext",
-      "isolatedModules": true,
-      "allowJs": true,
-      "checkJs": false,
-      "jsx": "react-jsx",
-      "outDir": "./build",
-      "removeComments": true,
-      "pretty": true,
-      "skipLibCheck": true,
-      "strict": true,
-      "moduleResolution": "node",
-      "esModuleInterop": true,
-      "noImplicitAny": false,
-      "resolveJsonModule": true,
-      "sourceMap": true,
-      "types": ["node", "jest"],
-      "typeRoots": [
-      "./node_modules/@types",
-      ]
-    },
-    "include": ["src/**/*.ts", "**/*.tsx", "**/*"],
-    "exclude": ["./node_modules/*", "**/*.js", "content-sources-backend"]
-  }
-  
+  "compilerOptions": {
+    "baseUrl": "src",
+    "module": "CommonJS",
+    "target": "ESNext",
+    "isolatedModules": true,
+    "allowJs": true,
+    "checkJs": false,
+    "jsx": "react-jsx",
+    "outDir": "./build",
+    "removeComments": true,
+    "pretty": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "types": ["node", "jest"],
+    "typeRoots": ["./node_modules/@types"],
+    "paths": {
+      "test-utils": ["../_playwright-tests/test-utils/_playwright-tests/test-utils/src/index.ts"],
+      "test-utils/*": ["../_playwright-tests/test-utils/_playwright-tests/test-utils/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "**/*.tsx", "**/*", "_playwright-tests/**/*.ts"],
+  "exclude": ["./node_modules/*", "**/*.js", "content-sources-backend"]
+}

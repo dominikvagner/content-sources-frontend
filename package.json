@@ -37,6 +37,7 @@
     "@unleash/proxy-client-react": "^4.4.0",
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
+    "content-sources-test-utils": "file:./_playwright-tests/test-utils/_playwright-tests/test-utils",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
     "dotenv": "^16.4.7",
