@@ -1,0 +1,13 @@
+name: 'Sparse Checkout Test Utils'
+description: 'Sets up sparse checkout for test utils'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up sparse checkout
+      shell: bash
+      working-directory: _playwright-tests/test-utils/
+      run: |
+        git sparse-checkout init --cone
+        git sparse-checkout set _playwright-tests/test-utils/
+

@@ -3601,7 +3601,7 @@ content-disposition@0.5.4:
   dependencies:
     safe-buffer "5.2.1"
 
-"content-sources-test-utils@file:./test-utils":
+"content-sources-test-utils@file:./_playwright-tests/test-utils/_playwright-tests/test-utils":
   version "1.0.0"
   dependencies:
     "@playwright/test" "^1.49.1"

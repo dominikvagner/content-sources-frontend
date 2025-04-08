@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
+import { cleanupRepositories } from 'test-utils/helpers';
 import { navigateToRepositories } from './helpers/navHelpers';
-import { deleteAllRepos } from './helpers/deleteRepositories';
 import { closePopupsIfExist, getRowByNameOrUrl } from './helpers/helpers';
 
 const repoNamePrefix = 'GPG-key';
@@ -13,11 +13,11 @@ const packages_key =
 const meta_key = 'https://jlsherrill.fedorapeople.org/fake-repos/signed/GPG-KEY.gpg';
 
 test.describe('Test GPG keys', () => {
-  test('Create a repo, add a GPG Key, toggle metadata', async ({ page }) => {
+  test('Create a repo, add a GPG Key, toggle metadata', async ({ page, client, cleanup }) => {
     await test.step('Delete any GPG key test repos that exist', async () => {
+      await cleanup.runAndAdd(() => cleanupRepositories(client, repoName, url));
       await navigateToRepositories(page);
       await closePopupsIfExist(page);
-      await deleteAllRepos(page, `&search=${repoNamePrefix}`);
     });
 
     await test.step('Create a repository', async () => {
@@ -48,6 +48,7 @@ test.describe('Test GPG keys', () => {
       await page.getByPlaceholder('Paste GPG key or URL here').fill(packages_key);
       await page.getByRole('button', { name: 'Save', exact: true }).click();
     });
+
     await test.step('Change to Metadata GPG Key', async () => {
       // Search for the created repo
       const row = await getRowByNameOrUrl(page, repoName);
@@ -63,9 +64,6 @@ test.describe('Test GPG keys', () => {
       await page.getByText('Package and metadata').click();
       // Save button would be disabled for bad or incorrect gpg key
       await page.getByRole('button', { name: 'Save changes', exact: true }).click();
-    });
-    await test.step('Post test cleanup', async () => {
-      await deleteAllRepos(page, `&search=${repoNamePrefix}`);
     });
   });
 });
