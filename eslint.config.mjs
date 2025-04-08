@@ -20,7 +20,12 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ['node_modules/*', 'static/*', 'dist/*'],
+    ignores: [
+      'node_modules/*',
+      'static/*',
+      'dist/*',
+      '_playwright-tests/test-utils/_playwright-tests/test-utils/src/client',
+    ],
   },
   ...compat.extends(
     'eslint:recommended',
