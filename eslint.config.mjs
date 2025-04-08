@@ -8,7 +8,6 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
 import { FlatCompat } from '@eslint/eslintrc';
-import pwexportrule from './custom-rules/playwright-imports.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,7 +19,12 @@ const compat = new FlatCompat({
 
 export default [
   {
-    ignores: ['node_modules/*', 'static/*', 'dist/*'],
+    ignores: [
+      'node_modules/*',
+      'static/*',
+      'dist/*',
+      '_playwright-tests/test-utils/_playwright-tests/test-utils/src/client',
+    ],
   },
   ...compat.extends(
     'eslint:recommended',
@@ -34,11 +38,6 @@ export default [
       '@typescript-eslint': typescriptEslint,
       prettier,
       'unused-imports': unusedImports,
-      custom: {
-        rules: {
-          pwexportrule,
-        },
-      },
     },
 
     languageOptions: {
@@ -87,7 +86,6 @@ export default [
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': ['warn'],
       'no-empty-pattern': ['error', { allowObjectPatternsAsParameters: true }],
-      // 'custom/pwexportrule': 'error',
     },
   },
 ];
