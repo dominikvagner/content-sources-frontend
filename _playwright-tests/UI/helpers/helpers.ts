@@ -23,21 +23,21 @@ export const closePopupsIfExist = async (page: Page) => {
   }
 };
 
-export const filterByNameOrUrl = async (page: Page, name: string) => {
-  await page.getByPlaceholder(/^Filter by name.*$/).fill(name);
+export const filterByNameOrUrl = async (locator: Locator | Page, name: string) => {
+  await locator.getByPlaceholder(/^Filter by name.*$/).fill(name);
   // We are expecting the first item in the table to contain the name
   // Ensure that your filter is unique to your repository!
-  await expect(page.getByRole('row').filter({ has: page.getByText(name) })).toBeVisible();
+  await expect(locator.getByRole('row').filter({ hasText: name })).toBeVisible();
 };
 
-export const clearFilters = async (page: Page) => {
+export const clearFilters = async (locator: Locator | Page) => {
   try {
-    await page.getByRole('button', { name: 'Clear filters' }).waitFor({ timeout: 5000 });
+    await locator.getByRole('button', { name: 'Clear filters' }).waitFor({ timeout: 5000 });
   } catch {
     return;
   }
 
-  await page.getByRole('button', { name: 'Clear filters' }).click();
+  await locator.getByRole('button', { name: 'Clear filters' }).click();
 };
 
 /**
@@ -46,16 +46,16 @@ export const clearFilters = async (page: Page) => {
  * Set "forceFilter" to enforce filtering logic.
  **/
 export const getRowByNameOrUrl = async (
-  page: Page,
+  locator: Locator | Page,
   name: string,
   forceFilter: boolean = false,
 ): Promise<Locator> => {
-  await clearFilters(page);
-  const target = page.getByRole('row').filter({ has: page.getByText(name) });
+  await clearFilters(locator);
+  const target = locator.getByRole('row').filter({ hasText: name });
   // First check if the row is visible, if so don't filter, and just return the target
   if (!forceFilter && (await target.isVisible())) return target;
   // Now run the filter
-  await filterByNameOrUrl(page, name);
+  await filterByNameOrUrl(locator, name);
   return target;
 };
 
