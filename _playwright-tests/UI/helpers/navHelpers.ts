@@ -26,7 +26,15 @@ const navigateToRepositoriesFunc = async (page: Page) => {
 };
 
 export const navigateToRepositories = async (page: Page) => {
-  await retry(page, navigateToRepositoriesFunc);
+  try {
+    const repositoriesNavLink = page
+      .getByRole('navigation')
+      .getByRole('link', { name: 'Repositories' });
+    await repositoriesNavLink.waitFor({ state: 'visible', timeout: 1500 });
+    await repositoriesNavLink.click();
+  } catch {
+    await retry(page, navigateToRepositoriesFunc, 5);
+  }
 };
 
 const navigateToTemplatesFunc = async (page: Page) => {
@@ -39,5 +47,11 @@ const navigateToTemplatesFunc = async (page: Page) => {
 };
 
 export const navigateToTemplates = async (page: Page) => {
-  await retry(page, navigateToTemplatesFunc);
+  try {
+    const templatesNavLink = page.getByRole('navigation').getByRole('link', { name: 'Templates' });
+    await templatesNavLink.waitFor({ state: 'visible', timeout: 1500 });
+    await templatesNavLink.click();
+  } catch {
+    await retry(page, navigateToTemplatesFunc, 5);
+  }
 };

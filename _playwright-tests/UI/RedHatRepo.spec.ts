@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { navigateToRepositories } from './helpers/navHelpers';
-import { closePopupsIfExist } from './helpers/helpers';
+import { closePopupsIfExist, getRowByNameOrUrl } from './helpers/helpers';
 
 test.describe('Red Hat Repositories', () => {
   const smallRHRepo = 'Red Hat CodeReady Linux Builder for RHEL 9 ARM 64 (RPMs)';
@@ -16,24 +16,13 @@ test.describe('Red Hat Repositories', () => {
     });
   });
 
-  test('Wait for repository status to be "Valid"', async ({ page }) => {
-    const status = page
-      .getByRole('row')
-      .filter({ hasText: smallRHRepo })
-      .getByRole('gridcell')
-      .filter({ hasText: 'Valid' });
-
-    await test.step('Filter repos by name', async () => {
-      await page.getByPlaceholder('Filter by name/url').fill(smallRHRepo);
+  test('Verify snapshotting of Red Hat repositories', async ({ page }) => {
+    await test.step('Wait for status to be "Valid"', async () => {
+      const row = await getRowByNameOrUrl(page, smallRHRepo);
+      await expect(row.getByText('Valid')).toBeVisible({ timeout: 600_000 });
     });
 
-    await test.step('Wait for a valid status', async () => {
-      await status.waitFor({ state: 'visible', timeout: 600_000 });
-    });
-  });
-
-  test('Check repository snapshots', async ({ page }) => {
-    await test.step('Open the snapshots list modal', async () => {
+    await test.step('Check repository snapshots', async () => {
       await page
         .getByRole('row')
         .filter({ hasText: smallRHRepo })

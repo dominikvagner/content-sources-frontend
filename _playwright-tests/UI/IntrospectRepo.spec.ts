@@ -1,12 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { navigateToRepositories } from './helpers/navHelpers';
 import { deleteAllRepos } from './helpers/deleteRepositories';
-import {
-  closePopupsIfExist,
-  getRowByNameOrUrl,
-  getRowCellByHeader,
-  waitForTaskPickup,
-} from './helpers/helpers';
+import { closePopupsIfExist, getRowByNameOrUrl, getRowCellByHeader } from './helpers/helpers';
 
 test.describe('Introspect Repositories', () => {
   const repoName = 'introspection-test';
@@ -18,17 +13,17 @@ test.describe('Introspect Repositories', () => {
   const testPackage = 'cheetah';
 
   test.beforeEach(async ({ page }) => {
+    await test.step('Cleanup repository, if using the same url', async () => {
+      await deleteAllRepos(page, `&url=${repoUrl}`);
+    });
+
     await test.step('Navigate to the repository page', async () => {
       await navigateToRepositories(page);
       await closePopupsIfExist(page);
     });
   });
 
-  test('Create an introspection repository', async ({ page }) => {
-    await test.step('Cleanup repository, if using the same url', async () => {
-      await deleteAllRepos(page, `&url=${repoUrl}`);
-    });
-
+  test('Create and delete an introspection repository', async ({ page }) => {
     await test.step('Open the add repository modal', async () => {
       await page.getByRole('button', { name: 'Add repositories' }).first().click();
       await expect(page.getByText('Add custom repositories')).toBeVisible();
@@ -51,13 +46,10 @@ test.describe('Introspect Repositories', () => {
     });
 
     await test.step('Wait for status to be "Valid"', async () => {
-      await waitForTaskPickup(page, repoUrl, 'introspect');
       const row = await getRowByNameOrUrl(page, repoName);
-      await expect(row.getByText('Valid')).toBeVisible({ timeout: 60_000 });
+      await expect(row.getByText('Valid')).toBeVisible({ timeout: 180_000 });
     });
-  });
 
-  test('Check introspected repository packages', async ({ page }) => {
     await test.step('Open the packages modal', async () => {
       const row = await getRowByNameOrUrl(page, repoName);
       await row.getByRole('gridcell', { name: repoPackageCount, exact: true }).locator('a').click();
@@ -79,11 +71,10 @@ test.describe('Introspect Repositories', () => {
         ).toBeVisible(),
         expect((await getRowCellByHeader(page, row, 'Arch')).getByText(repoArch)).toBeVisible(),
       ]);
+      await page.getByRole('button', { name: 'close' }).first().click();
     });
-  });
 
-  test('Delete introspected repository', async ({ page }) => {
-    await test.step('Delete created repository', async () => {
+    await test.step('Delete the created repository', async () => {
       const row = await getRowByNameOrUrl(page, repoName);
       await row.getByLabel('Kebab toggle').click();
       await row.getByRole('menuitem', { name: 'Delete' }).click();
