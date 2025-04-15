@@ -15,7 +15,8 @@ export const closePopupsIfExist = async (page: Page) => {
   for (const locator of locatorsToCheck) {
     await page.addLocatorHandler(locator, async () => {
       try {
-        await locator.first().click(); // There can be multiple toast pop-ups
+        await page.getByRole('dialog').waitFor({ state: 'hidden', timeout: 1000 });
+        await locator.first().click({ noWaitAfter: true }); // There can be multiple toast pop-ups
       } catch {
         return;
       }

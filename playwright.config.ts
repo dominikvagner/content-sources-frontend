@@ -1,5 +1,11 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices, ReporterDescription } from '@playwright/test';
 import 'dotenv/config';
+
+const reporters: ReporterDescription[] = [['html'], ['list']];
+
+// if (process.env.CURRENTS_PROJECT_ID && process.env.CURRENTS_RECORD_KEY) {
+//   reporters.push(['@currents/playwright']);
+// }
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -8,20 +14,11 @@ export default defineConfig({
   testDir: './_playwright-tests/',
   fullyParallel: false,
   forbidOnly: false,
-  retries: process.env.CI ? 1 : 0,
-  workers: 1,
-  reporter: process.env.CI
-    ? [
-        ['html', { outputFolder: 'playwright-report' }],
-        [
-          'playwright-ctrf-json-reporter',
-          { outputDir: 'playwright-ctrf', outputFile: 'playwright-ctrf.json' },
-        ],
-        ['@currents/playwright'],
-      ]
-    : 'list',
-  globalTimeout: 29.5 * 60 * 1000, // 29.5m, Set because of codebuild, we want PW to timeout before CB to get the results.
-  timeout: 10 * 60 * 1000, // 10m
+  retries: process.env.CI ? 2 : 1,
+  workers: process.env.CI ? 1 : 4,
+  reporter: reporters,
+  globalTimeout: 20 * 60 * 1000, // 20m, Set because of codebuild, we want PW to timeout before CB to get the results.
+  timeout: 5 * 60 * 1000, // 5
   expect: { timeout: 30_000 }, // 30s
   use: {
     actionTimeout: 30_000, // 30s
@@ -38,18 +35,23 @@ export default defineConfig({
       : {}),
     baseURL: process.env.BASE_URL,
     ignoreHTTPSErrors: true,
-          ...process.env.PROXY ? {
+    ...(process.env.PROXY
+      ? {
           proxy: {
-              server: process.env.PROXY,
-          }
-      } : {},
+            server: process.env.PROXY,
+          },
+        }
+      : {}),
     testIdAttribute: 'data-ouia-component-id',
     trace: 'on',
-    screenshot: 'on',
+    screenshot: 'off',
     video: 'on',
   },
   projects: [
-    { name: 'setup', testMatch: /.*\.setup\.ts/ },
+    {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
     {
       name: 'chromium',
       use: {

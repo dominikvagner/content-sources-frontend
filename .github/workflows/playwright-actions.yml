@@ -110,7 +110,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version-file: ".nvmrc"
+          node-version-file: '.nvmrc'
 
       # - name: Cache - API-test node_modules
       #        if: ${{ !cancelled() }}
@@ -178,7 +178,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "${{ steps.get-go-version.outputs.go-version }}"
+          go-version: '${{ steps.get-go-version.outputs.go-version }}'
 
       - name: Set up Make
         working-directory: content-sources-backend
@@ -206,13 +206,14 @@ jobs:
           .github/workflowScripts/waitForBackend.sh
 
       - name: Run front-end Playwright tests
-        run: CURRENTS_PROJECT_ID=mMVOFH CURRENTS_RECORD_KEY=$CURRENTS_RECORD_KEY yarn playwright test
+        # run: CURRENTS_PROJECT_ID=mMVOFH CURRENTS_RECORD_KEY=$CURRENTS_RECORD_KEY yarn playwright test
+        run: yarn playwright test
 
-      - name: Publish front-end Test Report
-        uses: ctrf-io/github-test-reporter@v1
-        with:
-          report-path: "./playwright-ctrf/playwright-ctrf.json"
-        if: ${{ !cancelled() }}
+      # - name: Publish front-end Test Report
+      #   uses: ctrf-io/github-test-reporter@v1
+      #   with:
+      #     report-path: "./playwright-ctrf/playwright-ctrf.json"
+      #   if: ${{ !cancelled() }}
 
       - name: Store front-end Test report
         uses: actions/upload-artifact@v4

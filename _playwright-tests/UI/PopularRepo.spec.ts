@@ -68,22 +68,28 @@ test.describe('Popular Repositories', () => {
     });
 
     await test.step('Use kebab menu to delete a repo', async () => {
-      await page.getByRole('textbox', { name: 'Filter by name/url' }).fill(repoName8);
-      await page.getByRole('checkbox', { name: 'Select row 0' }).check();
+      const row = await getRowByNameOrUrl(page, repoName8);
+      await row.getByRole('checkbox', { name: 'Select row' }).check();
 
       await page.getByTestId('custom_repositories_kebab_toggle').click();
       await page.getByRole('menuitem', { name: 'Remove 1 repositories' }).click();
       // Confirm the removal in the pop-up
-      await page.getByRole('button', { name: 'Remove' }).click();
+      await page
+        .getByRole('dialog', { name: 'Remove repositories?' })
+        .getByRole('button', { name: 'Remove' })
+        .click();
     });
 
     await test.step('Use kebab menu to delete a repo', async () => {
       const row = await getRowByNameOrUrl(page, repoName9);
-      await row.getByRole('checkbox', { name: 'Select row 0' }).check();
+      await row.getByRole('checkbox', { name: 'Select row' }).check();
       await page.getByTestId('custom_repositories_kebab_toggle').click();
       await page.getByRole('menuitem', { name: 'Remove 1 repositories' }).click();
       // Confirm the removal in the pop-up
-      await page.getByRole('button', { name: 'Remove' }).click();
+      await page
+        .getByRole('dialog', { name: 'Remove repositories?' })
+        .getByRole('button', { name: 'Remove' })
+        .click();
     });
   });
 });

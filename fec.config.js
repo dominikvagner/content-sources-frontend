@@ -1,40 +1,39 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const path = require('path');
-const { dependencies, insights } = require('./package.json');
 
-const moduleName = insights.appname.replace(/-(\w)/g, (_, match) => match.toUpperCase());
 const srcDir = path.resolve(__dirname, './src');
 
 module.exports = {
-  appName: moduleName,
-  appUrl: '/insights/content/repositories',
+  appName: 'content',
+  appUrl: '/insights/content',
+  debug: true,
+  useAgent: true,
   useProxy: true,
+  devtool: 'hidden-source-map',
+  interceptChromeConfig: false,
+  plugins: [],
+  hotReload: process.env.HOT === 'true',
   moduleFederation: {
-    moduleName,
     exposes: {
       './RootApp': path.resolve(__dirname, './src/AppEntry.tsx'),
     },
+    exclude: ['react-router-dom'],
     shared: [
       {
         'react-router-dom': {
           singleton: true,
           import: false,
-          version: dependencies['react-router-dom'],
-          requiredVersion: '>=6.0.0 <7.0.0',
+          version: '^6.3.0',
         },
       },
       {
         '@unleash/proxy-client-react': {
-          version: dependencies['@unleash/proxy-client-react'],
           singleton: true,
+          version: '*',
         },
       },
     ],
   },
-  /**
-   * Add additional webpack plugins
-   */
-  //   plugins: [...(process.env.VERBOSE ? [new WatchRunPlugin()] : []), new webpack.ProgressPlugin()],
   resolve: {
     modules: [srcDir, path.resolve(__dirname, './node_modules')],
   },

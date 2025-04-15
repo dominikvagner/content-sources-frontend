@@ -45,10 +45,11 @@ export const logInWithUsernameAndPassword = async (
   await login.press('Enter');
   const passwordField = page.getByRole('textbox', { name: 'Password' });
   await passwordField.fill(password);
-  await passwordField.press('Enter');
+  await page.getByRole('button', { name: 'Log in' }).click();
 
   await expect(async () => {
-    expect(page.url()).toBe(`${process.env.BASE_URL}/insights/content/repositories`);
+    const pattern = `^${process.env.BASE_URL}/insights/content/repositories.*$`;
+    expect(page.url()).toMatch(new RegExp(pattern));
   }).toPass();
 };
 

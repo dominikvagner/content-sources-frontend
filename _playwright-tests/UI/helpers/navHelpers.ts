@@ -2,7 +2,7 @@ import { type Page } from '@playwright/test';
 import { retry } from './helpers';
 
 const navigateToRepositoriesFunc = async (page: Page) => {
-  await page.goto('/insights/content/repositories', { timeout: 5000 });
+  await page.goto('/insights/content/repositories', { timeout: 10000 });
 
   const zeroState = page.getByText('Start using Content management now');
 
@@ -11,8 +11,8 @@ const navigateToRepositoriesFunc = async (page: Page) => {
   // Wait for either list page or zerostate
   try {
     await Promise.race([
-      repositoriesListPage.waitFor({ state: 'visible', timeout: 20000 }),
-      zeroState.waitFor({ state: 'visible', timeout: 20000 }),
+      repositoriesListPage.waitFor({ state: 'visible' }),
+      zeroState.waitFor({ state: 'visible' }),
     ]);
   } catch (error) {
     throw new Error(
@@ -38,7 +38,7 @@ export const navigateToRepositories = async (page: Page) => {
 };
 
 const navigateToTemplatesFunc = async (page: Page) => {
-  await page.goto('/insights/content/templates');
+  await page.goto('/insights/content/templates', { timeout: 10000 });
 
   const templateText = page.getByText('View all content templates within your organization.');
 

@@ -19,7 +19,7 @@ test.describe('Red Hat Repositories', () => {
   test('Verify snapshotting of Red Hat repositories', async ({ page }) => {
     await test.step('Wait for status to be "Valid"', async () => {
       const row = await getRowByNameOrUrl(page, smallRHRepo);
-      await expect(row.getByText('Valid')).toBeVisible({ timeout: 600_000 });
+      await expect(row.getByText('Valid')).toBeVisible({ timeout: 240_000 });
     });
 
     await test.step('Check repository snapshots', async () => {
