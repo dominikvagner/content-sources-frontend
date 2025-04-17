@@ -1,5 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import path from 'path';
+import { retry } from '../UI/helpers/helpers';
 
 // This file can only contain functions that are referenced by authentication.
 
@@ -31,7 +32,10 @@ export const logInWithUsernameAndPassword = async (
     throw new Error('Username or password not found');
   }
 
-  await page.goto('/insights/content/repositories');
+  const goto = async (page: Page): Promise<void> => {
+    await page.goto('/insights/content/repositories', { timeout: 10000 });
+  };
+  await retry(page, goto);
 
   await expect(async () => {
     expect(page.url()).not.toBe(process.env.BASE_URL + '/insights/content/repositories');

@@ -12,6 +12,7 @@ setup.describe('Setup', async () => {
   });
 
   setup('Authenticate', async ({ page }) => {
+    setup.setTimeout(90_000);
     await closePopupsIfExist(page);
     await reloadOnSentry(page);
     await logInWithUser1(page);

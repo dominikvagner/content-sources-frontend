@@ -15,14 +15,14 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: false,
   retries: process.env.CI ? 2 : 1,
-  workers: process.env.CI ? 1 : 4,
+  workers: 4,
   reporter: reporters,
-  globalTimeout: 20 * 60 * 1000, // 20m, Set because of codebuild, we want PW to timeout before CB to get the results.
-  timeout: 5 * 60 * 1000, // 5
+  globalTimeout: 15 * 60 * 1000, // 15m, Set because of codebuild, we want PW to timeout before CB to get the results.
+  timeout: 3.5 * 60 * 1000, // 3.5m
   expect: { timeout: 30_000 }, // 30s
   use: {
     actionTimeout: 30_000, // 30s
-    navigationTimeout: 30_000, // 30s
+    navigationTimeout: 20_000, // 20s
     launchOptions: {
       args: ['--use-fake-device-for-media-stream'],
     },
