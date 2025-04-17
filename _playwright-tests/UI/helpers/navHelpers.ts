@@ -1,5 +1,5 @@
 import { type Page } from '@playwright/test';
-import { retry } from './helpers';
+import { reloadOnSentry, retry, sentryLocator } from './helpers';
 
 const navigateToRepositoriesFunc = async (page: Page) => {
   await page.goto('/insights/content/repositories', { timeout: 10000 });
@@ -33,7 +33,9 @@ export const navigateToRepositories = async (page: Page) => {
     await repositoriesNavLink.waitFor({ state: 'visible', timeout: 1500 });
     await repositoriesNavLink.click();
   } catch {
+    await reloadOnSentry(page);
     await retry(page, navigateToRepositoriesFunc, 5);
+    await page.removeLocatorHandler(sentryLocator(page));
   }
 };
 
@@ -52,6 +54,8 @@ export const navigateToTemplates = async (page: Page) => {
     await templatesNavLink.waitFor({ state: 'visible', timeout: 1500 });
     await templatesNavLink.click();
   } catch {
+    await reloadOnSentry(page);
     await retry(page, navigateToTemplatesFunc, 5);
+    await page.removeLocatorHandler(sentryLocator(page));
   }
 };

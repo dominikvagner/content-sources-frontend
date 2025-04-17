@@ -24,6 +24,19 @@ export const closePopupsIfExist = async (page: Page) => {
   }
 };
 
+export const sentryLocator = (page: Page) =>
+  page.getByText(/^Something went wrong Sentry error ID:.*$/);
+
+export const reloadOnSentry = async (page: Page) => {
+  await page.addLocatorHandler(sentryLocator(page), async () => {
+    try {
+      await page.reload();
+    } catch {
+      return;
+    }
+  });
+};
+
 export const filterByNameOrUrl = async (locator: Locator | Page, name: string) => {
   await locator.getByPlaceholder(/^Filter by name.*$/).fill(name);
   // We are expecting the first item in the table to contain the name

@@ -4,7 +4,7 @@ import {
   logInWithUser1,
   storeStorageStateAndToken,
 } from './helpers/loginHelpers';
-import { closePopupsIfExist } from './UI/helpers/helpers';
+import { closePopupsIfExist, reloadOnSentry } from './UI/helpers/helpers';
 
 setup.describe('Setup', async () => {
   setup('Ensure needed ENV variables exist', async () => {
@@ -13,6 +13,7 @@ setup.describe('Setup', async () => {
 
   setup('Authenticate', async ({ page }) => {
     await closePopupsIfExist(page);
+    await reloadOnSentry(page);
     await logInWithUser1(page);
     await storeStorageStateAndToken(page);
   });
