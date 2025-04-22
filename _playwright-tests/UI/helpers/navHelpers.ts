@@ -27,6 +27,9 @@ const navigateToRepositoriesFunc = async (page: Page) => {
 
 export const navigateToRepositories = async (page: Page) => {
   try {
+    await page.route('https://consent.trustarc.com/**', (route) => route.abort());
+    await page.route('https://smetrics.redhat.com/**', (route) => route.abort());
+
     const repositoriesNavLink = page
       .getByRole('navigation')
       .getByRole('link', { name: 'Repositories' });
@@ -48,6 +51,9 @@ const navigateToTemplatesFunc = async (page: Page) => {
 
 export const navigateToTemplates = async (page: Page) => {
   try {
+    await page.route('https://consent.trustarc.com/**', (route) => route.abort());
+    await page.route('https://smetrics.redhat.com/**', (route) => route.abort());
+
     const templatesNavLink = page.getByRole('navigation').getByRole('link', { name: 'Templates' });
     await templatesNavLink.waitFor({ state: 'visible', timeout: 1500 });
     await templatesNavLink.click();
