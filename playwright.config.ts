@@ -9,7 +9,7 @@ export default defineConfig({
   fullyParallel: false,
   forbidOnly: false,
   retries: process.env.CI ? 1 : 0,
-  workers: 1,
+  workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI
     ? [
         ['html', { outputFolder: 'playwright-report' }],
@@ -20,8 +20,8 @@ export default defineConfig({
         ['@currents/playwright'],
       ]
     : 'list',
-  globalTimeout: 29.5 * 60 * 1000, // 29.5m, Set because of codebuild, we want PW to timeout before CB to get the results.
-  timeout: 10 * 60 * 1000, // 10m
+  globalTimeout: 20 * 60 * 1000, // 15m, Set because of codebuild, we want PW to timeout before CB to get the results.
+  timeout: 4 * 60 * 1000, // 4m
   expect: { timeout: 30_000 }, // 30s
   use: {
     actionTimeout: 30_000, // 30s
@@ -38,14 +38,16 @@ export default defineConfig({
       : {}),
     baseURL: process.env.BASE_URL,
     ignoreHTTPSErrors: true,
-          ...process.env.PROXY ? {
+    ...(process.env.PROXY
+      ? {
           proxy: {
-              server: process.env.PROXY,
-          }
-      } : {},
+            server: process.env.PROXY,
+          },
+        }
+      : {}),
     testIdAttribute: 'data-ouia-component-id',
     trace: 'on',
-    screenshot: 'on',
+    screenshot: 'off',
     video: 'on',
   },
   projects: [
