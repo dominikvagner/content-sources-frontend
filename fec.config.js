@@ -1,19 +1,23 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const path = require('path');
 const { dependencies, insights } = require('./package.json');
 
-const moduleName = insights.appname.replace(/-(\w)/g, (_, match) => match.toUpperCase());
+const sassPrefix = insights.appname.replace(/-(\w)/g, (_, match) => match.toUpperCase());
 const srcDir = path.resolve(__dirname, './src');
 
 module.exports = {
-  appName: moduleName,
-  appUrl: '/insights/content/repositories',
+  sassPrefix: `.${sassPrefix}`,
+  appUrl: '/insights/content',
+  debug: true,
+  devtool: 'hidden-source-map',
   useProxy: true,
+  interceptChromeConfig: false,
+  plugins: [],
   moduleFederation: {
-    moduleName,
     exposes: {
       './RootApp': path.resolve(__dirname, './src/AppEntry.tsx'),
     },
+    exclude: ['react-router-dom'],
     shared: [
       {
         'react-router-dom': {
