@@ -42,7 +42,7 @@ test.describe('Templates', () => {
         page.url().startsWith('https://docs.redhat.com/en/documentation/red_hat_insights/'),
       ).toBeTruthy();
       expect(page.url().includes('content-template')).toBeTruthy();
-      await expect(page.getByText('Creating a content template').first()).toBeVisible();
+      await expect(page.getByText(/^.*Using content templates.*$/).first()).toBeVisible();
       await expect(
         page.getByText('A content template is a set of repository snapshots').first(),
       ).toBeVisible();
