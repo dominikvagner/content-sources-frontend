@@ -33,13 +33,10 @@ export const logInWithUsernameAndPassword = async (
 
   await page.goto('/insights/content/repositories');
 
-  await expect(async () => {
-    expect(page.url()).not.toBe(process.env.BASE_URL + '/insights/content/repositories');
-  }).toPass();
-
   await expect(async () =>
     expect(page.getByText('Log in to your Red Hat account')).toBeVisible(),
   ).toPass();
+
   const login = page.getByRole('textbox');
   await login.fill(username);
   await login.press('Enter');
