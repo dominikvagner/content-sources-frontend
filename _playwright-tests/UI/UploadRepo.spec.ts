@@ -12,10 +12,12 @@ test.describe('Upload Repositories', () => {
       await deleteAllRepos(page, `&search=${uploadRepoName}`);
     });
 
-    await test.step('Create upload repository', async () => {
+    await test.step('Navigate to repositories', async () => {
       await closePopupsIfExist(page);
       await navigateToRepositories(page);
+    });
 
+    await test.step('Create upload repository', async () => {
       // Click 'Add repositories' button
       await page.getByRole('button', { name: 'Add repositories' }).first().click();
 
@@ -77,8 +79,6 @@ test.describe('Upload Repositories', () => {
     });
 
     await test.step('Delete one upload repository', async () => {
-      await navigateToRepositories(page);
-      await closePopupsIfExist(page);
       const row = await getRowByNameOrUrl(page, uploadRepoName);
       // Check if the 'Kebab toggle' button is disabled
       await row.getByLabel('Kebab toggle').click();
