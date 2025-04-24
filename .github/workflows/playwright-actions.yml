@@ -15,6 +15,11 @@ jobs:
       - instance-size:medium
       - buildspec-override:true
 
+    strategy:
+      fail-fast: false
+      matrix:
+        worker: [1, 2]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -170,33 +175,6 @@ jobs:
       - name: Run front-end and back-end setup in parallel
         run: 'parallel --line-buffer --tagstring "[{#}]:" ::: "yarn install && yarn build && yarn playwright install --with-deps && (BACKEND_PORT=8000 yarn start:stage & npx wait-on https://localhost:1337)" "cd content-sources-backend && make compose-down compose-clean compose-up"'
 
-      # - name: Install front-end dependencies
-      #   run: yarn install
-      #
-      # - name: Build front-end FEC container
-      #   run: yarn build
-      #
-      # - name: Install front-end Playwright Browsers
-      #   run: yarn playwright install --with-deps
-      #
-      # - name: Start front-end server
-      #   run: |
-      #     BACKEND_PORT=8000 yarn start:stage &
-      #     npx wait-on https://localhost:1337
-      #
-      # - name: Backend compose-up
-      #   working-directory: content-sources-backend
-      #   run: make compose-down compose-clean compose-up
-      #
-
-      - name: Import the smallest Redhat repos
-        working-directory: content-sources-backend
-        run: OPTIONS_REPOSITORY_IMPORT_FILTER=small make repos-import
-
-      - name: Run snapshot for redhat repo
-        working-directory: content-sources-backend
-        run: go run cmd/external-repos/main.go snapshot https://cdn.redhat.com/content/dist/rhel9/9/aarch64/codeready-builder/os/
-
       - name: Backend run
         working-directory: content-sources-backend
         run: make run &
@@ -206,8 +184,16 @@ jobs:
           chmod +x .github/workflowScripts/waitForBackend.sh
           .github/workflowScripts/waitForBackend.sh
 
+      - name: Import the smallest Redhat repos
+        working-directory: content-sources-backend
+        run: OPTIONS_REPOSITORY_IMPORT_FILTER=small make repos-import
+
+      - name: Run snapshot for redhat repo
+        working-directory: content-sources-backend
+        run: go run cmd/external-repos/main.go snapshot https://cdn.redhat.com/content/dist/rhel9/9/aarch64/codeready-builder/os/ --force
+
       - name: Run front-end Playwright tests
-        run: CURRENTS_PROJECT_ID=mMVOFH CURRENTS_RECORD_KEY=$CURRENTS_RECORD_KEY yarn playwright test
+        run: CURRENTS_PROJECT_ID=mMVOFH CURRENTS_RECORD_KEY=$CURRENTS_RECORD_KEY CURRENTS_CI_BUILD_ID="${{ github.repository }}-${{ github.run_id }}-${{ github.run_attempt }}" yarn playwright test --shard ${{ matrix.worker }}/2
 
       - name: Publish front-end Test Report
         uses: ctrf-io/github-test-reporter@v1
@@ -219,6 +205,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.worker }}
           path: playwright-report/
           retention-days: 10
