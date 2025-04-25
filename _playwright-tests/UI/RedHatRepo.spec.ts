@@ -16,7 +16,8 @@ test.describe('Red Hat Repositories', () => {
     });
   });
 
-  test('Verify snapshotting of Red Hat repositories', async ({ page }) => {
+  // Currently broken due to Pulp bug in stage, remove fixme after it gets fixed.
+  test.fixme('Verify snapshotting of Red Hat repositories', async ({ page }) => {
     await test.step('Wait for status to be "Valid"', async () => {
       const row = await getRowByNameOrUrl(page, smallRHRepo);
       await expect(row.getByText('Valid', { exact: true })).toBeVisible({ timeout: 210_000 });
