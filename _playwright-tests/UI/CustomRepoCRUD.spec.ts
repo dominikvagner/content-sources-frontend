@@ -1,26 +1,19 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
+import { cleanupRepositories, randomName, randomUrl } from 'test-utils/helpers';
+
 import { navigateToRepositories } from './helpers/navHelpers';
-import { deleteAllRepos } from './helpers/deleteRepositories';
 import { closePopupsIfExist, getRowByNameOrUrl } from './helpers/helpers';
 
-export const repoNamePrefix = 'Repo-CRUD';
-export const randomName = () => (Math.random() + 1).toString(36).substring(2, 6);
-export const repoName = `${repoNamePrefix}-${randomName()}`;
-export const rank = () => Math.floor(Math.random() * 10 + 1).toString();
-export const randomNum = () =>
-  Math.floor(Math.random() * 10 + 1)
-    .toString()
-    .padStart(2, '0');
-
-export const url = `https://stephenw.fedorapeople.org/multirepos/${rank()}/repo${randomNum()}/`;
+const repoNamePrefix = 'Repo-CRUD';
+const repoName = `${repoNamePrefix}-${randomName()}`;
+const url = randomUrl();
 
 test.describe('Custom Repositories CRUD', () => {
-  test('Add, Read, update, delete a repo', async ({ page }) => {
-    await test.step('Delete any CRUD test repos that exist', async () => {
-      await navigateToRepositories(page);
-      await closePopupsIfExist(page);
-      await deleteAllRepos(page, `&search=${repoNamePrefix}`);
-    });
+  test('Add, Read, update, delete a repo', async ({ page, client, cleanup }) => {
+    await cleanup.runAndAdd(() => cleanupRepositories(client, repoNamePrefix));
+    await navigateToRepositories(page);
+    await closePopupsIfExist(page);
+
     await test.step('Create a repository', async () => {
       // Click on the 'Add repositories' button
       // HMS-5268 There are two buttons on the ZeroState page
@@ -33,10 +26,12 @@ test.describe('Custom Repositories CRUD', () => {
       await page.getByLabel('URL').fill(url);
       await page.getByRole('button', { name: 'Save', exact: true }).click();
     });
+
     await test.step('Wait for status to be "Valid"', async () => {
       const row = await getRowByNameOrUrl(page, repoName);
       await expect(row.getByText('Valid')).toBeVisible({ timeout: 60000 });
     });
+
     await test.step('Read the repo', async () => {
       // Search for the created repo
       await page.getByRole('textbox', { name: 'Filter by name/url' }).fill(repoName);
@@ -50,15 +45,18 @@ test.describe('Custom Repositories CRUD', () => {
       await expect(page.getByPlaceholder('Enter name', { exact: true })).toHaveValue(`${repoName}`);
       await expect(page.getByPlaceholder('https://', { exact: true })).toHaveValue(`${url}`);
     });
+
     await test.step('Update the repository', async () => {
       await page.getByPlaceholder('Enter name', { exact: true }).fill(`${repoName}-Edited`);
       await page.getByLabel('Snapshotting').click();
       await page.getByRole('button', { name: 'Save changes', exact: true }).click();
     });
+
     await test.step('Wait for status to be "Valid"', async () => {
       const row = await getRowByNameOrUrl(page, repoName);
       await expect(row.getByText('Valid')).toBeVisible({ timeout: 60000 });
     });
+
     await test.step('Confirm repo was updated', async () => {
       await page.getByRole('textbox', { name: 'Filter by name/url' }).fill(`${repoName}-Edited`);
       const row = await getRowByNameOrUrl(page, `${repoName}-Edited`);
@@ -74,6 +72,7 @@ test.describe('Custom Repositories CRUD', () => {
       await expect(page.getByPlaceholder('https://', { exact: true })).toHaveValue(`${url}`);
       await page.getByRole('button', { name: 'Cancel' }).click();
     });
+
     await test.step('Delete one custom repository', async () => {
       await page.getByRole('textbox', { name: 'Filter by name/url' }).fill(`${repoName}-Edited`);
       const row = await getRowByNameOrUrl(page, `${repoName}-Edited`);
@@ -81,7 +80,7 @@ test.describe('Custom Repositories CRUD', () => {
       await row.getByRole('menuitem', { name: 'Delete' }).click();
       await expect(page.getByText('Remove repositories?')).toBeVisible();
       await page.getByRole('button', { name: 'Remove' }).click();
-      await expect(page.getByRole('row', { name: repoName })).not.toBeVisible;
+      await expect(page.getByRole('row', { name: repoName })).not.toBeVisible();
     });
   });
 });

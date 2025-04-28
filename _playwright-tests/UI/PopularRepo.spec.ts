@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
 import { navigateToRepositories } from './helpers/navHelpers';
 import { closePopupsIfExist, getRowByNameOrUrl } from './helpers/helpers';
 import { deleteAllPopularRepos } from './helpers/deletePopularRepositories';
@@ -7,9 +7,9 @@ const repoName9 = 'EPEL 9 Everything x86_64';
 const repoName8 = 'EPEL 8 Everything x86_64';
 
 test.describe('Popular Repositories', () => {
-  test('Add popular repos', async ({ page }) => {
+  test('Add popular repos', async ({ page, cleanup }) => {
     // Ensure no popular repos are selected.
-    await deleteAllPopularRepos(page);
+    await cleanup.runAndAdd(() => deleteAllPopularRepos(page));
 
     await navigateToRepositories(page);
     await closePopupsIfExist(page);

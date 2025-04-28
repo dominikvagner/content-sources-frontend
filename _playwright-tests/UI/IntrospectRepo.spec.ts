@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
+import { cleanupRepositories } from 'test-utils/helpers';
 import { navigateToRepositories } from './helpers/navHelpers';
-import { deleteAllRepos } from './helpers/deleteRepositories';
 import { closePopupsIfExist, getRowByNameOrUrl, getRowCellByHeader } from './helpers/helpers';
 
 test.describe('Introspect Repositories', () => {
@@ -12,18 +12,11 @@ test.describe('Introspect Repositories', () => {
   const repoArch = 'noarch';
   const testPackage = 'cheetah';
 
-  test.beforeEach(async ({ page }) => {
-    await test.step('Cleanup repository, if using the same url', async () => {
-      await deleteAllRepos(page, `&url=${repoUrl}`);
-    });
+  test('Create and delete an introspection repository', async ({ page, client, cleanup }) => {
+    await cleanup.runAndAdd(() => cleanupRepositories(client, repoName, repoUrl));
+    await navigateToRepositories(page);
+    await closePopupsIfExist(page);
 
-    await test.step('Navigate to the repository page', async () => {
-      await navigateToRepositories(page);
-      await closePopupsIfExist(page);
-    });
-  });
-
-  test('Create and delete an introspection repository', async ({ page }) => {
     await test.step('Open the add repository modal', async () => {
       await page.getByRole('button', { name: 'Add repositories' }).first().click();
       await expect(page.getByText('Add custom repositories')).toBeVisible();

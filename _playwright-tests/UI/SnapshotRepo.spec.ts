@@ -1,25 +1,20 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
+import { cleanupRepositories } from 'test-utils/helpers';
 import { navigateToRepositories } from './helpers/navHelpers';
-import { deleteAllRepos } from './helpers/deleteRepositories';
 import {
   closePopupsIfExist,
   getRowByNameOrUrl,
   validateSnapshotTimestamp,
 } from './helpers/helpers';
 
+const repoName = 'one';
+const repoUrl = 'https://jlsherrill.fedorapeople.org/fake-repos/revision/' + repoName;
+
 test.describe('Snapshot Repositories', () => {
-  test('Snapshot a repository', async ({ page }) => {
+  test('Snapshot a repository', async ({ page, client, cleanup }) => {
+    await cleanup.runAndAdd(() => cleanupRepositories(client, repoName, repoUrl));
     await navigateToRepositories(page);
     await closePopupsIfExist(page);
-
-    const repoName = 'one';
-
-    await test.step('Cleanup repository, if using the same url', async () => {
-      await deleteAllRepos(
-        page,
-        `&url=https://jlsherrill.fedorapeople.org/fake-repos/revision/` + repoName,
-      );
-    });
 
     await test.step('Open the add repository modal', async () => {
       await page.getByRole('button', { name: 'Add repositories' }).first().click();
@@ -28,9 +23,7 @@ test.describe('Snapshot Repositories', () => {
 
     await test.step('Fill in the repository details', async () => {
       await page.getByLabel('Name').fill(repoName);
-      await page
-        .getByLabel('URL')
-        .fill('https://jlsherrill.fedorapeople.org/fake-repos/revision/' + repoName);
+      await page.getByLabel('URL').fill(repoUrl);
     });
 
     await test.step('Filter by architecture', async () => {
@@ -83,10 +76,7 @@ test.describe('Snapshot Repositories', () => {
     });
 
     await test.step('Delete created repository', async () => {
-      const row = await getRowByNameOrUrl(
-        page,
-        'https://jlsherrill.fedorapeople.org/fake-repos/revision/' + repoName,
-      );
+      const row = await getRowByNameOrUrl(page, repoUrl);
       await row.getByLabel('Kebab toggle').click();
       await row.getByRole('menuitem', { name: 'Delete' }).click();
       await expect(page.getByText('Remove repositories?')).toBeVisible();
