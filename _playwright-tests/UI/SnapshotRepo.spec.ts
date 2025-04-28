@@ -1,6 +1,6 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
+import { cleanupRepositories, randomName } from 'test-utils/helpers';
 import { navigateToRepositories, navigateToTemplates } from './helpers/navHelpers';
-import { deleteAllRepos } from './helpers/deleteRepositories';
 import {
   closePopupsIfExist,
   getRowByNameOrUrl,
@@ -8,19 +8,14 @@ import {
 } from './helpers/helpers';
 
 test.describe('Snapshot Repositories', () => {
-  test('Snapshot a repository', async ({ page }) => {
-    await navigateToRepositories(page);
-    await closePopupsIfExist(page);
-
+  test('Snapshot a repository', async ({ page, client, cleanup }) => {
     const repoName = 'one';
     const editedRepoName = `${repoName}-edited`;
+    const repoUrl = 'https://jlsherrill.fedorapeople.org/fake-repos/revision/' + repoName;
 
-    await test.step('Cleanup repository, if using the same url', async () => {
-      await deleteAllRepos(
-        page,
-        `&url=https://jlsherrill.fedorapeople.org/fake-repos/revision/` + repoName,
-      );
-    });
+    await cleanup.runAndAdd(() => cleanupRepositories(client, repoName, repoUrl));
+    await navigateToRepositories(page);
+    await closePopupsIfExist(page);
 
     await test.step('Open the add repository modal', async () => {
       await page.getByRole('button', { name: 'Add repositories' }).first().click();
@@ -29,10 +24,8 @@ test.describe('Snapshot Repositories', () => {
 
     await test.step('Fill in the repository details', async () => {
       await page.getByLabel('Name').fill(repoName);
-      await page
-        .getByLabel('URL')
-        .fill('https://jlsherrill.fedorapeople.org/fake-repos/revision/' + repoName);
       await page.getByLabel('Introspect only').click();
+      await page.getByLabel('URL').fill(repoUrl);
     });
 
     await test.step('Filter by architecture', async () => {
@@ -93,10 +86,7 @@ test.describe('Snapshot Repositories', () => {
     });
 
     await test.step('Delete created repository', async () => {
-      const edited_row = await getRowByNameOrUrl(
-        page,
-        'https://jlsherrill.fedorapeople.org/fake-repos/revision/' + repoName,
-      );
+      const edited_row = await getRowByNameOrUrl(page, repoUrl);
       await edited_row.getByLabel('Kebab toggle').click();
       await page.getByRole('menuitem', { name: 'Delete' }).click();
       await expect(page.getByText('Remove repositories?')).toBeVisible();
@@ -113,19 +103,23 @@ test.describe('Snapshot Repositories', () => {
     });
   });
 
-  test('Snapshot deletion', async ({ page }) => {
+  test('Snapshot deletion', async ({ page, client, cleanup }) => {
     const smallRHRepo = 'Red Hat CodeReady Linux Builder for RHEL 9 ARM 64 (RPMs)';
-
-    await navigateToRepositories(page);
-    await closePopupsIfExist(page);
     const repoNamePrefix = 'snapshot-deletion';
-    const randomName = () => `${(Math.random() + 1).toString(36).substring(2, 6)}`;
     const repoName = `${repoNamePrefix}-${randomName()}`;
     const templateName = `Test-template-for-snapshot-deletion-${randomName()}`;
 
     await test.step('Cleanup repositories using "zoo" URLs', async () => {
-      await deleteAllRepos(page, `&search=https://fedorapeople.org/groups/katello/fakerepos/zoo`);
+      await cleanup.runAndAdd(() =>
+        cleanupRepositories(
+          client,
+          repoNamePrefix,
+          'https://fedorapeople.org/groups/katello/fakerepos/zoo',
+        ),
+      );
     });
+    await navigateToRepositories(page);
+    await closePopupsIfExist(page);
 
     await test.step('Create a repository', async () => {
       await page.getByRole('button', { name: 'Add repositories' }).first().click();
@@ -238,6 +232,5 @@ test.describe('Snapshot Repositories', () => {
       });
       await page.getByText('Close').click();
     });
-    await deleteAllRepos(page, `&search=${repoNamePrefix}`);
   });
 });

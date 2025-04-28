@@ -1,24 +1,29 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
+import { cleanupRepositories, randomName } from 'test-utils/helpers';
+
 import { navigateToRepositories } from './helpers/navHelpers';
-import { deleteAllRepos } from './helpers/deleteRepositories';
 import { closePopupsIfExist, getRowByNameOrUrl } from './helpers/helpers';
+
 const repoNamePrefix = 'snapshot-package-list-test';
-const randomName = () => `${(Math.random() + 1).toString(36).substring(2, 6)}`;
 const repoName = `${repoNamePrefix}-${randomName()}`;
 const editedRepo = `${repoName}-Edited`;
+const repoUrl = 'https://jlsherrill.fedorapeople.org/fake-repos/signed/';
+const editedRepoUrl = 'http://jlsherrill.fedorapeople.org/fake-repos/needed-errata/';
 
 test.describe('Snapshot Package Count and List', async () => {
-  test('Verify package count and search functionality in snapshot details', async ({ page }) => {
+  test('Verify package count and search in snapshot details', async ({ page, client, cleanup }) => {
+    await cleanup.runAndAdd(() =>
+      cleanupRepositories(client, repoNamePrefix, repoUrl, editedRepoUrl),
+    );
     await navigateToRepositories(page);
     await closePopupsIfExist(page);
-    await deleteAllRepos(page, `&search=${repoNamePrefix}`);
 
     await test.step('Create a repository', async () => {
       await page.getByRole('button', { name: 'Add repositories' }).first().click();
       await expect(page.getByRole('dialog', { name: 'Add custom repositories' })).toBeVisible();
       await page.getByLabel('Name').fill(`${repoName}`);
       await page.getByLabel('Snapshotting').click();
-      await page.getByLabel('URL').fill('https://jlsherrill.fedorapeople.org/fake-repos/signed/');
+      await page.getByLabel('URL').fill(repoUrl);
       await page.getByRole('button', { name: 'Save', exact: true }).click();
     });
 
@@ -47,9 +52,7 @@ test.describe('Snapshot Package Count and List', async () => {
       await row.getByLabel('Kebab toggle').click();
       await page.getByRole('menuitem', { name: 'Edit' }).click();
       await page.getByPlaceholder('Enter name', { exact: true }).fill(editedRepo);
-      await page
-        .getByLabel('URL')
-        .fill('http://jlsherrill.fedorapeople.org/fake-repos/needed-errata/');
+      await page.getByLabel('URL').fill(editedRepoUrl);
       await page.getByRole('button', { name: 'Save changes', exact: true }).click();
       const editedRow = await getRowByNameOrUrl(page, editedRepo);
       await expect(editedRow.getByText('Valid')).toBeVisible({ timeout: 60000 });
@@ -84,9 +87,6 @@ test.describe('Snapshot Package Count and List', async () => {
         page.getByRole('heading', { name: 'No packages match the filter criteria' }),
       ).toBeVisible();
       await page.getByText('Close').click();
-    });
-    await test.step('Post test cleanup', async () => {
-      await deleteAllRepos(page, `&search=${repoNamePrefix}`);
     });
   });
 });

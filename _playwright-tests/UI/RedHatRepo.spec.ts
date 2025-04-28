@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
 import { navigateToRepositories } from './helpers/navHelpers';
 import { closePopupsIfExist, getRowByNameOrUrl } from './helpers/helpers';
 

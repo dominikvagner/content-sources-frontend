@@ -1,10 +1,10 @@
 import { test, expect } from 'test-utils';
-import { cleanupRepositories } from 'test-utils/helpers';
+import { cleanupRepositories, randomName } from 'test-utils/helpers';
+
 import { navigateToRepositories } from './helpers/navHelpers';
 import { closePopupsIfExist, getRowByNameOrUrl } from './helpers/helpers';
 
 const repoNamePrefix = 'GPG-key';
-const randomName = () => (Math.random() + 1).toString(36).substring(2, 6);
 const repoName = `${repoNamePrefix}-${randomName()}`;
 
 const url = 'https://jlsherrill.fedorapeople.org/fake-repos/signed/';

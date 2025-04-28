@@ -1,11 +1,9 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
+import { cleanupRepositories, cleanupTemplates, randomName } from 'test-utils/helpers';
+
 import { navigateToRepositories, navigateToTemplates } from './helpers/navHelpers';
 import { closePopupsIfExist, getRowByNameOrUrl } from './helpers/helpers';
-import { deleteAllTemplates } from './helpers/deleteTemplates';
-import { deleteAllRepos } from './helpers/deleteRepositories';
 import { createCustomRepo } from './helpers/createRepositories';
-
-import { randomName } from './helpers/repoHelpers';
 
 const templateNamePrefix = 'template_CRUD';
 const repoNamePrefix = 'custom_repo-template';
@@ -16,14 +14,14 @@ const templateName = `${templateNamePrefix}-${randomName()}`;
 const smallRHRepo = 'Red Hat CodeReady Linux Builder for RHEL 9 ARM 64 (RPMs)';
 
 test.describe('Templates CRUD', () => {
-  test('Add, Read, update, delete a template', async ({ page }) => {
+  test('Add, Read, update, delete a template', async ({ page, client, cleanup }) => {
     await test.step('Delete any templates and template test repos that exist', async () => {
-      await deleteAllRepos(page, `&search=${repoNamePrefix}`);
-      await deleteAllTemplates(page, `&search=${templateNamePrefix}`);
-      await navigateToRepositories(page);
-      await closePopupsIfExist(page);
+      await cleanup.runAndAdd(() => cleanupRepositories(client, repoNamePrefix));
+      await cleanup.runAndAdd(() => cleanupTemplates(client, templateNamePrefix));
     });
     await test.step('Create a repository', async () => {
+      await navigateToRepositories(page);
+      await closePopupsIfExist(page);
       await createCustomRepo(page, repoName);
       const row = await getRowByNameOrUrl(page, repoName);
       await expect(row.getByText('Valid')).toBeVisible({ timeout: 60_000 });
@@ -95,7 +93,6 @@ test.describe('Templates CRUD', () => {
       await expect(page.getByText('Remove template?')).toBeVisible();
       await page.getByRole('button', { name: 'Remove' }).click();
       await expect(rowTemplate.getByText('Valid')).not.toBeVisible();
-      await deleteAllTemplates(page, `&search=${templateNamePrefix}`);
     });
   });
 });

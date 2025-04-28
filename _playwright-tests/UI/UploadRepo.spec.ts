@@ -1,21 +1,15 @@
-import { test, expect } from '@playwright/test';
-import { navigateToRepositories } from './helpers/navHelpers';
 import path from 'path';
+import { test, expect, cleanupRepositories } from 'test-utils';
+import { navigateToRepositories } from './helpers/navHelpers';
 import { closePopupsIfExist, getRowByNameOrUrl, retry } from './helpers/helpers';
-import { deleteAllRepos } from './helpers/deleteRepositories';
 
 const uploadRepoName = 'Upload Repo!';
 
 test.describe('Upload Repositories', () => {
-  test('Upload repo creation and deletion', async ({ page }) => {
-    await test.step('Clean - Delete any current repos that exist', async () => {
-      await deleteAllRepos(page, `&search=${uploadRepoName}`);
-    });
-
-    await test.step('Navigate to repositories', async () => {
-      await closePopupsIfExist(page);
-      await navigateToRepositories(page);
-    });
+  test('Upload repo creation and deletion', async ({ page, client, cleanup }) => {
+    await cleanup.runAndAdd(() => cleanupRepositories(client, uploadRepoName));
+    await closePopupsIfExist(page);
+    await navigateToRepositories(page);
 
     await test.step('Create upload repository', async () => {
       // Click 'Add repositories' button
@@ -98,10 +92,6 @@ test.describe('Upload Repositories', () => {
         page.getByRole('button', { name: 'Remove' }).click(),
         await expect(row).not.toBeVisible(),
       ]);
-    });
-
-    await test.step('Clean - Double check upload repo for deletion', async () => {
-      await deleteAllRepos(page, `&search=${uploadRepoName}`);
     });
   });
 });

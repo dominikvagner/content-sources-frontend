@@ -1,4 +1,5 @@
 import { type Page } from '@playwright/test';
+import { test } from 'test-utils';
 import { retry } from './helpers';
 
 const navigateToRepositoriesFunc = async (page: Page) => {
@@ -26,18 +27,26 @@ const navigateToRepositoriesFunc = async (page: Page) => {
 };
 
 export const navigateToRepositories = async (page: Page) => {
-  try {
-    await page.route('https://consent.trustarc.com/**', (route) => route.abort());
-    await page.route('https://smetrics.redhat.com/**', (route) => route.abort());
+  await test.step(
+    `Navigating to repositories`,
+    async () => {
+      try {
+        await page.route('https://consent.trustarc.com/**', (route) => route.abort());
+        await page.route('https://smetrics.redhat.com/**', (route) => route.abort());
 
-    const repositoriesNavLink = page
-      .getByRole('navigation', { name: 'Breadcrumb' })
-      .getByRole('link', { name: 'Repositories' });
-    await repositoriesNavLink.waitFor({ state: 'visible', timeout: 1500 });
-    await repositoriesNavLink.click();
-  } catch {
-    await retry(page, navigateToRepositoriesFunc, 5);
-  }
+        const repositoriesNavLink = page
+          .getByRole('navigation', { name: 'Breadcrumb' })
+          .getByRole('link', { name: 'Repositories' });
+        await repositoriesNavLink.waitFor({ state: 'visible', timeout: 1500 });
+        await repositoriesNavLink.click();
+      } catch {
+        await retry(page, navigateToRepositoriesFunc, 5);
+      }
+    },
+    {
+      box: true,
+    },
+  );
 };
 
 const navigateToTemplatesFunc = async (page: Page) => {
@@ -50,14 +59,24 @@ const navigateToTemplatesFunc = async (page: Page) => {
 };
 
 export const navigateToTemplates = async (page: Page) => {
-  try {
-    await page.route('https://consent.trustarc.com/**', (route) => route.abort());
-    await page.route('https://smetrics.redhat.com/**', (route) => route.abort());
+  await test.step(
+    `Navigating to templates`,
+    async () => {
+      try {
+        await page.route('https://consent.trustarc.com/**', (route) => route.abort());
+        await page.route('https://smetrics.redhat.com/**', (route) => route.abort());
 
-    const templatesNavLink = page.getByRole('navigation').getByRole('link', { name: 'Templates' });
-    await templatesNavLink.waitFor({ state: 'visible', timeout: 1500 });
-    await templatesNavLink.click();
-  } catch {
-    await retry(page, navigateToTemplatesFunc, 5);
-  }
+        const templatesNavLink = page
+          .getByRole('navigation')
+          .getByRole('link', { name: 'Templates' });
+        await templatesNavLink.waitFor({ state: 'visible', timeout: 1500 });
+        await templatesNavLink.click();
+      } catch {
+        await retry(page, navigateToTemplatesFunc, 5);
+      }
+    },
+    {
+      box: true,
+    },
+  );
 };
