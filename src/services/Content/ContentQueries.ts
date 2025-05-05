@@ -311,6 +311,7 @@ export const useEditContentQuery = (request: EditContentRequestItem) => {
 
       queryClient.invalidateQueries(CONTENT_LIST_KEY);
       queryClient.invalidateQueries(CONTENT_ITEM_KEY);
+      queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
       queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
       queryClient.invalidateQueries(POPULAR_REPOSITORIES_LIST_KEY);
     },
@@ -705,6 +706,7 @@ export const useTriggerSnapshot = (queryClient: QueryClient) => {
         title: 'Snapshot triggered successfully',
         id: 'trigger-snapshot-success',
       });
+      queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
       queryClient.invalidateQueries(CONTENT_LIST_KEY);
     },
     onError: (err) => {
@@ -767,6 +769,8 @@ export const useIntrospectRepositoryMutate = (
           id: 'introspect-repository-success',
         });
       }
+      queryClient.invalidateQueries(CONTENT_ITEM_KEY);
+      queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
       queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
     },
     // If the mutation fails, use the context returned from onMutate to roll back
