@@ -12,13 +12,8 @@ jobs:
   playwright-tests:
     runs-on:
       - codebuild-content-services-fe-repo-${{ github.run_id }}-${{ github.run_attempt }}
-      - instance-size:medium
+      - instance-size:large
       - buildspec-override:true
-
-    strategy:
-      fail-fast: false
-      matrix:
-        worker: [1, 2]
 
     steps:
       - name: Checkout code
@@ -173,16 +168,25 @@ jobs:
         run: sudo npm run patch:hosts
 
       - name: Run front-end and back-end setup in parallel
-        run: 'parallel --line-buffer --tagstring "[{#}]:" ::: "yarn install && yarn build && yarn playwright install --with-deps && (BACKEND_PORT=8000 yarn start:stage & npx wait-on https://localhost:1337)" "cd content-sources-backend && make compose-down compose-clean compose-up"'
+        run: 'parallel --line-buffer --tagstring "[{#}]:" ::: "yarn install && yarn build && yarn playwright install --with-deps" "cd content-sources-backend && make compose-down compose-clean compose-up"'
+
+      - name: Frontend run (static)
+        run: yarn fec static --port 8003 &
 
       - name: Backend run
         working-directory: content-sources-backend
         run: make run &
 
+      - name: Wait for frontend to be ready
+        run: npx wait-on http://localhost:8003/apps/content-sources/
+
       - name: Wait for backend to be ready
         run: |
           chmod +x .github/workflowScripts/waitForBackend.sh
           .github/workflowScripts/waitForBackend.sh
+
+      - name: Run testing proxy
+        run: docker run -d --network=host -e HTTPS_PROXY=$RH_PROXY_URL -v "$(pwd)/config:/config:ro,Z" --name consoledot-testing-proxy quay.io/dvagner/consoledot-testing-proxy
 
       - name: Import the smallest Redhat repos
         working-directory: content-sources-backend
@@ -193,7 +197,7 @@ jobs:
         run: go run cmd/external-repos/main.go snapshot https://cdn.redhat.com/content/dist/rhel9/9/aarch64/codeready-builder/os/ --force
 
       - name: Run front-end Playwright tests
-        run: CURRENTS_PROJECT_ID=mMVOFH CURRENTS_RECORD_KEY=$CURRENTS_RECORD_KEY CURRENTS_CI_BUILD_ID="${{ github.repository }}-${{ github.run_id }}-${{ github.run_attempt }}" yarn playwright test --shard ${{ matrix.worker }}/2
+        run: CURRENTS_PROJECT_ID=mMVOFH CURRENTS_RECORD_KEY=$CURRENTS_RECORD_KEY CURRENTS_CI_BUILD_ID="${{ github.repository }}-${{ github.run_id }}-${{ github.run_attempt }}" yarn playwright test
 
       - name: Publish front-end Test Report
         uses: ctrf-io/github-test-reporter@v1
@@ -205,6 +209,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report-${{ matrix.worker }}
+          name: playwright-report
           path: playwright-report/
           retention-days: 10
