@@ -46,7 +46,10 @@ export const logInWithUsernameAndPassword = async (
 
   await expect(async () => {
     expect(page.url()).toBe(`${process.env.BASE_URL}/insights/content/repositories`);
-  }).toPass();
+  }).toPass({
+    intervals: [1_000],
+    timeout: 30_000,
+  });
 };
 
 export const logInWithUser1 = async (page: Page) =>
