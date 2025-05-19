@@ -30,7 +30,7 @@ test.describe('Snapshot Package Count and List', async () => {
     await test.step('Verify the package count matches the snapshot', async () => {
       const row = await getRowByNameOrUrl(page, repoName);
       const packageCountValue = await row.getByTestId('package_count_button').textContent();
-      await page.getByRole('button', { name: 'Kebab toggle' }).click();
+      await row.getByRole('button', { name: 'Kebab toggle' }).click();
       await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
       // click on the first row to view the snapshot details
       const snapshotPackagesColumn = await page
