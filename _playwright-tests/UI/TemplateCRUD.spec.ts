@@ -26,7 +26,7 @@ test.describe('Templates CRUD', () => {
     await test.step('Create a repository', async () => {
       await createCustomRepo(page, repoName);
       const row = await getRowByNameOrUrl(page, repoName);
-      await expect(row.getByText('Valid')).toBeVisible();
+      await expect(row.getByText('Valid')).toBeVisible({ timeout: 60_000 });
     });
     await test.step('Navigate to templates, ensure the Add content template button can be clicked', async () => {
       await navigateToTemplates(page);
@@ -41,11 +41,11 @@ test.describe('Templates CRUD', () => {
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       const modalPage = page.getByTestId('add_template_modal');
       const rowRHELRepo = await getRowByNameOrUrl(modalPage, smallRHRepo);
-      await rowRHELRepo.getByLabel('Select row 0', { exact: true }).click();
+      await rowRHELRepo.getByLabel('Select row').click();
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       await modalPage.getByRole('textbox', { name: 'Filter by name/url' }).fill(repoName);
       const rowRepo = await getRowByNameOrUrl(modalPage, repoName);
-      await rowRepo.getByLabel('Select row 0', { exact: true }).click();
+      await rowRepo.getByLabel('Select row').click();
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       await page.getByText('Use latest content', { exact: true }).click();
       await page.getByRole('button', { name: 'Next', exact: true }).click();

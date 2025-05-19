@@ -29,7 +29,7 @@ test.describe('Test GPG keys', () => {
       await page.getByLabel('Introspect only').click();
       await page.getByLabel('URL').fill(url);
       await page.getByPlaceholder('Paste GPG key or URL here').fill(packages_key);
-      expect(page.getByRole('textbox', { name: 'gpgkey_file_to_upload' })).toContainText(
+      await expect(page.getByRole('textbox', { name: 'gpgkey_file_to_upload' })).toContainText(
         '-----BEGIN PGP PUBLIC KEY BLOCK-----',
       );
       // Check that validate fails if you select the metadata option
@@ -56,7 +56,7 @@ test.describe('Test GPG keys', () => {
       await row.getByRole('menuitem', { name: 'Edit' }).click();
       await expect(page.getByRole('dialog', { name: 'Edit custom repository' })).toBeVisible();
       await page.getByPlaceholder('Paste GPG key or URL here').fill(meta_key);
-      expect(page.getByRole('textbox', { name: 'gpgkey_file_to_upload' })).toContainText(
+      await expect(page.getByRole('textbox', { name: 'gpgkey_file_to_upload' })).toContainText(
         '-----BEGIN PGP PUBLIC KEY BLOCK-----',
       );
       await page.getByText('Package and metadata').click();
