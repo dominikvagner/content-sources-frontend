@@ -3,6 +3,8 @@ import {
   throwIfMissingEnvVariables,
   logInWithUser1,
   storeStorageStateAndToken,
+  logInWithReadOnlyUser,
+  logout,
 } from './helpers/loginHelpers';
 import { closePopupsIfExist } from './UI/helpers/helpers';
 
@@ -15,8 +17,12 @@ setup.describe('Setup', async () => {
 
   setup('Authenticate', async ({ page }) => {
     setup.setTimeout(60_000);
-
     await closePopupsIfExist(page);
+
+    await logInWithReadOnlyUser(page);
+    await storeStorageStateAndToken(page, 'read-only');
+    await logout(page);
+
     await logInWithUser1(page);
     await storeStorageStateAndToken(page);
   });

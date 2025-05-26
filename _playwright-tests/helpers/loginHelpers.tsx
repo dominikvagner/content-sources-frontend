@@ -1,14 +1,14 @@
 import { expect, type Page } from '@playwright/test';
 import path from 'path';
+import { readFileSync } from 'fs';
 
 // This file can only contain functions that are referenced by authentication.
 
 export const logout = async (page: Page) => {
-  const button = await page.locator(
-    'div.pf-v5-c-toolbar__item.pf-m-hidden.pf-m-visible-on-lg.pf-v5-u-mr-0 > button',
-  );
-
-  await button.click();
+  await page
+    .getByRole('button')
+    .filter({ has: page.getByRole('img', { name: 'User Avatar' }) })
+    .click();
 
   await expect(async () => page.getByRole('menuitem', { name: 'Log out' }).isVisible()).toPass();
 
@@ -55,12 +55,33 @@ export const logInWithUsernameAndPassword = async (
 export const logInWithUser1 = async (page: Page) =>
   await logInWithUsernameAndPassword(page, process.env.USER1USERNAME, process.env.USER1PASSWORD);
 
-export const storeStorageStateAndToken = async (page: Page) => {
+export const logInWithReadOnlyUser = async (page: Page) =>
+  await logInWithUsernameAndPassword(
+    page,
+    process.env.READONLYUSERNAME,
+    process.env.READONLYPASSWORD,
+  );
+
+export const storeStorageStateAndToken = async (page: Page, name: string = 'user') => {
   const { cookies } = await page
     .context()
-    .storageState({ path: path.join(__dirname, '../../.auth/user.json') });
+    .storageState({ path: path.join(__dirname, `../../.auth/${name}.json`) });
   process.env.TOKEN = `Bearer ${cookies.find((cookie) => cookie.name === 'cs_jwt')?.value}`;
   await page.waitForTimeout(100);
+};
+
+export const getUserAuthToken = (name: string) => {
+  const userPath = path.join(__dirname, `../../.auth/${name}.json`);
+  const fileContent = readFileSync(userPath, { encoding: 'utf8' });
+
+  const regex = /"name":\s*"cs_jwt",\s*"value":\s*"(.*?)"/;
+
+  const match = fileContent.match(regex);
+  if (match && match[1]) {
+    return `Bearer ${match[1]}`;
+  }
+
+  return '';
 };
 
 export const throwIfMissingEnvVariables = () => {
