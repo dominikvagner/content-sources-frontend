@@ -12,8 +12,20 @@ jobs:
   playwright-tests:
     runs-on:
       - codebuild-content-services-fe-repo-${{ github.run_id }}-${{ github.run_attempt }}
-      - instance-size:large
-      - buildspec-override:true
+        instance-size:large
+        buildspec-override:true
+
+    services:
+      testing-proxy:
+        image: quay.io/dvagner/consoledot-testing-proxy
+        options: '--name consoledot-testing-proxy'
+        ports:
+          - 1337:1337
+        env:
+          HTTP_PROXY: ${{ secrets.RH_PROXY_URL }}
+          HTTPS_PROXY: ${{ secrets.RH_PROXY_URL }}
+        volumes:
+          - ${{ github.workspace }}/config:/config:ro,Z
 
     steps:
       - name: Checkout code
@@ -185,8 +197,8 @@ jobs:
           chmod +x .github/workflowScripts/waitForBackend.sh
           .github/workflowScripts/waitForBackend.sh
 
-      - name: Run testing proxy
-        run: docker run -d --network=host -e HTTPS_PROXY=$RH_PROXY_URL -v "$(pwd)/config:/config:ro,Z" --name consoledot-testing-proxy quay.io/dvagner/consoledot-testing-proxy
+      # - name: Run testing proxy
+      #   run: docker run -d --network=host -e HTTPS_PROXY=$RH_PROXY_URL -v "$(pwd)/config:/config:ro,Z" --name consoledot-testing-proxy quay.io/dvagner/consoledot-testing-proxy
 
       - name: Import the smallest Redhat repos
         working-directory: content-sources-backend
