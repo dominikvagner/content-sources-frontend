@@ -1,4 +1,7 @@
 {
-  "/apps/content-sources*": { "url": "http://127.0.0.1:8003" },
-  "/api/content-sources/*": { "url": "http://127.0.0.1:8000", "rh-identity-headers": true }
+  "/apps/content-sources*": { "url": "http://host.docker.internal:8003" },
+  "/api/content-sources/*": {
+    "url": "http://host.docker.internal:8000",
+    "rh-identity-headers": true
+  }
 }

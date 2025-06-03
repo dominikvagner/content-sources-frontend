@@ -44,9 +44,20 @@ Keep in mind that you have to be connected to the VPN for this to work, even in 
    OR <br/>
    `yarn local` to run against a local backend running on port 8000.<br/>
 
-2. With a browser, open the URL listed in the terminal output, https://stage.foo.redhat.com:1337/insights/content for example.
+2. With a browser, open the URL listed in the terminal output, <https://stage.foo.redhat.com:1337/insights/content> for example.
 
-### Unit Testing
+### Running the app in static mode with a testing proxy
+
+Sometimes the default development proxy started with `yarn start||local` can be
+slow and unstable, which can be problematic while testing. To overcome this you
+can use the [consoledot-testing-proxy](https://github.com/dvagner/consoledot-testing-proxy)
+and run the app in static mode.
+
+1. `yarn fec static` to start the app in static mode
+
+2. `podman run -d -e HTTPS_PROXY=$RH_PROXY_URL -p 1337:1337 -v "$(pwd)/config:/config:ro,Z" --replace --name consoledot-testing-proxy quay.io/dvagner/consoledot-testing-proxy` to run the proxy against stage
+
+## Unit Testing
 
 `yarn verify` will run `yarn build` `yarn lint` (eslint), `yarn format:check` Prettier formatting check and `yarn test` (Jest unit tests)
 
@@ -60,7 +71,7 @@ One can also: `yarn test` to run the unit tests directly.
    For local development only the BASE_URL:`https://stage.foo.redhat.com:1337` is required, which is already set in the example config.
 
 3. Install Playwright browsers and dependencies
-   `yarn playwright install `
+   `yarn playwright install`
 
    OR
 
@@ -97,4 +108,4 @@ If a backend PR is linked, the front-end and back-end PR's in question will both
     - `qa-stable` (deployed by pushing to `qa-stable` on this repo)
     - `prod-beta` (deployed by pushing to `prod-beta` on this repo)
     - `prod-stable` (deployed by pushing to `prod-stable` on this repo)
-- Travis uploads results to RedHatInsight's [codecov](https://codecov.io) account. To change the account, modify CODECOV_TOKEN on https://travis-ci.com/.
+- Travis uploads results to RedHatInsight's [codecov](https://codecov.io) account. To change the account, modify CODECOV_TOKEN on <https://travis-ci.com/>.
