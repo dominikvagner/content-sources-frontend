@@ -20,8 +20,8 @@ export default defineConfig({
         ['@currents/playwright'],
       ]
     : 'list',
-  globalTimeout: 20 * 60 * 1000, // 15m, Set because of codebuild, we want PW to timeout before CB to get the results.
-  timeout: 4 * 60 * 1000, // 4m
+  globalTimeout: (process.env.INTEGRATION ? 35 : 20) * 60 * 1000,
+  timeout: (process.env.INTEGRATION ? 6 : 4) * 60 * 1000, // 6m || 4m
   expect: { timeout: 30_000 }, // 30s
   use: {
     actionTimeout: 30_000, // 30s
@@ -47,18 +47,55 @@ export default defineConfig({
       : {}),
     testIdAttribute: 'data-ouia-component-id',
     trace: 'on',
-    screenshot: 'off',
+    screenshot: 'on',
     video: 'on',
   },
   projects: [
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: '.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
+    process.env.INTEGRATION
+      ? {
+          name: 'integration',
+          grepInvert: process.env.PROD
+            ? [/preview-only/, /switch-to-preview/, /local-only/]
+            : [/switch-to-preview/, /local-only/],
+          use: {
+            ...devices['Desktop Chrome'],
+            storageState: `.auth/user.json`,
+          },
+          testDir: './_playwright-tests/Integration/',
+          dependencies: ['setup'],
+        }
+      : {
+          name: 'UI',
+          use: {
+            ...devices['Desktop Chrome'],
+            storageState: '.auth/user.json',
+          },
+          testDir: './_playwright-tests/UI',
+          dependencies: ['setup'],
+        },
+    ...(process.env.INTEGRATION && process.env.PROD
+      ? [
+          {
+            name: 'Switch to preview',
+            grep: [/switch-to-preview/],
+            use: {
+              ...devices['Desktop Chrome'],
+              storageState: `.auth/user.json`,
+            },
+            dependencies: ['setup', 'integration'],
+          },
+          {
+            name: 'Run preview only',
+            grep: [/preview-only/],
+            use: {
+              ...devices['Desktop Chrome'],
+              storageState: `.auth/user.json`,
+            },
+            testDir: './_playwright-tests/Integration',
+            dependencies: ['Switch to preview'],
+          },
+        ]
+      : []),
   ],
 });

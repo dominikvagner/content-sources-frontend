@@ -1,0 +1,98 @@
+name: nightly-stage-test-action
+on:
+  pull_request:
+    paths:
+      - _playwright-tests/Integration/*
+    types: [opened, reopened, synchronize, labeled, unlabeled]
+
+  schedule:
+    - cron: '0 0 * * *' # This cron expression runs the action every 24 hours at midnight UTC
+
+  workflow_dispatch:
+
+concurrency:
+  group: integration-group
+  cancel-in-progress: true
+
+jobs:
+  playwright-integration-test:
+    runs-on:
+      - codebuild-content-services-int-repo-${{ github.run_id }}-${{ github.run_attempt }}
+      - instance-size:large
+      - buildspec-override:true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache - node_modules
+        if: ${{ !cancelled() }}
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            dist
+          key: ${{ runner.os }}-frontend-node-modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: ${{ runner.os }}-frontend-node-modules-
+
+      - name: Cache Playwright browsers
+        if: ${{ !cancelled() }}
+        id: cache-playwright-browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('playwright.config.ts') }}
+          restore-keys: ${{ runner.os }}-playwright-
+
+      - name: Create .env file
+        run: |
+          echo "CI=true" >> .env
+          echo "INTEGRATION=true" >> .env
+          echo "USER1USERNAME=$USER1USERNAME" >> .env
+          echo "USER1PASSWORD=$USER1PASSWORD" >> .env
+          echo "BASE_URL=$BASE_URL" >> .env
+          echo "PROXY=$PROXY" >> .env
+          echo "TOKEN=apple" >> .env
+          echo "ORG_ID_1=$STAGE_ORG_ID" >> .env
+          echo "ACTIVATION_KEY_1=$STAGE_ACTIVATION_KEY" >> .env
+          echo "DOCKER_SOCKET=/var/run/docker.sock" >> .env
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: CURRENTS_PROJECT_ID=jRJFbV CURRENTS_RECORD_KEY=$CURRENTS_RECORD_KEY CURRENTS_CI_BUILD_ID="${{ github.repository }}-${{ github.run_id }}-${{ github.run_attempt }}" yarn playwright test
+
+      - name: Publish Test Report
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: './playwright-ctrf/playwright-ctrf.json'
+        if: ${{ !cancelled() }}
+
+      - name: Store report
+        uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: ./playwright-ctrf
+          retention-days: 10
+
+      - name: Slack Notification
+        if: github.event_name != 'pull_request'
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: ${{ job.status }}
+          SLACK_ICON: https://jlsherrill.fedorapeople.org/nightly.png
+          SLACK_TITLE: Nightly Stage Test
+          SLACK_USERNAME: Content Sources
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_MESSAGE_ON_SUCCESS: 'Nightly stage tests successful!'
+          SLACK_MESSAGE_ON_FAILURE: 'Nightly stage tests FAILED :('

@@ -89,6 +89,8 @@ One can also: `yarn test` to run the unit tests directly.
 
 It is recommended to test using vs-code and the [Playwright Test module for VSCode](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright). But other editors do have similar plugins to for ease of use, if so desired
 
+For running the integration tests you will need to run `yarn get-tests`, point playwright to stage directly (i.e.: set proxy and change URL, check `playwright_example.env`), set the `INTEGRATION` flag to true and run the tests.
+
 ## PR checks and linking front-end/backend-end PRs for testing
 
 The CICD pipeline for playwright (both front-end and backend) will check in the description of the front-end PRs for the following formatted text:

@@ -1,8 +1,9 @@
 import { expect, test as setup } from '@playwright/test';
 import {
-  throwIfMissingEnvVariables,
+  ensureNotInPreview,
   logInWithUser1,
   storeStorageStateAndToken,
+  throwIfMissingEnvVariables,
 } from './helpers/loginHelpers';
 import { closePopupsIfExist } from './UI/helpers/helpers';
 
@@ -19,5 +20,7 @@ setup.describe('Setup', async () => {
     await closePopupsIfExist(page);
     await logInWithUser1(page);
     await storeStorageStateAndToken(page);
+
+    await ensureNotInPreview(page);
   });
 });

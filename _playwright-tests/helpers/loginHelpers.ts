@@ -46,6 +46,10 @@ export const logInWithUsernameAndPassword = async (
 
   await expect(async () => {
     expect(page.url()).toBe(`${process.env.BASE_URL}/insights/content/repositories`);
+
+    const cookies = await page.context().cookies();
+    const found = cookies.find((cookie) => cookie.name === 'cs_jwt');
+    expect(found).not.toBe(undefined);
   }).toPass({
     intervals: [1_000],
     timeout: 30_000,
@@ -64,7 +68,12 @@ export const storeStorageStateAndToken = async (page: Page) => {
 };
 
 export const throwIfMissingEnvVariables = () => {
-  const ManditoryEnvVariables = ['USER1USERNAME', 'USER1PASSWORD', 'BASE_URL'];
+  const ManditoryEnvVariables = [
+    'USER1USERNAME',
+    'USER1PASSWORD',
+    'BASE_URL',
+    ...(process.env.INTEGRATION ? ['PROXY', 'ORG_ID_1', 'ACTIVATION_KEY_1'] : []),
+  ];
 
   const missing: string[] = [];
   ManditoryEnvVariables.forEach((envVar) => {
@@ -76,4 +85,24 @@ export const throwIfMissingEnvVariables = () => {
   if (missing.length > 0) {
     throw new Error('Missing env variables:' + missing.join(','));
   }
+};
+
+export const ensureNotInPreview = async (page: Page) => {
+  const toggle = page.locator('div').filter({ hasText: 'Preview mode' }).getByRole('switch');
+  if ((await toggle.isVisible()) && (await toggle.isChecked())) {
+    await toggle.click();
+  }
+};
+
+export const ensureInPreview = async (page: Page) => {
+  const toggle = page.locator('div').filter({ hasText: 'Preview mode' }).getByRole('switch');
+  await expect(toggle).toBeVisible();
+  if (!(await toggle.isChecked())) {
+    await toggle.click();
+  }
+  const turnOnButton = page.getByRole('button', { name: 'Turn on' });
+  if (await turnOnButton.isVisible()) {
+    await turnOnButton.click();
+  }
+  await expect(toggle).toBeChecked();
 };

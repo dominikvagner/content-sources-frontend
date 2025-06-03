@@ -1,26 +1,38 @@
 {
-    "compilerOptions": {
-      "baseUrl": "src",
-      "module": "CommonJS",
-      "target": "ESNext",
-      "isolatedModules": true,
-      "allowJs": true,
-      "checkJs": false,
-      "jsx": "react-jsx",
-      "outDir": "./build",
-      "removeComments": true,
-      "pretty": true,
-      "skipLibCheck": true,
-      "strict": true,
-      "moduleResolution": "node",
-      "esModuleInterop": true,
-      "noImplicitAny": false,
-      "resolveJsonModule": true,
-      "sourceMap": true,
-      "types": ["node", "jest", "@testing-library/jest-dom"]
-    },
-    "include": ["src"],
-    "exclude": [
+  "compilerOptions": {
+    "baseUrl": "src",
+    "module": "CommonJS",
+    "target": "ESNext",
+    "isolatedModules": true,
+    "allowJs": true,
+    "checkJs": false,
+    "jsx": "react-jsx",
+    "outDir": "./build",
+    "removeComments": true,
+    "pretty": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "noImplicitAny": false,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "types": ["node", "jest", "@testing-library/jest-dom"]
+  },
+  "include": ["src"],
+  "exclude": [
+    "cache",
+    "auth",
+    "node_modules",
+    "dist",
+    "build",
+    "test-results",
+    "build-tools",
+    "content-sources-backend"
+  ],
+  "watchOptions": {
+    "excludeDirectories": [
+      "_playwright-tests",
       "cache",
       "auth",
       "node_modules",
@@ -29,18 +41,6 @@
       "test-results",
       "build-tools",
       "content-sources-backend"
-    ],
-    "watchOptions": {
-      "excludeDirectories": [
-        "_playwright-tests",
-        "cache",
-        "auth",
-        "node_modules",
-        "dist",
-        "build",
-        "test-results",
-        "build-tools",
-        "content-sources-backend"
-      ]
-    }
+    ]
   }
+}

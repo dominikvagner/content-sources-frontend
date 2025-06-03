@@ -23,7 +23,8 @@
     "test-ci": "TZ=UTC jest --verbose --no-cache",
     "testAllPreviewFailures": "npm-run-all -p test jestPreview",
     "jestPreview": "jest-preview",
-    "jestClear": "jest --clearCache"
+    "jestClear": "jest --clearCache",
+    "get-tests-prod": ".github/workflowScripts/getProdTests.sh"
   },
   "dependencies": {
     "@patternfly/react-core": "^6.3.0-prerelease.2",
@@ -34,11 +35,13 @@
     "@redhat-cloud-services/frontend-components-notifications": "^5.0.6",
     "@redhat-cloud-services/frontend-components-utilities": "^6.0.5",
     "@testing-library/dom": "^10.4.0",
+    "@types/dockerode": "^3.3.34",
     "@unleash/proxy-client-react": "^4.4.0",
     "axios": "^1.7.7",
     "classnames": "^2.5.1",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
+    "dockerode": "^4.0.4",
     "dotenv": "^16.4.7",
     "formik": "^2.4.6",
     "github-actions-ctrf": "^0.0.58",
@@ -85,6 +88,7 @@
     "jest-junit": "^16.0.0",
     "jest-preview": "^0.3.1",
     "npm-run-all": "^4.1.5",
+    "pg": "^8.14.1",
     "prettier": "^3.3.3",
     "pretty-format": "^29.7.0",
     "prop-types": "15.8.1",

@@ -86,7 +86,8 @@ export default [
       'no-duplicate-imports': 'error',
       'unused-imports/no-unused-imports': 'error',
       'unused-imports/no-unused-vars': ['warn'],
-      'custom/pwexportrule': 'error',
+      'no-empty-pattern': ['error', { allowObjectPatternsAsParameters: true }],
+      // 'custom/pwexportrule': 'error',
     },
   },
 ];
