@@ -194,7 +194,7 @@ jobs:
 
       - name: Run snapshot for redhat repo
         working-directory: content-sources-backend
-        run: go run cmd/external-repos/main.go snapshot https://cdn.redhat.com/content/dist/rhel9/9/aarch64/codeready-builder/os/ --force
+        run: go run cmd/external-repos/main.go snapshot --url https://cdn.redhat.com/content/dist/rhel9/9/aarch64/codeready-builder/os/ --force
 
       - name: Run front-end Playwright tests
         run: CURRENTS_PROJECT_ID=mMVOFH CURRENTS_RECORD_KEY=$CURRENTS_RECORD_KEY CURRENTS_CI_BUILD_ID="${{ github.repository }}-${{ github.run_id }}-${{ github.run_attempt }}" yarn playwright test
