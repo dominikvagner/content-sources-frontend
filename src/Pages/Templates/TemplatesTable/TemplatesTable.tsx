@@ -443,7 +443,7 @@ const TemplatesTable = () => {
                   iconPosition='end'
                   isInline
                 >
-                  <a href='https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/managing_system_content_and_patch_updates_with_red_hat_insights/patching-using-content-templates'>
+                  <a href='https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/managing_system_content_and_patch_updates_with_red_hat_insights/patching-using-content-templates_patch-service-overview'>
                     Learn more about templates
                   </a>
                 </Button>
