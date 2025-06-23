@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { navigateToRepositories } from './helpers/navHelpers';
 import path from 'path';
-import { closePopupsIfExist, getRowByNameOrUrl } from './helpers/helpers';
+import { closePopupsIfExist, getRowByNameOrUrl, retry } from './helpers/helpers';
 import { deleteAllRepos } from './helpers/deleteRepositories';
 
 const uploadRepoName = 'Upload Repo!';
@@ -59,12 +59,13 @@ test.describe('Upload Repositories', () => {
         ),
       ]);
 
-      const dragBoxSelector = page.locator('#pf-modal-part-1  > div');
-
       // Handle the file chooser and upload the file
-      await dragBoxSelector
-        .locator('input[type=file]')
-        .setInputFiles(path.join(__dirname, './fixtures/libreOffice.rpm'));
+      await retry(page, async (page) => {
+        await page
+          .locator('#pf-modal-part-1  > div')
+          .locator('input[type=file]')
+          .setInputFiles(path.join(__dirname, './fixtures/libreOffice.rpm'));
+      });
 
       // Verify the upload completion message
       await expect(page.getByText('All uploads completed!')).toBeVisible();
@@ -74,8 +75,8 @@ test.describe('Upload Repositories', () => {
 
       // There might be many rows at this point, we need to ensure that we filter the repo
       const row = await getRowByNameOrUrl(page, uploadRepoName);
-      // Verify the 'In progress' status
-      await expect(row.getByText('In progress')).toBeVisible();
+      // Verify the 'Valid' status
+      await expect(row.getByText('Valid')).toBeVisible();
     });
 
     await test.step('Delete one upload repository', async () => {
