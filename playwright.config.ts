@@ -62,6 +62,7 @@ export default defineConfig({
             ...devices['Desktop Chrome'],
             storageState: `.auth/admin_user.json`,
           },
+          testIgnore: ['**/UI/**'],
           testDir: './_playwright-tests/Integration/',
           dependencies: ['setup'],
         }
@@ -71,7 +72,8 @@ export default defineConfig({
             ...devices['Desktop Chrome'],
             storageState: '.auth/admin_user.json',
           },
-          testDir: './_playwright-tests/UI',
+          testIgnore: ['**/Integration/**'],
+          testDir: './_playwright-tests/UI/',
           dependencies: ['setup'],
         },
     ...(process.env.INTEGRATION && process.env.PROD
@@ -97,13 +99,5 @@ export default defineConfig({
           },
         ]
       : []),
-    {
-      name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        storageState: '.auth/admin_user.json',
-      },
-      dependencies: ['setup'],
-    },
   ],
 });
