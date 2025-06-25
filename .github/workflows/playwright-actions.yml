@@ -28,7 +28,7 @@ jobs:
       - name: Create front-end .env file
         run: |
           # Check if the secrets are set
-          if [ -z "$" ]; then
+          if [ -z "$ADMIN_USERNAME" ]; then
             echo "Error: ADMIN_USERNAME secret is not set."
             exit 1
           fi
