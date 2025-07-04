@@ -3,6 +3,7 @@ on:
   pull_request:
     paths:
       - _playwright-tests/Integration/*
+      - .github/workflows/nightly-stage-test-action.yml
     types: [opened, reopened, synchronize, labeled, unlabeled]
 
   schedule:
@@ -53,11 +54,13 @@ jobs:
         run: |
           echo "CI=true" >> .env
           echo "INTEGRATION=true" >> .env
-          echo "USER1USERNAME=$USER1USERNAME" >> .env
-          echo "USER1PASSWORD=$USER1PASSWORD" >> .env
           echo "BASE_URL=$BASE_URL" >> .env
           echo "PROXY=$PROXY" >> .env
           echo "TOKEN=apple" >> .env
+          echo "ADMIN_USERNAME=$ADMIN_USERNAME" >> .env
+          echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
+          echo "READONLY_USERNAME=$READONLY_USERNAME" >> .env
+          echo "READONLY_PASSWORD=$READONLY_PASSWORD" >> .env
           echo "ORG_ID_1=$STAGE_ORG_ID" >> .env
           echo "ACTIVATION_KEY_1=$STAGE_ACTIVATION_KEY" >> .env
           echo "DOCKER_SOCKET=/var/run/docker.sock" >> .env
