@@ -56,7 +56,6 @@ jobs:
           echo "INTEGRATION=true" >> .env
           echo "BASE_URL=$BASE_URL" >> .env
           echo "PROXY=$PROXY" >> .env
-          echo "TOKEN=apple" >> .env
           echo "ADMIN_USERNAME=$ADMIN_USERNAME" >> .env
           echo "ADMIN_PASSWORD=$ADMIN_PASSWORD" >> .env
           echo "READONLY_USERNAME=$READONLY_USERNAME" >> .env
