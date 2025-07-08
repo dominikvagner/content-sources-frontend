@@ -53,10 +53,13 @@ export const getRowByNameOrUrl = async (
   name: string,
   forceFilter: boolean = false,
 ): Promise<Locator> => {
-  await clearFilters(locator);
-  const target = locator.getByRole('row').filter({ hasText: name });
   // First check if the row is visible, if so don't filter, and just return the target
+  const target = locator.getByRole('row').filter({ hasText: name });
+  if (await target.isVisible()) return target;
+
+  await clearFilters(locator);
   if (!forceFilter && (await target.isVisible())) return target;
+
   // Now run the filter
   await filterByNameOrUrl(locator, name);
   return target;

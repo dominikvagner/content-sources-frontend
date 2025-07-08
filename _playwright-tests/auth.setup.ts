@@ -7,7 +7,6 @@ import {
   logInWithReadOnlyUser,
   logInWithAdminUser,
 } from './helpers/loginHelpers';
-import { closePopupsIfExist } from './UI/helpers/helpers';
 
 import { existsSync, mkdirSync } from 'fs';
 import path from 'path';
@@ -25,8 +24,6 @@ setup.describe('Setup Authentication States', async () => {
 
   setup('Authenticate Read-Only User and Save State', async ({ page }) => {
     setup.setTimeout(60_000);
-
-    await closePopupsIfExist(page);
 
     // Login read-only user
     await logInWithReadOnlyUser(page);
