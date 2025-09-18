@@ -1,3 +1,5 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/RedHatInsights/frontend-components/refs/heads/master/packages/config-utils/src/feo/spec/frontend-crd.schema.json
+---
 apiVersion: v1
 kind: Template
 metadata:
@@ -8,6 +10,7 @@ objects:
     metadata:
       name: content-sources
     spec:
+      feoConfigEnabled: true
       envName: ${ENV_NAME}
       title: ContentSources
       deploymentRepo: https://github.com/content-services/content-sources-frontend
@@ -19,12 +22,93 @@ objects:
           - /apps/content-sources
       image: ${IMAGE}:${IMAGE_TAG}
       module:
-        manifestLocation: "/apps/content-sources/fed-mods.json"
+        manifestLocation: /apps/content-sources/fed-mods.json
         modules:
-          - id: "insights-content-sources"
-            module: "./RootApp"
+          - id: insights-content-sources
+            module: ./RootApp
             routes:
               - pathname: /insights/content
+      bundleSegments:
+        - segmentId: content
+          bundleId: insights
+          position: 600
+          navItems:
+            - id: content
+              title: Content
+              expandable: true
+              routes:
+                - segmentRef:
+                    frontendName: patch
+                    segmentId: patch-advisories-packages
+                - id: repositories
+                  title: Repositories
+                  href: /insights/content/repositories
+                - id: templates
+                  title: Templates
+                  href: /insights/content/templates
+                - segmentRef:
+                    frontendName: patch
+                    segmentId: patch-systems
+      serviceTiles:
+        - section: systemConfiguration
+          group: rhel
+          id: repositories
+          href: /insights/content/repositories
+          title: Repositories
+          description: 'Define repositories to use in image building and patching.'
+          icon: InsightsIcon
+        - section: systemConfiguration
+          group: rhel
+          id: templates
+          href: /insights/content/templates
+          title: Templates
+          description: 'Control Red Hat and custom content updates available to systems using point in time snapshots of repositories.'
+          icon: InsightsIcon
+      searchEntries:
+        - id: repositories
+          title: Repositories
+          href: /insights/content/repositories
+          description: 'Define repositories to use in image building and patching.'
+          alt_title:
+            - 'content'
+            - 'custom content'
+            - 'my content'
+            - 'my repos'
+            - 'repos'
+            - 'repo'
+            - 'repositories'
+            - 'repository'
+            - 'repository sets'
+            - 'Red Hat repositories'
+            - 'introspect'
+            - 'snapshot'
+            - 'upload'
+            - 'epel'
+            - 'community'
+            - 'dnf'
+            - 'yum'
+            - 'rpms'
+            - 'rpm'
+            - 'insights'
+        - id: templates
+          title: Templates
+          href: /insights/content/templates
+          description: 'Control Red Hat and custom content updates available to systems using point in time snapshots of repositories.'
+          alt_title:
+            - 'Content view'
+            - 'SOE'
+            - 'standard operating environment'
+            - 'content'
+            - 'custom content'
+            - 'my content'
+            - 'my repos'
+            - 'repos'
+            - 'repositories'
+            - 'repository'
+            - 'repository sets'
+            - 'Red Hat repositories'
+            - 'snapshot'
+            - 'insights'
 
 parameters:
   - name: ENV_NAME
@@ -33,17 +117,3 @@ parameters:
     required: true
   - name: IMAGE
     value: quay.io/redhat-services-prod/insights-management-tenant/insights-content-sources/content-sources-frontend
-  - name: SELENIUM_MEMORY_LIMIT
-    value: 3Gi
-  - name: SELENIUM_CPU_REQUEST
-    value: 100m
-  - name: SELENIUM_MEMORY_REQUEST
-    value: 2Gi
-  - name: SELENIUM_JAVA_OPTS
-    value: ""
-  - name: VNC_GEOMETRY
-    value: "1920x1080"
-  - name: IQE_PARALLEL_ENABLED
-    value: "false"
-  - name: SE_NODE_SESSION_TIMEOUT
-    value: "600"
