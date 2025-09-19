@@ -1359,17 +1359,17 @@
     js-yaml "^4.1.0"
     node-fetch "2.6.7"
 
-"@redhat-cloud-services/frontend-components-config@^6.6.11":
-  version "6.6.11"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components-config/-/frontend-components-config-6.6.11.tgz#9864c0c7612d11ba7613816f46c2c91131f2d60a"
-  integrity sha512-97IztUl8PdAUOI/KpCe/iZ/JvFJc/OOfC9b3qPNZ8uipAHRjx06AWDbE4S5TFXpQczZb2DbxA+4OS6xKmGnXMg==
+"@redhat-cloud-services/frontend-components-config@^6.7.0":
+  version "6.7.0"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components-config/-/frontend-components-config-6.7.0.tgz#9075d7c9c654a807355bd11249a6aeb40c03cf87"
+  integrity sha512-l+ix9/58Juh2YUVw2xpboJQsrQz1ZqAwh03rkJJbLo7J1At+gDOiKCSn1HBBCrCBeGoowKv1SUuDV53nOrLzWA==
   dependencies:
     "@pmmmwh/react-refresh-webpack-plugin" "^0.5.15"
     "@redhat-cloud-services/frontend-components-config-utilities" "^4.7.0"
     "@redhat-cloud-services/tsc-transform-imports" "^1.0.21"
     "@swc/core" "^1.3.76"
     assert "^2.0.0"
-    axios "^0.28.1 || ^1.7.0"
+    axios "^1.12.2"
     browserify-zlib "^0.2.0"
     buffer "^6.0.3"
     chalk "^4.1.2"
