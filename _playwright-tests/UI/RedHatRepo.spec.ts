@@ -1,5 +1,5 @@
 import { test, expect } from 'test-utils';
-import { navigateToRepositories } from './helpers/navHelpers';
+import { navigateToRepositories, navigateToSnapshotsOfRepository } from './helpers/navHelpers';
 import { closeGenericPopupsIfExist, waitForValidStatus } from './helpers/helpers';
 
 test.describe('Red Hat Repositories', () => {
@@ -22,12 +22,8 @@ test.describe('Red Hat Repositories', () => {
     });
 
     await test.step('Check repository snapshots', async () => {
-      await page
-        .getByRole('row')
-        .filter({ hasText: smallRHRepo })
-        .getByLabel('Kebab toggle')
-        .click();
-      await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+      const row = page.getByRole('row').filter({ hasText: smallRHRepo });
+      await navigateToSnapshotsOfRepository(page, row);
       await expect(
         page.getByTestId('snapshot_list_modal').filter({ hasText: smallRHRepo }),
       ).toBeVisible();

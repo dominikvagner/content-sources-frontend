@@ -1,7 +1,7 @@
 import { test, expect } from 'test-utils';
 import { cleanupRepositories, randomName } from 'test-utils/helpers';
 
-import { navigateToRepositories } from './helpers/navHelpers';
+import { navigateToRepositories, navigateToSnapshotsOfRepository } from './helpers/navHelpers';
 import {
   closeGenericPopupsIfExist,
   getRowByNameOrUrl,
@@ -40,8 +40,7 @@ test.describe('Snapshot Package Count and List', () => {
     await test.step('Verify the package count matches the snapshot', async () => {
       const row = await getRowByNameOrUrl(page, repoName);
       await expect(row.getByTestId('package_count_button')).toHaveText(repoPackageCount);
-      await row.getByRole('button', { name: 'Kebab toggle' }).click();
-      await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+      await navigateToSnapshotsOfRepository(page, row);
       await expect(page.getByTestId('snapshot_package_count_button')).toHaveText(repoPackageCount);
       await page.getByText('Close').click();
     });
@@ -62,8 +61,7 @@ test.describe('Snapshot Package Count and List', () => {
       await expect(editedRow.getByTestId('package_count_button')).toHaveText(
         editedRepoPackageCount,
       );
-      await editedRow.getByRole('button', { name: 'Kebab toggle' }).click();
-      await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+      await navigateToSnapshotsOfRepository(page, editedRow);
       await expect(page.getByTestId('snapshot_package_count_button').first()).toHaveText(
         editedRepoPackageCount,
       );

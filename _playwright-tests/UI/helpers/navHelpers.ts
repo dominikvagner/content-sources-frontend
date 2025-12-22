@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { type Page, type Locator } from '@playwright/test';
 import { test } from 'test-utils';
 import { retry } from './helpers';
 
@@ -79,4 +79,11 @@ export const navigateToTemplates = async (page: Page) => {
       box: true,
     },
   );
+};
+
+export const navigateToSnapshotsOfRepository = async (page: Page, row: Locator) => {
+  await test.step(`Navigating to snapshots of repository`, async () => {
+    await row.getByRole('button', { name: 'Kebab toggle' }).click();
+    await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+  });
 };

@@ -1,6 +1,10 @@
 import { expect, test } from 'test-utils';
 import { cleanupRepositories, randomName } from 'test-utils/helpers';
-import { navigateToRepositories, navigateToTemplates } from './helpers/navHelpers';
+import {
+  navigateToRepositories,
+  navigateToSnapshotsOfRepository,
+  navigateToTemplates,
+} from './helpers/navHelpers';
 import {
   closeGenericPopupsIfExist,
   getRowByNameOrUrl,
@@ -68,8 +72,7 @@ test.describe('Snapshot Repositories', () => {
       // Trigger a snapshot manually
       await page.getByRole('menuitem', { name: 'Trigger snapshot' }).click();
       await waitForValidStatus(page, editedRepoName);
-      await edited_row.getByLabel('Kebab toggle').click();
-      await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+      await navigateToSnapshotsOfRepository(page, edited_row);
       // Verify that snapshot is in snapshots list
       await expect(page.getByRole('dialog', { name: 'Snapshots' }).locator('tbody')).toBeVisible();
       const snapshotTimestamp = await page
@@ -150,8 +153,7 @@ test.describe('Snapshot Repositories', () => {
       }
 
       const row = await waitForValidStatus(page, repoName);
-      await row.getByRole('button', { name: 'Kebab toggle' }).click();
-      await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+      await navigateToSnapshotsOfRepository(page, row);
       await expect(page.getByRole('button', { name: '1 - 4 of 4' }).first()).toBeVisible({
         timeout: 60000,
       });
@@ -197,8 +199,7 @@ test.describe('Snapshot Repositories', () => {
     await test.step('Delete a single snapshot', async () => {
       await navigateToRepositories(page);
       const row = await getRowByNameOrUrl(page, repoName);
-      await row.getByLabel('Kebab toggle').click();
-      await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+      await navigateToSnapshotsOfRepository(page, row);
       await expect(page.getByRole('dialog', { name: 'Snapshots' }).locator('tbody')).toBeVisible();
       await page
         .getByTestId('snapshot_list_table')
@@ -217,8 +218,7 @@ test.describe('Snapshot Repositories', () => {
 
     await test.step('Bulk delete snapshot', async () => {
       const row = await getRowByNameOrUrl(page, repoName);
-      await row.getByLabel('Kebab toggle').click();
-      await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+      await navigateToSnapshotsOfRepository(page, row);
 
       await expect(page.getByRole('dialog', { name: 'Snapshots' }).locator('tbody')).toBeVisible();
       await page.getByRole('row', { name: 'select-snapshot-checkbox' }).locator('label').click();

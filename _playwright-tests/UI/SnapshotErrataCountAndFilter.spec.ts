@@ -1,6 +1,6 @@
 import { test, expect } from 'test-utils';
 import { cleanupRepositories, randomName } from 'test-utils/helpers';
-import { navigateToRepositories } from './helpers/navHelpers';
+import { navigateToRepositories, navigateToSnapshotsOfRepository } from './helpers/navHelpers';
 import {
   closeGenericPopupsIfExist,
   getRowByNameOrUrl,
@@ -43,8 +43,7 @@ test.describe('Snapshot Errata Count and Filter', () => {
     await test.step('Wait for repository to be valid and verify errata count', async () => {
       const row = await waitForValidStatus(page, firstSnapshotName, 180_000);
 
-      await row.getByLabel('Kebab toggle').click();
-      await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+      await navigateToSnapshotsOfRepository(page, row);
 
       const snapshotsModal = page.getByRole('dialog', { name: 'Snapshots' });
       await expect(snapshotsModal).toBeVisible();
@@ -75,8 +74,7 @@ test.describe('Snapshot Errata Count and Filter', () => {
     await test.step('Verify edited repository has 6 errata', async () => {
       const editedRow = await waitForValidStatus(page, secondSnapshotName, 180_000);
 
-      await editedRow.getByLabel('Kebab toggle').click();
-      await page.getByRole('menuitem', { name: 'View all snapshots' }).click();
+      await navigateToSnapshotsOfRepository(page, editedRow);
 
       const errataCountButton = page.getByRole('button', { name: '6' });
       await expect(errataCountButton).toBeVisible();
