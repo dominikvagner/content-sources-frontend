@@ -22,9 +22,13 @@ import {
   useFetchTemplate,
 } from 'services/Templates/TemplateQueries';
 import { SYSTEMS_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
-import { useListSystemsByTemplateId } from 'services/Systems/SystemsQueries';
+import {
+  GET_TEMPLATE_SYSTEMS_KEY,
+  useListSystemsByTemplateId,
+} from 'services/Systems/SystemsQueries';
 import { ActionButtons } from 'components/ActionButtons/ActionButtons';
 import useSafeUUIDParam from 'Hooks/useSafeUUIDParam';
+import { useEffect } from 'react';
 
 const useStyles = createUseStyles({
   description: {
@@ -65,9 +69,13 @@ export default function DeleteTemplateModal() {
     });
   };
 
+  useEffect(() => {
+    queryClient.invalidateQueries(GET_TEMPLATE_SYSTEMS_KEY);
+  }, []);
+
   const {
     isLoading: isLoading,
-    data: systems = { data: [], meta: { count: 0, limit: 1, offset: 0 } },
+    data: systems = { data: [], meta: { count: 0, limit: 1, offset: 0, total_items: 0 } },
   } = useListSystemsByTemplateId(uuid, 1, 1, '', '');
 
   const actionTakingPlace = isLoading || isDeleting;
@@ -99,8 +107,8 @@ export default function DeleteTemplateModal() {
                 href={`${rootPath}/${TEMPLATES_ROUTE}/${uuid}/${SYSTEMS_ROUTE}`}
                 className={classes.link}
               >
-                This template is assigned to {systems.data.length}{' '}
-                {systems.data.length === 1 ? 'system' : 'systems'}.
+                This template is assigned to {systems.meta.total_items}{' '}
+                {systems.meta.total_items === 1 ? 'system' : 'systems'}.
               </a>
               <span>
                 Deleting this template will cause all associated systems to stop receiving custom
