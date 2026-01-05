@@ -69,7 +69,10 @@ export const useListSystemsByTemplateId = (
     {
       keepPreviousData: true,
       optimisticResults: true,
-      staleTime: 60000,
+      staleTime: 25_000,
+      refetchOnWindowFocus: 'always',
+      refetchOnMount: 'always',
+      refetchInterval: 20_000,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
         errorNotifier(

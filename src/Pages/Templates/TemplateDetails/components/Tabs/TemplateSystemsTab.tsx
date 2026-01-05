@@ -109,7 +109,6 @@ export default function TemplateSystemsTab() {
 
   const {
     isLoading,
-    isFetching,
     error,
     isError,
     data = { data: [], meta: { total_items: 0, limit: 20, offset: 0 } },
@@ -167,9 +166,7 @@ export default function TemplateSystemsTab() {
     localStorage.setItem(perPageKey, newPerPage.toString());
   };
 
-  const fetchingOrLoading = isFetching || isLoading || isDeleting;
-
-  const loadingOrZeroCount = fetchingOrLoading || !total_items || isFetchingRegSystems; // `isFetchingRegSystems` is only relevant to the zero state
+  const loadingOrDeleting = isLoading || isDeleting;
 
   const errorState = isError || isErrorFetchingRegSystems;
 
@@ -228,7 +225,7 @@ export default function TemplateSystemsTab() {
                   id='assignTemplateToSystems'
                   ouiaId='assign_template_to_systems'
                   variant='primary'
-                  isDisabled={fetchingOrLoading}
+                  isDisabled={loadingOrDeleting}
                   onClick={() => navigate('add')}
                 >
                   Assign template to systems
@@ -326,8 +323,7 @@ export default function TemplateSystemsTab() {
           perPage={perPage}
           selectAllToggle={selectAllToggle}
           deleteFromSystems={deleteFromSystems}
-          isFetchingOrLoading={fetchingOrLoading}
-          isLoadingOrZeroCount={loadingOrZeroCount}
+          isLoadingOrDeleting={loadingOrDeleting}
           systemsList={systemsList}
           sortParams={sortParams}
           selected={selectedList}

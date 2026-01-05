@@ -8,7 +8,9 @@ import { DETAILS_ROUTE } from 'Routes/constants';
 
 jest.mock('react-query', () => ({
   ...jest.requireActual('react-query'),
-  useQueryClient: jest.fn(),
+  useQueryClient: jest.fn(() => ({
+    invalidateQueries: jest.fn(),
+  })),
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -39,6 +41,7 @@ it('Render delete modal where there are no systems', () => {
       isLoading: false,
       data: [],
       count: 0,
+      meta: { total_items: 0 },
     },
   }));
   (useFetchTemplate as jest.Mock).mockImplementation(() => ({
@@ -65,6 +68,7 @@ it('Render delete modal where template has one system', () => {
       isLoading: false,
       data: [defaultSystemsListItem],
       count: 1,
+      meta: { total_items: 0 },
     },
   }));
 

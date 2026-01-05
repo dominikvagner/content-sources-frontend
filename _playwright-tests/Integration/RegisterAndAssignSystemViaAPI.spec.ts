@@ -105,7 +105,6 @@ test.describe('Register and assign template to systems via API', () => {
       expect(isAttached, 'system should be attached to template').toBe(true);
 
       // Check if system row is visible with extended timeout
-      await page.reload(); // TODO: remove this once we fixed the bug in HMS-9947
       const systemRow = page.getByRole('row').filter({ hasText: hostname });
       await expect(systemRow).toBeVisible({ timeout: 120000 });
     });

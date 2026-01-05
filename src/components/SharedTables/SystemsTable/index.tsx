@@ -47,8 +47,7 @@ interface CustomThProps extends ThProps {
 }
 
 interface Props {
-  isFetchingOrLoading: boolean;
-  isLoadingOrZeroCount: boolean;
+  isLoadingOrDeleting: boolean;
   systemsList: IDSystemItem[];
   perPage: number;
   selected: Set<string>;
@@ -61,8 +60,7 @@ interface Props {
 }
 
 export default function SystemsTable({
-  isFetchingOrLoading,
-  isLoadingOrZeroCount,
+  isLoadingOrDeleting,
   deleteFromSystems,
   systemsList,
   perPage,
@@ -94,7 +92,7 @@ export default function SystemsTable({
 
   return (
     <>
-      <Hide hide={!isFetchingOrLoading}>
+      <Hide hide={!isLoadingOrDeleting}>
         <Grid className={classes.mainContainer}>
           <SkeletonTable
             rows={prevLength}
@@ -103,29 +101,27 @@ export default function SystemsTable({
           />
         </Grid>
       </Hide>
-      <Hide hide={isFetchingOrLoading}>
+      <Hide hide={isLoadingOrDeleting}>
         <Table aria-label='assign systems table' ouiaId='assign_systems_table' variant='compact'>
-          <Hide hide={isLoadingOrZeroCount}>
-            <Thead>
-              <Tr>
-                <Hide hide={!editAllowed}>
-                  <Th
-                    className={classes.fixLabelFontSize}
-                    aria-label='select-all-box'
-                    select={{
-                      onSelect: () => selectAllToggle(),
-                      isSelected: allSelected,
-                    }}
-                  />
-                </Hide>
-                {columnHeaders.map(({ title, ...props }, index) => (
-                  <Th key={title + '_column'} sort={sortParams && sortParams(index)} {...props}>
-                    {title}
-                  </Th>
-                ))}
-              </Tr>
-            </Thead>
-          </Hide>
+          <Thead>
+            <Tr>
+              <Hide hide={!editAllowed}>
+                <Th
+                  className={classes.fixLabelFontSize}
+                  aria-label='select-all-box'
+                  select={{
+                    onSelect: () => selectAllToggle(),
+                    isSelected: allSelected,
+                  }}
+                />
+              </Hide>
+              {columnHeaders.map(({ title, ...props }, index) => (
+                <Th key={title + '_column'} sort={sortParams && sortParams(index)} {...props}>
+                  {title}
+                </Th>
+              ))}
+            </Tr>
+          </Thead>
           <Tbody>
             {systemsList.map(
               (
