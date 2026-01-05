@@ -9,9 +9,7 @@ import {
   WizardStep,
 } from '@patternfly/react-core';
 
-import useRootPath from 'Hooks/useRootPath';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { TEMPLATES_ROUTE } from 'Routes/constants';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCreateTemplateQuery, useEditTemplateQuery } from 'services/Templates/TemplateQueries';
 import { AddTemplateContextProvider, useAddTemplateContext } from './AddTemplateContext';
 import RedhatRepositoriesStep from './steps/RedhatRepositoriesStep';
@@ -49,13 +47,9 @@ const indexMapper = {
 };
 
 const AddOrEditTemplateBase = () => {
-  const rootPath = useRootPath();
   const classes = useStyles();
   const navigate = useNavigate();
   const [urlSearchParams, setUrlSearchParams] = useSearchParams();
-
-  // edit template modal can be placed over templates list page or the template details page
-  const isOverTemplateDetail = useLocation().pathname.includes('details');
 
   const { isEdit, templateRequest, checkIfCurrentStepValid, editUUID } = useAddTemplateContext();
 
@@ -71,12 +65,7 @@ const AddOrEditTemplateBase = () => {
 
   const { queryClient } = useAddTemplateContext();
 
-  const onCancel = () =>
-    navigate(
-      isOverTemplateDetail
-        ? `${rootPath}/${TEMPLATES_ROUTE}/${editUUID}`
-        : `${rootPath}/${TEMPLATES_ROUTE}`,
-    );
+  const onCancel = () => navigate(-1);
 
   const { mutateAsync: addTemplate, isLoading: isAdding } = useCreateTemplateQuery(queryClient, {
     ...(templateRequest as TemplateRequest),

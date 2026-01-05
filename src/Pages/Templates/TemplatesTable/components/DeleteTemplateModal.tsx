@@ -14,7 +14,7 @@ import {
 import { createUseStyles } from 'react-jss';
 import Hide from 'components/Hide/Hide';
 import { useQueryClient } from 'react-query';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useRootPath from 'Hooks/useRootPath';
 import {
   GET_TEMPLATES_KEY,
@@ -45,9 +45,6 @@ export default function DeleteTemplateModal() {
   const rootPath = useRootPath();
   const queryClient = useQueryClient();
 
-  // delete template modal can be placed over templates list page or the template details page
-  const isOverTemplateDetail = useLocation().pathname.includes('details');
-
   const uuid = useSafeUUIDParam('templateUUID');
 
   if (!uuid) throw new Error('UUID is invalid');
@@ -59,9 +56,7 @@ export default function DeleteTemplateModal() {
 
   const onClose = () => navigate(`${rootPath}/${TEMPLATES_ROUTE}`);
 
-  const onCancel = isOverTemplateDetail
-    ? () => navigate(`${rootPath}/${TEMPLATES_ROUTE}/${uuid}`)
-    : onClose;
+  const onCancel = () => navigate(-1);
 
   const onSave = async () => {
     deleteTemplate(uuid).then(() => {
