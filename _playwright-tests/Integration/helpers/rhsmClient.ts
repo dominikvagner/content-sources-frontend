@@ -107,6 +107,13 @@ export class RHSMClient {
    * @returns
    */
   async RegisterRHC(activationKey?: string, orgId?: string, template?: string) {
+    // Before registering randomize dmi.system.uuid
+    await runCommand(this.name, [
+      'sh',
+      '-c',
+      `echo '{"dmi.system.uuid": "${this.name}"}' > /etc/rhsm/facts/custom-dmi.facts`,
+    ]);
+
     if (!process.env.PROD) {
       await this.ConfigureSubManForStage();
       await this.ConfigureRHCForStage();
