@@ -1,4 +1,4 @@
-import { useIsFetching, useIsMutating } from 'react-query';
+import { useIsFetching, useIsMutating } from '@tanstack/react-query';
 import useDebounce from './useDebounce';
 
 function usePageSafe(): boolean {

@@ -36,7 +36,7 @@ import {
   PopularRepository,
 } from 'services/Content/ContentApi';
 import Hide from 'components/Hide/Hide';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAppContext } from 'middleware/AppContext';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import UrlWithExternalIcon from 'components/UrlWithLinkIcon/UrlWithLinkIcon';

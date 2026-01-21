@@ -13,7 +13,7 @@ import {
 
 import { createUseStyles } from 'react-jss';
 import Hide from 'components/Hide/Hide';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import useRootPath from 'Hooks/useRootPath';
 import {
@@ -64,13 +64,13 @@ export default function DeleteTemplateModal() {
 
   const onSave = async () => {
     deleteTemplate(uuid).then(() => {
-      queryClient.invalidateQueries(GET_TEMPLATES_KEY);
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATES_KEY] });
       onClose();
     });
   };
 
   useEffect(() => {
-    queryClient.invalidateQueries(GET_TEMPLATE_SYSTEMS_KEY);
+    queryClient.invalidateQueries({ queryKey: [GET_TEMPLATE_SYSTEMS_KEY] });
   }, []);
 
   const {

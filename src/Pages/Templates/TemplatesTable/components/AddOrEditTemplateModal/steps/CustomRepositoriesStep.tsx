@@ -162,7 +162,7 @@ export default function CustomRepositoriesStep() {
           icon={isLoading || isFetching ? undefined : <SyncAltIcon />}
           isLoading={isLoading || isFetching}
           isDisabled={isLoading || isFetching}
-          onClick={() => queryClient.invalidateQueries(CONTENT_LIST_KEY)}
+          onClick={() => queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] })}
         >
           Refresh repository list
         </Button>

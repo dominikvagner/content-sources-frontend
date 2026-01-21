@@ -34,15 +34,17 @@ export default function App() {
     statuses: [],
   });
 
-  const { data = { data: [], meta: { count: 0, limit: 20, offset: 0 } }, isLoading } =
-    useContentListQuery(
-      1,
-      storedPerPage,
-      filterData,
-      '',
-      [ContentOrigin.EXTERNAL, ContentOrigin.UPLOAD],
-      isDefaultRoute && zeroState, // We only check if the route is correct and zerostate is true (defaults to true)
-    );
+  const {
+    data = { data: [], meta: { count: 0, limit: 20, offset: 0 } },
+    isInitialLoading: isLoading,
+  } = useContentListQuery(
+    1,
+    storedPerPage,
+    filterData,
+    '',
+    [ContentOrigin.EXTERNAL, ContentOrigin.UPLOAD],
+    isDefaultRoute && zeroState, // We only check if the route is correct and zerostate is true (defaults to true)
+  );
 
   // Hide Insights' global filter bar
   useEffect(() => {

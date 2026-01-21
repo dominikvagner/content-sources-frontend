@@ -1,4 +1,4 @@
-import { QueryClient, useMutation, useQuery } from 'react-query';
+import { QueryClient, useMutation, useQuery } from '@tanstack/react-query';
 
 import useErrorNotification from 'Hooks/useErrorNotification';
 import {
@@ -42,12 +42,12 @@ export const useEditTemplateQuery = (queryClient: QueryClient, request: EditTemp
         title: `Successfully edited template '${request.name}'`,
       });
 
-      queryClient.invalidateQueries(GET_TEMPLATES_KEY);
-      queryClient.invalidateQueries(FETCH_TEMPLATE_KEY);
-      queryClient.invalidateQueries(GET_TEMPLATE_PACKAGES_KEY);
-      queryClient.invalidateQueries(TEMPLATE_ERRATA_KEY);
-      queryClient.invalidateQueries(TEMPLATES_FOR_SNAPSHOTS);
-      queryClient.invalidateQueries(TEMPLATE_SNAPSHOTS_KEY);
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [FETCH_TEMPLATE_KEY] });
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATE_PACKAGES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [TEMPLATE_ERRATA_KEY] });
+      queryClient.invalidateQueries({ queryKey: [TEMPLATES_FOR_SNAPSHOTS] });
+      queryClient.invalidateQueries({ queryKey: [TEMPLATE_SNAPSHOTS_KEY] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
@@ -221,8 +221,8 @@ export const useCreateTemplateQuery = (queryClient: QueryClient, request: Templa
         title: `Content Template "${request?.name}" created`,
       });
 
-      queryClient.invalidateQueries(GET_TEMPLATES_KEY);
-      queryClient.invalidateQueries(FETCH_TEMPLATE_KEY);
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [FETCH_TEMPLATE_KEY] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
@@ -268,7 +268,7 @@ export const useDeleteTemplateItemMutate = (queryClient: QueryClient) => {
         previousData: TemplateCollectionResponse;
       };
       queryClient.setQueriesData(
-        GET_TEMPLATES_KEY,
+        [GET_TEMPLATES_KEY],
         (data: Partial<TemplateCollectionResponse> = {}) => {
           if (data?.meta?.count) {
             data.meta.count = previousData?.meta?.count - 1;
@@ -277,7 +277,7 @@ export const useDeleteTemplateItemMutate = (queryClient: QueryClient) => {
           return data;
         },
       );
-      queryClient.invalidateQueries(GET_TEMPLATES_KEY);
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATES_KEY] });
     },
     // If the mutation fails, use the context returned from onMutate to roll back
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

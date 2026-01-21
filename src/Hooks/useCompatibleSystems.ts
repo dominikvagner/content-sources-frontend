@@ -1,4 +1,4 @@
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSystemsListQuery } from '../services/Systems/SystemsQueries';
 import { TemplateItem } from '../services/Templates/TemplateApi';
 import { FETCH_TEMPLATE_KEY } from '../services/Templates/TemplateQueries';

@@ -1,4 +1,4 @@
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import React, { useState, useMemo, useEffect } from 'react';
 import useDebounce from '../../../../../Hooks/useDebounce';
@@ -257,7 +257,7 @@ const SystemListView = ({
             variant='link'
             icon={isFetching ? <Spinner isInline /> : <SyncAltIcon />}
             isDisabled={isLoading || isFetching}
-            onClick={() => queryClient.invalidateQueries(GET_SYSTEMS_KEY)}
+            onClick={() => queryClient.invalidateQueries({ queryKey: [GET_SYSTEMS_KEY] })}
             className={spacing.py_0}
           >
             Refresh

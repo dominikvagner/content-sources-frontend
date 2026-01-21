@@ -1,6 +1,6 @@
 import { render, waitFor, screen, within } from '@testing-library/react';
 import AddSystemModal from './AddSystemModal';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useSystemsListQuery } from 'services/Systems/SystemsQueries';
 import {
   defaultSystemsListItem,
@@ -19,7 +19,7 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('Hooks/useRootPath', () => () => 'someUrl');
 
-jest.mock('react-query');
+jest.mock('@tanstack/react-query');
 
 beforeAll(() => {
   (useQueryClient as jest.Mock).mockImplementation(() => ({

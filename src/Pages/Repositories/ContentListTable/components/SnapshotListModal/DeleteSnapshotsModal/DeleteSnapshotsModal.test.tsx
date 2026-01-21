@@ -12,8 +12,8 @@ import { useGetSnapshotList } from 'services/Content/ContentQueries';
 import { useFetchTemplatesForSnapshots } from 'services/Templates/TemplateQueries';
 import { formatDateDDMMMYYYY } from 'helpers';
 
-jest.mock('react-query', () => ({
-  ...jest.requireActual('react-query'),
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
   useQueryClient: jest.fn(),
 }));
 

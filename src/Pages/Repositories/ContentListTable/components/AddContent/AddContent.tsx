@@ -51,7 +51,7 @@ import {
   useValidateContentList,
 } from 'services/Content/ContentQueries';
 import { ContentOrigin, RepositoryParamsResponse } from 'services/Content/ContentApi';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import { isEmpty, isEqual } from 'lodash';
 import useDeepCompareEffect from 'Hooks/useDeepCompareEffect';
@@ -99,7 +99,11 @@ const AddContent = ({ isEdit = false }: Props) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isActionOpen, setIsActionOpen] = useState(false);
 
-  const { data, isLoading: isLoadingInitialContent, isSuccess } = useFetchContent(uuid!, isEdit);
+  const {
+    data,
+    isInitialLoading: isLoadingInitialContent,
+    isSuccess,
+  } = useFetchContent(uuid!, isEdit);
 
   const [values, setValues] = useState(getDefaultValues({}));
   const [changeVerified, setChangeVerified] = useState(false);
@@ -141,7 +145,7 @@ const AddContent = ({ isEdit = false }: Props) => {
   const { fetchGpgKey, isLoading: isFetchingGpgKey } = useFetchGpgKey();
 
   const { distribution_arches: distArches = [], distribution_versions: distVersions = [] } =
-    queryClient.getQueryData<RepositoryParamsResponse>(REPOSITORY_PARAMS_KEY) || {};
+    queryClient.getQueryData<RepositoryParamsResponse>([REPOSITORY_PARAMS_KEY]) || {};
 
   const { distributionArches, distributionVersions } = useMemo(() => {
     const distributionArches = {};

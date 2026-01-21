@@ -11,8 +11,8 @@ import { ContentOrigin } from 'services/Content/ContentApi';
 import { DELETE_ROUTE } from 'Routes/constants';
 import { useTemplateList } from 'services/Templates/TemplateQueries';
 
-jest.mock('react-query', () => ({
-  ...jest.requireActual('react-query'),
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
   useQueryClient: jest.fn(),
 }));
 

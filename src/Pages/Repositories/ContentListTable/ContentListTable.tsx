@@ -45,7 +45,7 @@ import {
   BulkSelectValue,
 } from '@patternfly/react-component-groups/dist/dynamic/BulkSelect';
 import flex from '@patternfly/react-styles/css/utilities/Flex/flex';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import StatusIcon from './components/StatusIcon';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { SkeletonTableBody } from '@patternfly/react-component-groups';
