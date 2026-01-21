@@ -6,8 +6,8 @@ import { useListSystemsByTemplateId } from 'services/Systems/SystemsQueries';
 import { useFetchTemplate } from 'services/Templates/TemplateQueries';
 import { DETAILS_ROUTE } from 'Routes/constants';
 
-jest.mock('react-query', () => ({
-  ...jest.requireActual('react-query'),
+jest.mock('@tanstack/react-query', () => ({
+  ...jest.requireActual('@tanstack/react-query'),
   useQueryClient: jest.fn(() => ({
     invalidateQueries: jest.fn(),
   })),

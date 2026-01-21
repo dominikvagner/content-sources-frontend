@@ -2,7 +2,7 @@ import { Subscriptions, getSubscriptions, getEphemeralSubscriptions } from './Su
 import useErrorNotification from 'Hooks/useErrorNotification';
 import useIsEphemeralEnv from 'Hooks/useIsEphemeralEnv';
 import { useMemo } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 
 const SUBSCRIPTION_CHECK_KEY = 'SUBSCRIPTION_CHECK_KEY';
 

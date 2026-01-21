@@ -30,7 +30,7 @@ jest.mock('Hooks/useRootPath', () => () => 'someUrl');
 
 jest.mock('Hooks/useCompatibleSystems');
 
-jest.mock('react-query');
+jest.mock('@tanstack/react-query');
 
 jest.mock('Hooks/useNotification', () => () => ({ notify: () => null }));
 

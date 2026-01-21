@@ -21,7 +21,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
 import { useEffect, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import Hide from 'components/Hide/Hide';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useHref, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useSnapshotListOutletContext } from '../SnapshotListModal';
 import useRootPath from 'Hooks/useRootPath';

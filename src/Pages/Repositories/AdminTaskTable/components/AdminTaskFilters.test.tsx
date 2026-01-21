@@ -6,7 +6,7 @@ jest.mock('middleware/AppContext', () => ({
   useAppContext: () => ({}),
 }));
 
-jest.mock('react-query');
+jest.mock('@tanstack/react-query');
 
 it('Render loading state (disabled)', () => {
   const { getByRole } = render(

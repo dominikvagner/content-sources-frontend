@@ -25,7 +25,7 @@ import {
   useBulkDeleteContentItemMutate,
   useContentListQuery,
 } from 'services/Content/ContentQueries';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { useHref, useLocation, useNavigate } from 'react-router-dom';
 import { useContentListOutletContext } from '../../ContentListTable';
 import useRootPath from 'Hooks/useRootPath';
@@ -96,8 +96,8 @@ export default function DeleteContentModal() {
 
   const {
     isError: isRepoError,
-    isLoading: isRepoLoading,
     data: repos = { data: [] as ContentItem[], meta: { count: 0, limit: 20, offset: 0 } },
+    isInitialLoading: isRepoLoading,
   } = useContentListQuery(selectedPage, selectedPerPage, repoFilterData, '', [
     ContentOrigin.CUSTOM,
   ]);
@@ -120,8 +120,8 @@ export default function DeleteContentModal() {
     deleteItems(reposToDelete).then(() => {
       onClose();
       clearCheckedRepositories();
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
-      queryClient.invalidateQueries(GET_TEMPLATES_KEY);
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATES_KEY] });
     });
   };
 
@@ -135,8 +135,8 @@ export default function DeleteContentModal() {
 
   const {
     isError: isTemplateError,
-    isLoading: isTemplateLoading,
     data: templates = { data: [], meta: { count: 0, limit: 20, offset: 0 } },
+    isInitialLoading: isTemplateLoading,
   } = useTemplateList(page, perPage, '', templateFilterData);
 
   useEffect(() => {

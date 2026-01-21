@@ -13,7 +13,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { createUseStyles } from 'react-jss';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { SortByDirection, type ThProps } from '@patternfly/react-table';
 import Loader from 'components/Loader';
 import {

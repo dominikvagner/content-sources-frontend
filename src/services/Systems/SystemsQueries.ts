@@ -11,7 +11,7 @@ import {
   TagsResponse,
   listTags,
 } from './SystemsApi';
-import { useMutation, useQuery, type QueryClient } from 'react-query';
+import { useMutation, useQuery, type QueryClient } from '@tanstack/react-query';
 import useNotification from 'Hooks/useNotification';
 import { AlertVariant } from '@patternfly/react-core';
 
@@ -32,7 +32,6 @@ export const useSystemsListQuery = (
     () => getSystemsList(page, limit, searchQuery, filter, sortBy),
     {
       keepPreviousData: true,
-      optimisticResults: true,
       staleTime: 60000,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
@@ -70,7 +69,6 @@ export const useListSystemsByTemplateId = (
     () => listSystemsByTemplateId(id, page, limit, searchQuery, sortBy),
     {
       keepPreviousData: true,
-      optimisticResults: true,
       staleTime: 25_000,
       refetchOnWindowFocus: 'always',
       refetchOnMount: 'always',
@@ -102,9 +100,9 @@ export const useAddTemplateToSystemsQuery = (
         title: `Template successfully added to ${systemUUIDs.length} system${systemUUIDs.length > 1 ? 's' : ''}`,
       });
 
-      queryClient.invalidateQueries(GET_SYSTEMS_KEY);
-      queryClient.invalidateQueries(GET_TEMPLATE_SYSTEMS_KEY);
-      queryClient.invalidateQueries(TEMPLATE_SYSTEM_COUNTS_KEY);
+      queryClient.invalidateQueries({ queryKey: [GET_SYSTEMS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATE_SYSTEMS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [TEMPLATE_SYSTEM_COUNTS_KEY] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
@@ -122,9 +120,9 @@ export const useDeleteTemplateFromSystems = (queryClient: QueryClient) => {
   const errorNotifier = useErrorNotification();
   return useMutation(deleteTemplateFromSystems, {
     onSuccess: () => {
-      queryClient.invalidateQueries(GET_SYSTEMS_KEY);
-      queryClient.invalidateQueries(GET_TEMPLATE_SYSTEMS_KEY);
-      queryClient.invalidateQueries(TEMPLATE_SYSTEM_COUNTS_KEY);
+      queryClient.invalidateQueries({ queryKey: [GET_SYSTEMS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATE_SYSTEMS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [TEMPLATE_SYSTEM_COUNTS_KEY] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {

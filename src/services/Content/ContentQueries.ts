@@ -1,6 +1,12 @@
 import { AlertVariant } from '@patternfly/react-core';
 import { useState } from 'react';
-import { QueryClient, useMutation, useQuery, useQueryClient, UseQueryOptions } from 'react-query';
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from '@tanstack/react-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -182,9 +188,9 @@ export const useAddContentQuery = (request: CreateContentRequest) => {
             }),
       });
 
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
-      queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
-      queryClient.invalidateQueries(POPULAR_REPOSITORIES_LIST_KEY);
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
@@ -214,8 +220,8 @@ export const useAddUploadsQuery = (request: AddUploadRequest) => {
         description: 'This repository will be snapshotted shortly',
       });
 
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
-      queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
@@ -276,9 +282,9 @@ export const useAddPopularRepositoryQuery = (
           : 'Repository introspection data already available',
       });
 
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
-      queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
-      queryClient.invalidateQueries(POPULAR_REPOSITORIES_LIST_KEY);
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
     },
     onError: (err, _newData, context) => {
       if (context) {
@@ -308,11 +314,11 @@ export const useEditContentQuery = (request: EditContentRequestItem) => {
         title: `Successfully edited repository ${request.name}`,
       });
 
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
-      queryClient.invalidateQueries(CONTENT_ITEM_KEY);
-      queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
-      queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
-      queryClient.invalidateQueries(POPULAR_REPOSITORIES_LIST_KEY);
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [CONTENT_ITEM_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LIST_SNAPSHOTS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
@@ -375,9 +381,9 @@ export const useDeletePopularRepositoryMutate = (
       return { previousData: previousPopularData, queryClient };
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
-      queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
-      queryClient.invalidateQueries(POPULAR_REPOSITORIES_LIST_KEY);
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
     },
     // If the mutation fails, use the context returned from onMutate to roll back
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -439,16 +445,16 @@ export const useDeleteContentItemMutate = (
       const { previousData } = context as {
         previousData: ContentListResponse;
       };
-      queryClient.setQueriesData(CONTENT_LIST_KEY, (data: Partial<ContentListResponse> = {}) => {
+      queryClient.setQueriesData([CONTENT_LIST_KEY], (data: Partial<ContentListResponse> = {}) => {
         if (data?.meta?.count) {
           data.meta.count = previousData?.meta?.count - 1;
         }
 
         return data;
       });
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
-      queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
-      queryClient.invalidateQueries(POPULAR_REPOSITORIES_LIST_KEY);
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
     },
     // If the mutation fails, use the context returned from onMutate to roll back
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -520,15 +526,18 @@ export const useBulkDeleteContentItemMutate = <T extends DeletableItem>(
         const { newMeta } = context as {
           newMeta: Meta;
         };
-        queryClient.setQueriesData(CONTENT_LIST_KEY, (data: Partial<ContentListResponse> = {}) => {
-          if (data?.meta?.count) {
-            data.meta.count = newMeta?.count;
-          }
-          return data;
-        });
-        queryClient.invalidateQueries(CONTENT_LIST_KEY);
-        queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
-        queryClient.invalidateQueries(POPULAR_REPOSITORIES_LIST_KEY);
+        queryClient.setQueriesData(
+          [CONTENT_LIST_KEY],
+          (data: Partial<ContentListResponse> = {}) => {
+            if (data?.meta?.count) {
+              data.meta.count = newMeta?.count;
+            }
+            return data;
+          },
+        );
+        queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+        queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
+        queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
       },
       // If the mutation fails, use the context returned from onMutate to roll back
       onError: (err: { response?: { data: ErrorResponse } }, _newData, context) => {
@@ -564,7 +573,7 @@ export const useGetSnapshotsByDates = (uuids: string[], date: string) => {
 };
 
 export const useRepositoryParams = () =>
-  useQuery<RepositoryParamsResponse>(REPOSITORY_PARAMS_KEY, getRepositoryParams, {
+  useQuery<RepositoryParamsResponse>([REPOSITORY_PARAMS_KEY], getRepositoryParams, {
     keepPreviousData: true,
     staleTime: Infinity,
   });
@@ -602,7 +611,6 @@ export const useGetSnapshotList = (uuid: string, page: number, limit: number, so
     () => getSnapshotList(uuid, page, limit, sortBy),
     {
       keepPreviousData: true,
-      optimisticResults: true,
       staleTime: 60000,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
@@ -630,7 +638,6 @@ export const useGetPackagesQuery = (
     () => getPackages(uuid, page, limit, searchQuery, sortBy),
     {
       keepPreviousData: true,
-      optimisticResults: true,
       staleTime: 60000,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
@@ -657,7 +664,6 @@ export const useGetSnapshotPackagesQuery = (
     () => getSnapshotPackages(snap_uuid, page, limit, searchQuery),
     {
       keepPreviousData: true,
-      optimisticResults: true,
       staleTime: 60000,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
@@ -687,7 +693,6 @@ export const useGetSnapshotErrataQuery = (
     () => getSnapshotErrata(snap_uuid, page, limit, search, type, severity, sortBy),
     {
       keepPreviousData: true,
-      optimisticResults: true,
       staleTime: 60000,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
@@ -711,8 +716,8 @@ export const useTriggerSnapshot = (queryClient: QueryClient) => {
         variant: AlertVariant.success,
         title: 'Snapshot triggered successfully',
       });
-      queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
+      queryClient.invalidateQueries({ queryKey: [LIST_SNAPSHOTS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
     },
     onError: (err) => {
       errorNotifier(
@@ -773,9 +778,9 @@ export const useIntrospectRepositoryMutate = (
           title: 'Repository introspection in progress',
         });
       }
-      queryClient.invalidateQueries(CONTENT_ITEM_KEY);
-      queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
-      queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
+      queryClient.invalidateQueries({ queryKey: [CONTENT_ITEM_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LIST_SNAPSHOTS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
     },
     // If the mutation fails, use the context returned from onMutate to roll back
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -867,24 +872,27 @@ export const useBulkDeleteSnapshotsMutate = (
       const { newMeta } = context as {
         newMeta: Meta;
       };
-      queryClient.setQueriesData(LIST_SNAPSHOTS_KEY, (data: Partial<SnapshotListResponse> = {}) => {
-        if (data?.meta?.count) {
-          data.meta.count = newMeta?.count;
-        }
-        return data;
-      });
-      queryClient.invalidateQueries(CONTENT_LIST_KEY);
-      queryClient.invalidateQueries(GET_TEMPLATES_KEY);
-      queryClient.invalidateQueries(ADMIN_TASK_LIST_KEY);
-      queryClient.invalidateQueries(TEMPLATE_SNAPSHOTS_KEY);
-      queryClient.invalidateQueries(TEMPLATES_FOR_SNAPSHOTS);
-      queryClient.invalidateQueries(TEMPLATE_ERRATA_KEY);
-      queryClient.invalidateQueries(GET_TEMPLATE_PACKAGES_KEY);
-      queryClient.invalidateQueries(LIST_SNAPSHOTS_KEY);
-      queryClient.invalidateQueries(SNAPSHOT_ERRATA_KEY);
-      queryClient.invalidateQueries(SNAPSHOT_PACKAGES_KEY);
-      queryClient.invalidateQueries(REPO_CONFIG_FILE_KEY);
-      queryClient.invalidateQueries(LATEST_REPO_CONFIG_FILE_KEY);
+      queryClient.setQueriesData(
+        [LIST_SNAPSHOTS_KEY],
+        (data: Partial<SnapshotListResponse> = {}) => {
+          if (data?.meta?.count) {
+            data.meta.count = newMeta?.count;
+          }
+          return data;
+        },
+      );
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [TEMPLATE_SNAPSHOTS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [TEMPLATES_FOR_SNAPSHOTS] });
+      queryClient.invalidateQueries({ queryKey: [TEMPLATE_ERRATA_KEY] });
+      queryClient.invalidateQueries({ queryKey: [GET_TEMPLATE_PACKAGES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LIST_SNAPSHOTS_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SNAPSHOT_ERRATA_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SNAPSHOT_PACKAGES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [REPO_CONFIG_FILE_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LATEST_REPO_CONFIG_FILE_KEY] });
     },
     onError: (err: { response?: { data: ErrorResponse } }, _newData, context) => {
       if (context) {

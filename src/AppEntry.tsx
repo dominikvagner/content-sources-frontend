@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Provider as ReduxProvider } from 'react-redux';
 import * as Redux from 'redux';
 import { AccessCheck } from '@project-kessel/react-kessel-access-check';

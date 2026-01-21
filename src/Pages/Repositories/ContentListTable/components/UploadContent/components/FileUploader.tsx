@@ -57,7 +57,7 @@ export default function FileUploader({ setFileUUIDs, isLoading, setChildLoading 
 
   const {
     data: repositoryData,
-    isLoading: isLoadingRepo,
+    isInitialLoading: isLoadingRepo,
     refetch: refetchRepo,
   } = useFetchContent(uuid!, !!uuid);
 
