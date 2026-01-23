@@ -21,7 +21,7 @@ interface Props {
   onClose: () => void;
 }
 
-export const AddNavigateButton = ({ isAdding, add, onClose }: Props) => {
+export const AddTemplateButton = ({ isAdding, add, onClose }: Props) => {
   const root = useRootPath();
   const navigate = useNavigate();
   const [isActionOpen, setIsActionOpen] = useState(false);

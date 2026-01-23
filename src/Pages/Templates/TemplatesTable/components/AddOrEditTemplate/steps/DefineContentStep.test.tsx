@@ -1,14 +1,14 @@
 import { render } from '@testing-library/react';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { defaultTemplateItem, testRepositoryParamsResponse } from 'testingHelpers';
 import DefineContentStep from './DefineContentStep';
 
-jest.mock('../AddTemplateContext', () => ({
+jest.mock('../AddOrEditTemplateContext', () => ({
   useAddTemplateContext: jest.fn(),
 }));
 
 it('expect DefineContentStep to render correctly', () => {
-  (useAddTemplateContext as jest.Mock).mockImplementation(() => ({
+  (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     isEdit: false,
     templateRequest: defaultTemplateItem,
     setTemplateRequest: () => undefined,
@@ -30,7 +30,7 @@ it('expect DefineContentStep to render correctly', () => {
 });
 
 it('expect DefineContentStep to render with disabled inputs', () => {
-  (useAddTemplateContext as jest.Mock).mockImplementation(() => ({
+  (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     isEdit: true,
     templateRequest: defaultTemplateItem,
     setTemplateRequest: () => undefined,

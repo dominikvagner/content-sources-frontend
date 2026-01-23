@@ -8,13 +8,13 @@ import {
   ContentVariants,
   Title,
 } from '@patternfly/react-core';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { useState } from 'react';
 import { TemplateValidationSchema } from '../../templateHelpers';
 import CustomHelperText from 'components/CustomHelperText/CustomHelperText';
 
 export default function DetailStep() {
-  const { templateRequest, setTemplateRequest } = useAddTemplateContext();
+  const { templateRequest, setTemplateRequest } = useAddOrEditTemplateContext();
   const [errors, setErrors] = useState({ name: '', description: '' });
 
   const setFieldValues = (value: string, field: 'name' | 'description') => {

@@ -1,7 +1,7 @@
 import { render } from '@testing-library/react';
 import { useGetSnapshotsByDates, useContentListQuery } from 'services/Content/ContentQueries';
 import SetUpDateStep from './SetUpDateStep';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { defaultContentItem, defaultSnapshotsByDateResponse } from 'testingHelpers';
 
 jest.mock('services/Content/ContentQueries', () => ({
@@ -9,7 +9,7 @@ jest.mock('services/Content/ContentQueries', () => ({
   useContentListQuery: jest.fn(),
 }));
 
-jest.mock('../AddTemplateContext', () => ({
+jest.mock('../AddOrEditTemplateContext', () => ({
   useAddTemplateContext: jest.fn(),
 }));
 
@@ -41,7 +41,7 @@ it('expect Set snapshot date step to render dates', () => {
     },
   }));
 
-  (useAddTemplateContext as jest.Mock).mockImplementation(() => ({
+  (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     templateRequest: { date: '2024-01-22' },
     setTemplateRequest: () => undefined,
     selectedRedhatRepos: new Set(),
@@ -70,7 +70,7 @@ it('expect Set snapshot date step to render use latest', () => {
     },
   }));
 
-  (useAddTemplateContext as jest.Mock).mockImplementation(() => ({
+  (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     templateRequest: { date: '', use_latest: true },
     setTemplateRequest: () => undefined,
     selectedRedhatRepos: new Set(),

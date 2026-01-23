@@ -14,7 +14,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from '@patternfly/react-core';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { createUseStyles } from 'react-jss';
 import { ContentItem, ContentOrigin } from 'services/Content/ContentApi';
 import { useState } from 'react';
@@ -53,7 +53,7 @@ export default function RedhatRepositoriesStep() {
     templateRequest,
     selectedRedhatRepos,
     setSelectedRedhatRepos,
-  } = useAddTemplateContext();
+  } = useAddOrEditTemplateContext();
 
   const noAdditionalRepos = selectedRedhatRepos.size - hardcodedRedhatRepositoryUUIDS.size === 0;
 

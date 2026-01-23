@@ -18,7 +18,7 @@ import useRootPath from 'Hooks/useRootPath';
 import { isDateValid } from 'helpers';
 import useSafeUUIDParam from 'Hooks/useSafeUUIDParam';
 
-export interface AddTemplateContextInterface {
+export interface AddOrEditTemplateContextInterface {
   queryClient: QueryClient;
   distribution_arches: NameLabel[];
   distribution_versions: NameLabel[];
@@ -34,9 +34,20 @@ export interface AddTemplateContextInterface {
   editUUID?: string;
 }
 
-export const AddTemplateContext = createContext({} as AddTemplateContextInterface);
+// template will need to have attributes to store update stream and minor version
+// this task is not yet being worked on
 
-export const AddTemplateContextProvider = ({ children }: { children: ReactNode }) => {
+/*
+Here I will be:
+- Tracking my FE state so that it can be USED WITHIN the Add/Edit wizard
+- Getting Red Hat repos (based on user subscription - eus 9.6). EPEL & custom aren't affected (no extra logic)
+- Pull the ExtendedRelease & ExtendedReleaseVersion from the repos API (safety)
+- Prepare the request object (data) that I will be sending to our API to create a new template - setTemplateRequest
+ */
+
+export const AddOrEditTemplateContext = createContext({} as AddOrEditTemplateContextInterface);
+
+export const AddOrEditTemplateContextProvider = ({ children }: { children: ReactNode }) => {
   const uuid = useSafeUUIDParam('templateUUID');
   const { data: editTemplateData, isError } = useFetchTemplate(uuid, !!uuid);
 
@@ -170,7 +181,7 @@ export const AddTemplateContextProvider = ({ children }: { children: ReactNode }
   } = useRepositoryParams();
 
   return (
-    <AddTemplateContext.Provider
+    <AddOrEditTemplateContext.Provider
       key={uuid}
       value={{
         queryClient,
@@ -189,8 +200,8 @@ export const AddTemplateContextProvider = ({ children }: { children: ReactNode }
       }}
     >
       {children}
-    </AddTemplateContext.Provider>
+    </AddOrEditTemplateContext.Provider>
   );
 };
 
-export const useAddTemplateContext = () => useContext(AddTemplateContext);
+export const useAddOrEditTemplateContext = () => useContext(AddOrEditTemplateContext);

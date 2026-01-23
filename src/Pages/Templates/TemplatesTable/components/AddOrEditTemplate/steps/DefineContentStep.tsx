@@ -11,7 +11,7 @@ import {
   DropdownItem,
   DropdownList,
 } from '@patternfly/react-core';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import { useState } from 'react';
 import { createUseStyles } from 'react-jss';
@@ -33,7 +33,7 @@ export default function DefineContentStep() {
     setTemplateRequest,
     distribution_versions,
     distribution_arches,
-  } = useAddTemplateContext();
+  } = useAddOrEditTemplateContext();
 
   const archesDisplay = (arch?: string) =>
     distribution_arches.find(({ label }) => arch === label)?.name || 'Select architecture';

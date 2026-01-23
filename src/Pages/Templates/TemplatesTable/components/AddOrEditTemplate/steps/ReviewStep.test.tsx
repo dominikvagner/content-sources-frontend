@@ -1,15 +1,15 @@
 import { render } from '@testing-library/react';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { defaultTemplateItem, testRepositoryParamsResponse } from 'testingHelpers';
 import ReviewStep from './ReviewStep';
 import { formatDateDDMMMYYYY } from 'helpers';
 
-jest.mock('../AddTemplateContext', () => ({
+jest.mock('../AddOrEditTemplateContext', () => ({
   useAddTemplateContext: jest.fn(),
 }));
 
 it('expect Review step to render correctly', () => {
-  (useAddTemplateContext as jest.Mock).mockImplementation(() => ({
+  (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     templateRequest: defaultTemplateItem,
     selectedRedhatRepos: new Set(['item1', 'item2']),
     selectedCustomRepos: new Set(['item1']),

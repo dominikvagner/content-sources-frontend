@@ -13,7 +13,7 @@ import {
   Radio,
   Title,
 } from '@patternfly/react-core';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { useContentListQuery, useGetSnapshotsByDates } from 'services/Content/ContentQueries';
 import { useEffect, useMemo } from 'react';
 import Hide from 'components/Hide/Hide';
@@ -35,7 +35,7 @@ export default function SetUpDateStep() {
   const classes = useStyles();
 
   const { templateRequest, setTemplateRequest, selectedRedhatRepos, selectedCustomRepos } =
-    useAddTemplateContext();
+    useAddOrEditTemplateContext();
 
   const { data, mutateAsync } = useGetSnapshotsByDates(
     [...selectedRedhatRepos, ...selectedCustomRepos],

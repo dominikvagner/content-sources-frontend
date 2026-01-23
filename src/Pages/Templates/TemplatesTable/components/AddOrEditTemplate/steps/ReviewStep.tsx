@@ -6,7 +6,7 @@ import {
   ContentVariants,
   Title,
 } from '@patternfly/react-core';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { useMemo, useState } from 'react';
 import { formatDateDDMMMYYYY } from 'helpers';
 
@@ -20,7 +20,7 @@ export default function ReviewStep() {
     distribution_arches,
     distribution_versions,
     isEdit,
-  } = useAddTemplateContext();
+  } = useAddOrEditTemplateContext();
 
   const archesDisplay = (arch?: string) =>
     distribution_arches.find(({ label }) => arch === label)?.name || 'Select architecture';

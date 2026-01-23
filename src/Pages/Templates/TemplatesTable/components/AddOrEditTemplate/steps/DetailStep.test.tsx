@@ -1,14 +1,14 @@
 import { render } from '@testing-library/react';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { defaultTemplateItem } from 'testingHelpers';
 import DetailStep from './DetailStep';
 
-jest.mock('../AddTemplateContext', () => ({
+jest.mock('../AddOrEditTemplateContext', () => ({
   useAddTemplateContext: jest.fn(),
 }));
 
 it('expect DetailStep to render correctly', () => {
-  (useAddTemplateContext as jest.Mock).mockImplementation(() => ({
+  (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     templateRequest: defaultTemplateItem,
     setTemplateRequest: () => undefined,
   }));

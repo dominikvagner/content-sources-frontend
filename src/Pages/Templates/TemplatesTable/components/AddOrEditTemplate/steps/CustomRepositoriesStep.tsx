@@ -15,7 +15,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from '@patternfly/react-core';
-import { useAddTemplateContext } from '../AddTemplateContext';
+import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { createUseStyles } from 'react-jss';
 import { ContentItem, ContentOrigin } from 'services/Content/ContentApi';
 import { useState } from 'react';
@@ -58,7 +58,7 @@ export default function CustomRepositoriesStep() {
   const pathname = path.split('content')[0] + 'content';
 
   const { queryClient, templateRequest, selectedCustomRepos, setSelectedCustomRepos } =
-    useAddTemplateContext();
+    useAddOrEditTemplateContext();
   const { features } = useAppContext();
 
   const [toggled, setToggled] = useState(false);

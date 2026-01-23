@@ -12,7 +12,10 @@ import {
 
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useCreateTemplateQuery, useEditTemplateQuery } from 'services/Templates/TemplateQueries';
-import { AddTemplateContextProvider, useAddTemplateContext } from './AddTemplateContext';
+import {
+  AddOrEditTemplateContextProvider,
+  useAddOrEditTemplateContext,
+} from './AddOrEditTemplateContext';
 import RedhatRepositoriesStep from './steps/RedhatRepositoriesStep';
 import CustomRepositoriesStep from './steps/CustomRepositoriesStep';
 import { TemplateRequest } from 'services/Templates/TemplateApi';
@@ -25,7 +28,7 @@ import { formatTemplateDate } from 'helpers';
 import { isEmpty } from 'lodash';
 import { createUseStyles } from 'react-jss';
 import { useEffect, useRef } from 'react';
-import { AddNavigateButton } from './AddNavigateButton';
+import { AddTemplateButton } from './AddTemplateButton';
 import useRootPath from 'Hooks/useRootPath';
 import { TEMPLATES_ROUTE } from 'Routes/constants';
 
@@ -83,9 +86,10 @@ const AddOrEditTemplateBase = () => {
   // Store the original 'from' value on mount (before step navigation changes location.state)
   const fromRef = useRef(location.state?.from);
 
-  const { isEdit, templateRequest, checkIfCurrentStepValid, editUUID } = useAddTemplateContext();
+  const { isEdit, templateRequest, checkIfCurrentStepValid, editUUID } =
+    useAddOrEditTemplateContext();
 
-  // useSafeUUIDParam in AddTemplateContext already validates the UUID
+  // useSafeUUIDParam in AddOrEditTemplateContext already validates the UUID
   // If in edit mode and UUID is invalid, it will be an empty string
   if (isEdit && !editUUID) throw new Error('UUID is invalid');
 
@@ -98,7 +102,7 @@ const AddOrEditTemplateBase = () => {
     }
   }, []);
 
-  const { queryClient } = useAddTemplateContext();
+  const { queryClient } = useAddOrEditTemplateContext();
 
   const onCancel = () => {
     if (fromRef.current === 'table') {
@@ -228,7 +232,7 @@ const AddOrEditTemplateBase = () => {
                 }
               ) : (
                 <WizardFooterWrapper>
-                  <AddNavigateButton isAdding={isAdding} onClose={onCancel} add={addTemplate} />
+                  <AddTemplateButton isAdding={isAdding} onClose={onCancel} add={addTemplate} />
                 </WizardFooterWrapper>
               )
             }
@@ -242,10 +246,10 @@ const AddOrEditTemplateBase = () => {
 };
 
 // Wrap the modal with the provider
-export function AddOrEditTemplate() {
+export function AddOrEditTemplateModal() {
   return (
-    <AddTemplateContextProvider>
+    <AddOrEditTemplateContextProvider>
       <AddOrEditTemplateBase />
-    </AddTemplateContextProvider>
+    </AddOrEditTemplateContextProvider>
   );
 }
