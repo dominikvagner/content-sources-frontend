@@ -4,7 +4,7 @@ import { defaultTemplateItem, testRepositoryParamsResponse } from 'testingHelper
 import DefineContentStep from './DefineContentStep';
 
 jest.mock('../AddOrEditTemplateContext', () => ({
-  useAddTemplateContext: jest.fn(),
+  useAddOrEditTemplateContext: jest.fn(),
 }));
 
 it('expect DefineContentStep to render correctly', () => {
@@ -14,6 +14,8 @@ it('expect DefineContentStep to render correctly', () => {
     setTemplateRequest: () => undefined,
     distribution_arches: testRepositoryParamsResponse.distribution_arches,
     distribution_versions: testRepositoryParamsResponse.distribution_versions,
+    extended_release_features: testRepositoryParamsResponse.extended_release_features,
+    distribution_minor_versions: testRepositoryParamsResponse.distribution_minor_versions,
   }));
 
   const { getByText } = render(<DefineContentStep />);
@@ -36,6 +38,8 @@ it('expect DefineContentStep to render with disabled inputs', () => {
     setTemplateRequest: () => undefined,
     distribution_arches: testRepositoryParamsResponse.distribution_arches,
     distribution_versions: testRepositoryParamsResponse.distribution_versions,
+    extended_release_features: testRepositoryParamsResponse.extended_release_features,
+    distribution_minor_versions: testRepositoryParamsResponse.distribution_minor_versions,
   }));
 
   const { getByTestId } = render(<DefineContentStep />);

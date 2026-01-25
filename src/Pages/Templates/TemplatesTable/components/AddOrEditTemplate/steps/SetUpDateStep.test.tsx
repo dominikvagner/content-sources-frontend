@@ -10,7 +10,7 @@ jest.mock('services/Content/ContentQueries', () => ({
 }));
 
 jest.mock('../AddOrEditTemplateContext', () => ({
-  useAddTemplateContext: jest.fn(),
+  useAddOrEditTemplateContext: jest.fn(),
 }));
 
 jest.mock('react-router-dom', () => ({

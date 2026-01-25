@@ -53,6 +53,7 @@ export default function RedhatRepositoriesStep() {
     templateRequest,
     selectedRedhatRepos,
     setSelectedRedhatRepos,
+    useExtendedSupport,
   } = useAddOrEditTemplateContext();
 
   const noAdditionalRepos = selectedRedhatRepos.size - hardcodedRedhatRepositoryUUIDS.size === 0;
@@ -116,6 +117,10 @@ export default function RedhatRepositoriesStep() {
         search: searchQuery === '' ? searchQuery : debouncedSearch,
         availableForArch: templateRequest.arch as string,
         availableForVersion: templateRequest.version as string,
+        ...(useExtendedSupport && {
+          extended_release: templateRequest.extended_release as string,
+          extended_release_version: templateRequest.extended_release_version as string,
+        }),
         uuids: toggled ? [...selectedRedhatRepos] : undefined,
       },
       sortString(),

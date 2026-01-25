@@ -11,7 +11,7 @@ jest.mock('services/Content/ContentQueries', () => ({
 jest.mock('Pages/Repositories/ContentListTable/components/StatusIcon', () => () => 'StatusIcon');
 
 jest.mock('../AddOrEditTemplateContext', () => ({
-  useAddTemplateContext: jest.fn(),
+  useAddOrEditTemplateContext: jest.fn(),
 }));
 
 jest.mock('react-router-dom', () => ({

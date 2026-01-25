@@ -109,7 +109,12 @@ export default function DefineContentStep() {
         <FormGroup label='OS version' isRequired>
           <Dropdown
             onSelect={(_, val) => {
-              setTemplateRequest((prev) => ({ ...prev, version: val as string }));
+              setTemplateRequest((prev) => ({
+                ...prev,
+                version: val as string,
+                // With a change in an OS version, reset the minor version selection if it exists
+                ...(prev.extended_release_version !== '' && { extended_release_version: '' }),
+              }));
               setVersionOpen(false);
             }}
             toggle={(toggleRef) => (

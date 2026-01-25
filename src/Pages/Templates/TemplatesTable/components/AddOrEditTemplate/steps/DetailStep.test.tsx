@@ -4,7 +4,7 @@ import { defaultTemplateItem } from 'testingHelpers';
 import DetailStep from './DetailStep';
 
 jest.mock('../AddOrEditTemplateContext', () => ({
-  useAddTemplateContext: jest.fn(),
+  useAddOrEditTemplateContext: jest.fn(),
 }));
 
 it('expect DetailStep to render correctly', () => {

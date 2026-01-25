@@ -12,11 +12,13 @@ import { AdminTask } from 'services/Admin/AdminTaskApi';
 
 export interface TemplateRequest {
   arch: string;
+  version: string;
+  extended_release?: string;
+  extended_release_version?: string;
   date: string | null;
   description: string;
   name: string;
   repository_uuids: string[];
-  version: string;
   use_latest: boolean;
 }
 
@@ -34,6 +36,8 @@ export interface TemplateItem {
   to_be_deleted_snapshots: SnapshotItem[];
   arch: string;
   version: string;
+  extended_release?: string;
+  extended_release_version?: string;
   date: string;
   use_latest: boolean;
   created_at: string;
