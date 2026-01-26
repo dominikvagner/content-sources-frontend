@@ -140,7 +140,7 @@ const PopularRepositoriesTable = () => {
     search: !searchValue ? searchValue : debouncedSearchValue,
   });
 
-  const { mutateAsync: addContentQuery, isLoading: isAdding } = useAddPopularRepositoryQuery(
+  const { mutateAsync: addContentQuery, isPending: isAdding } = useAddPopularRepositoryQuery(
     queryClient,
     selectedData,
     page,
@@ -237,11 +237,11 @@ const PopularRepositoriesTable = () => {
     }
   }, [selectedData]);
 
-  const { isLoading: isDeleting } = useDeletePopularRepositoryMutate(queryClient, page, perPage, {
+  const { isPending: isDeleting } = useDeletePopularRepositoryMutate(queryClient, page, perPage, {
     search: debouncedSearchValue,
   } as FilterData);
 
-  const { isLoading: isDeletingItems } = useBulkDeleteContentItemMutate(
+  const { isPending: isDeletingItems } = useBulkDeleteContentItemMutate(
     queryClient,
     checkedRepositoriesToDelete,
     page,

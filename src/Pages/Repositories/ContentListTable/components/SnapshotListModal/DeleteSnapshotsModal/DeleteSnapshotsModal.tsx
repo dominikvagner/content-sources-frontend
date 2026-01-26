@@ -81,7 +81,7 @@ export default function DeleteSnapshotsModal() {
       : [];
   const snapshotsToDelete = new Set(uuids);
 
-  const { mutateAsync: deleteSnapshots, isLoading: isDeletingSnapshots } =
+  const { mutateAsync: deleteSnapshots, isPending: isDeletingSnapshots } =
     useBulkDeleteSnapshotsMutate(queryClient, uuid, snapshotsToDelete);
 
   const onClose = () => navigate(`${rootPath}/${REPOSITORIES_ROUTE}/${uuid}/snapshots`);

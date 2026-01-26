@@ -118,7 +118,7 @@ export default function RedHatRepositoriesStep() {
       [ContentOrigin.REDHAT],
       true,
       false,
-      { keepPreviousData: false, staleTime: 0 },
+      { placeholderData: undefined, staleTime: 0 },
     );
 
   const {

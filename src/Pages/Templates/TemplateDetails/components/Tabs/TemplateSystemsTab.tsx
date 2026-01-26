@@ -118,7 +118,7 @@ export default function TemplateSystemsTab() {
     data = { data: [], meta: { total_items: 0, limit: 20, offset: 0 } },
   } = useListSystemsByTemplateId(uuid, page, perPage, debouncedSearchQuery, sortString);
 
-  const { mutateAsync: deleteFromSystems, isLoading: isDeleting } =
+  const { mutateAsync: deleteFromSystems, isPending: isDeleting } =
     useDeleteTemplateFromSystems(queryClient);
 
   const {

@@ -110,12 +110,12 @@ const AddOrEditTemplateBase = () => {
     }
   };
 
-  const { mutateAsync: addTemplate, isLoading: isAdding } = useCreateTemplateQuery(queryClient, {
+  const { mutateAsync: addTemplate, isPending: isAdding } = useCreateTemplateQuery(queryClient, {
     ...(templateRequest as TemplateRequest),
     date: templateRequest.use_latest ? null : formatTemplateDate(templateRequest.date || ''),
   });
 
-  const { mutateAsync: editTemplate, isLoading: isEditing } = useEditTemplateQuery(queryClient, {
+  const { mutateAsync: editTemplate, isPending: isEditing } = useEditTemplateQuery(queryClient, {
     uuid: editUUID as string,
     ...(templateRequest as TemplateRequest),
     date: templateRequest.use_latest ? null : formatTemplateDate(templateRequest.date || ''),

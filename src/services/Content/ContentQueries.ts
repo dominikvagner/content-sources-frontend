@@ -1,6 +1,7 @@
 import { AlertVariant } from '@patternfly/react-core';
 import { useState } from 'react';
 import {
+  keepPreviousData,
   QueryClient,
   useMutation,
   useQuery,
@@ -13,7 +14,6 @@ import {
   ContentListResponse,
   deleteContentListItem,
   getContentList,
-  RepositoryParamsResponse,
   getRepositoryParams,
   AddContentListItems,
   CreateContentRequest,
@@ -21,7 +21,6 @@ import {
   validateContentListItems,
   EditContentListItem,
   getGpgKey,
-  PackagesResponse,
   getPackages,
   getPopularRepositories,
   PopularRepositoriesResponse,
@@ -41,7 +40,6 @@ import {
   getSnapshotsByDate,
   getSnapshotPackages,
   getSnapshotErrata,
-  ErrataResponse,
   type EditContentRequestItem,
   type ValidateContentRequestItem,
   addUploads,
@@ -88,47 +86,42 @@ const buildContentListKey = (
     '',
   )}${filterData?.statuses?.join('')}${filterData?.availableForArch}${filterData?.availableForVersion}${filterData?.search}${filterData?.extended_release}${filterData?.extended_release_version}`;
 
-export const useFetchContent = (uuid: string, enabled = true) => {
-  const errorNotifier = useErrorNotification();
-  return useQuery<ContentItem>([CONTENT_ITEM_KEY, uuid], () => fetchContentItem(uuid), {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onError: (err: any) =>
-      errorNotifier(
-        'Unable to find associated repository.',
-        'An error occurred',
-        err,
-        'fetch-content-error',
-      ),
-    keepPreviousData: true,
+export const useFetchContent = (uuid: string, enabled = true) =>
+  useQuery({
+    queryKey: [CONTENT_ITEM_KEY, uuid],
+    queryFn: () => fetchContentItem(uuid),
+    meta: {
+      title: 'Unable to find associated repository.',
+      id: 'fetch-content-error',
+    },
+    placeholderData: keepPreviousData,
     staleTime: 20000,
     enabled,
   });
-};
 
 export const usePopularRepositoriesQuery = (
   page: number,
   limit: number,
   filterData?: Partial<FilterData>,
   sortBy?: string,
-) => {
-  const errorNotifier = useErrorNotification();
-  return useQuery<PopularRepositoriesResponse>(
-    [POPULAR_REPOSITORIES_LIST_KEY, page, limit, sortBy, ...Object.values(filterData || {})], // NOTE: Update this if larger list!!!!
-    () => getPopularRepositories(page, limit, filterData, sortBy),
-    {
-      keepPreviousData: true,
-      staleTime: 20000,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) =>
-        errorNotifier(
-          'Unable to get popular repositories list',
-          'An error occurred',
-          err,
-          'popular-repository-error',
-        ),
+) =>
+  useQuery({
+    queryKey: [
+      POPULAR_REPOSITORIES_LIST_KEY,
+      page,
+      limit,
+      sortBy,
+      ...Object.values(filterData || {}),
+    ],
+    // NOTE: Update this if larger list!!!!
+    queryFn: () => getPopularRepositories(page, limit, filterData, sortBy),
+    placeholderData: keepPreviousData,
+    staleTime: 20000,
+    meta: {
+      title: 'Unable to get popular repositories list',
+      id: 'popular-repository-error',
     },
-  );
-};
+  });
 
 export const useContentListQuery = (
   page: number,
@@ -139,37 +132,42 @@ export const useContentListQuery = (
   enabled: boolean = true,
   polling: boolean = false,
   overrides?: Partial<UseQueryOptions<ContentListResponse>>,
-) => {
-  const errorNotifier = useErrorNotification();
-  return useQuery<ContentListResponse>(
+) =>
+  useQuery({
     // Below MUST match the "contentListKeyArray" seen below in the useDeleteContent.
-    [CONTENT_LIST_KEY, buildContentListKey(page, limit, sortBy, contentOrigin, filterData)],
-    () => getContentList(page, limit, filterData, sortBy, contentOrigin),
-    {
-      onError: (err) => {
-        errorNotifier(
-          'Unable to get repositories list',
-          'An error occurred',
-          err,
-          'content-list-error',
-        );
-      },
-      refetchInterval: polling ? CONTENT_LIST_POLLING_TIME : undefined,
-      refetchIntervalInBackground: false, // This prevents endless polling when our app isn't the focus tab in a browser
-      refetchOnWindowFocus: polling, // If polling and navigate to another tab, on refocus, we want to poll once more. (This is based off of the stalestime below)
-      keepPreviousData: true,
-      staleTime: 20000,
-      enabled,
-      ...overrides,
+    queryKey: [
+      CONTENT_LIST_KEY,
+      buildContentListKey(page, limit, sortBy, contentOrigin, filterData),
+    ],
+
+    queryFn: () => getContentList(page, limit, filterData, sortBy, contentOrigin),
+
+    meta: {
+      title: 'Unable to get repositories list',
+      id: 'content-list-error',
     },
-  );
-};
+
+    refetchInterval: polling ? CONTENT_LIST_POLLING_TIME : undefined,
+
+    // This prevents endless polling when our app isn't the focus tab in a browser
+    refetchIntervalInBackground: false,
+
+    // If polling and navigate to another tab, on refocus, we want to poll once more. (This is based off of the stalestime below)
+    refetchOnWindowFocus: polling,
+
+    placeholderData: keepPreviousData,
+    staleTime: 20000,
+    enabled,
+    ...overrides,
+  });
 
 export const useAddContentQuery = (request: CreateContentRequest) => {
   const queryClient = useQueryClient();
   const errorNotifier = useErrorNotification();
   const { notify } = useNotification();
-  return useMutation(() => AddContentListItems(request.filter((item) => !!item)), {
+  return useMutation({
+    mutationFn: () => AddContentListItems(request.filter((item) => !!item)),
+
     onSuccess: (data: CreateContentRequestResponse) => {
       const hasPending = (data as ContentItem[]).some(({ status }) => status === 'Pending');
 
@@ -192,6 +190,7 @@ export const useAddContentQuery = (request: CreateContentRequest) => {
       queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
       queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
     },
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
       errorNotifier(
@@ -208,7 +207,9 @@ export const useAddUploadsQuery = (request: AddUploadRequest) => {
   const queryClient = useQueryClient();
   const errorNotifier = useErrorNotification();
   const { notify } = useNotification();
-  return useMutation(() => addUploads(request), {
+  return useMutation({
+    mutationFn: () => addUploads(request),
+
     onSuccess: (data) => {
       const uploadCount = (request?.uploads?.length || 0) + (request?.artifacts?.length || 0);
       notify({
@@ -223,6 +224,7 @@ export const useAddUploadsQuery = (request: AddUploadRequest) => {
       queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
       queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
     },
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
       errorNotifier(
@@ -252,11 +254,15 @@ export const useAddPopularRepositoryQuery = (
     ...Object.values(filterData || {}),
   ];
   const filteredRequest = request.filter((item) => !!item);
-  return useMutation(() => AddContentListItems(filteredRequest), {
+  return useMutation({
+    mutationFn: () => AddContentListItems(filteredRequest),
+
     onMutate: async () => {
       const { name } = filteredRequest[0];
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries(popularRepositoriesKeyArray);
+      await queryClient.cancelQueries({
+        queryKey: popularRepositoriesKeyArray,
+      });
       // Snapshot the previous value
       const previousPopularData: Partial<PopularRepositoriesResponse> =
         queryClient.getQueryData(popularRepositoriesKeyArray) || {};
@@ -272,6 +278,7 @@ export const useAddPopularRepositoryQuery = (
       }));
       return { previousData: previousPopularData };
     },
+
     onSuccess: (data: CreateContentRequestResponse) => {
       const hasPending = (data as ContentItem[]).some(({ status }) => status === 'Pending');
       notify({
@@ -286,6 +293,7 @@ export const useAddPopularRepositoryQuery = (
       queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
       queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
     },
+
     onError: (err, _newData, context) => {
       if (context) {
         const { previousData } = context as {
@@ -307,7 +315,9 @@ export const useEditContentQuery = (request: EditContentRequestItem) => {
   const queryClient = useQueryClient();
   const errorNotifier = useErrorNotification();
   const { notify } = useNotification();
-  return useMutation(() => EditContentListItem(request), {
+  return useMutation({
+    mutationFn: () => EditContentListItem(request),
+
     onSuccess: () => {
       notify({
         variant: AlertVariant.success,
@@ -320,6 +330,7 @@ export const useEditContentQuery = (request: EditContentRequestItem) => {
       queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
       queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
     },
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
       errorNotifier(
@@ -334,7 +345,9 @@ export const useEditContentQuery = (request: EditContentRequestItem) => {
 
 export const useValidateContentList = () => {
   const errorNotifier = useErrorNotification();
-  return useMutation((request: ValidateContentRequestItem) => validateContentListItems(request), {
+  return useMutation({
+    mutationFn: (request: ValidateContentRequestItem) => validateContentListItems(request),
+
     onError: (err) => {
       errorNotifier(
         'Error validating form fields',
@@ -360,10 +373,13 @@ export const useDeletePopularRepositoryMutate = (
     ...Object.values(filterData || {}),
   ];
   const errorNotifier = useErrorNotification();
-  return useMutation(deleteContentListItem, {
+  return useMutation({
+    mutationFn: deleteContentListItem,
     onMutate: async (uuid: string) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries(popularRepositoriesKeyArray);
+      await queryClient.cancelQueries({
+        queryKey: popularRepositoriesKeyArray,
+      });
       // Snapshot the previous value
       const previousPopularData: Partial<PopularRepositoriesResponse> =
         queryClient.getQueryData(popularRepositoriesKeyArray) || {};
@@ -418,10 +434,13 @@ export const useDeleteContentItemMutate = (
     buildContentListKey(page, perPage, sortString, contentOrigin, filterData),
   ];
   const errorNotifier = useErrorNotification();
-  return useMutation(deleteContentListItem, {
+  return useMutation({
+    mutationFn: deleteContentListItem,
     onMutate: async (uuid: string) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries(contentListKeyArray);
+      await queryClient.cancelQueries({
+        queryKey: contentListKeyArray,
+      });
       // Snapshot the previous value
       const previousData: Partial<ContentListResponse> =
         queryClient.getQueryData(contentListKeyArray) || {};
@@ -445,13 +464,16 @@ export const useDeleteContentItemMutate = (
       const { previousData } = context as {
         previousData: ContentListResponse;
       };
-      queryClient.setQueriesData([CONTENT_LIST_KEY], (data: Partial<ContentListResponse> = {}) => {
-        if (data?.meta?.count) {
-          data.meta.count = previousData?.meta?.count - 1;
-        }
+      queryClient.setQueriesData(
+        { queryKey: [CONTENT_LIST_KEY] },
+        (data: Partial<ContentListResponse> = {}) => {
+          if (data?.meta?.count) {
+            data.meta.count = previousData?.meta?.count - 1;
+          }
 
-        return data;
-      });
+          return data;
+        },
+      );
       queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
       queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
       queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
@@ -492,75 +514,80 @@ export const useBulkDeleteContentItemMutate = <T extends DeletableItem>(
     buildContentListKey(page, perPage, sortString, contentOrigin, filterData),
   ];
   const errorNotifier = useErrorNotification();
-  return useMutation(
-    (selected: Map<string, ContentItem>) => {
+  return useMutation({
+    mutationFn: (selected: Map<string, ContentItem>) => {
       const uuids = Array.from(selected.keys());
       return deleteContentListItems(uuids);
     },
-    {
-      onMutate: async (selected: Map<string, ContentItem>) => {
-        // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-        await queryClient.cancelQueries(contentListKeyArray);
-        // Snapshot the previous value
-        const previousData: Partial<ContentListResponse> =
-          queryClient.getQueryData(contentListKeyArray) || {};
 
-        const newMeta = previousData.meta
-          ? {
-              ...previousData.meta,
-              count: previousData.meta.count ? previousData.meta.count - selected.size : 1,
-            }
-          : undefined;
+    onMutate: async (selected: Map<string, ContentItem>) => {
+      // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
+      await queryClient.cancelQueries({
+        queryKey: contentListKeyArray,
+      });
+      // Snapshot the previous value
+      const previousData: Partial<ContentListResponse> =
+        queryClient.getQueryData(contentListKeyArray) || {};
 
-        // Optimistically update to the new value
-        queryClient.setQueryData(contentListKeyArray, () => ({
-          ...previousData,
-          data: previousData.data?.filter((data) => !selected.has(data.uuid)),
-          meta: newMeta,
-        }));
-        // Return a context object with the snapshotted value
-        return { previousData, newMeta, queryClient };
-      },
-      onSuccess: (_data, _variables, context) => {
-        // Update all of the existing calls "count" to prevent number jumping on pagination
-        const { newMeta } = context as {
-          newMeta: Meta;
-        };
-        queryClient.setQueriesData(
-          [CONTENT_LIST_KEY],
-          (data: Partial<ContentListResponse> = {}) => {
-            if (data?.meta?.count) {
-              data.meta.count = newMeta?.count;
-            }
-            return data;
-          },
-        );
-        queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
-        queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
-        queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
-      },
-      // If the mutation fails, use the context returned from onMutate to roll back
-      onError: (err: { response?: { data: ErrorResponse } }, _newData, context) => {
-        if (context) {
-          const { previousData } = context as {
-            previousData: ContentListResponse;
-          };
-          queryClient.setQueryData(contentListKeyArray, previousData);
-        }
-        errorNotifier(
-          'Error deleting items from content list',
-          'An error occurred',
-          err,
-          'bulk-delete-error',
-        );
-      },
+      const newMeta = previousData.meta
+        ? {
+            ...previousData.meta,
+            count: previousData.meta.count ? previousData.meta.count - selected.size : 1,
+          }
+        : undefined;
+
+      // Optimistically update to the new value
+      queryClient.setQueryData(contentListKeyArray, () => ({
+        ...previousData,
+        data: previousData.data?.filter((data) => !selected.has(data.uuid)),
+        meta: newMeta,
+      }));
+      // Return a context object with the snapshotted value
+      return { previousData, newMeta, queryClient };
     },
-  );
+
+    onSuccess: (_data, _variables, context) => {
+      // Update all of the existing calls "count" to prevent number jumping on pagination
+      const { newMeta } = context as {
+        newMeta: Meta;
+      };
+      queryClient.setQueriesData(
+        { queryKey: [CONTENT_LIST_KEY] },
+        (data: Partial<ContentListResponse> = {}) => {
+          if (data?.meta?.count) {
+            data.meta.count = newMeta?.count;
+          }
+          return data;
+        },
+      );
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [ADMIN_TASK_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [POPULAR_REPOSITORIES_LIST_KEY] });
+    },
+
+    // If the mutation fails, use the context returned from onMutate to roll back
+    onError: (err: { response?: { data: ErrorResponse } }, _newData, context) => {
+      if (context) {
+        const { previousData } = context as {
+          previousData: ContentListResponse;
+        };
+        queryClient.setQueryData(contentListKeyArray, previousData);
+      }
+      errorNotifier(
+        'Error deleting items from content list',
+        'An error occurred',
+        err,
+        'bulk-delete-error',
+      );
+    },
+  });
 };
 
 export const useGetSnapshotsByDates = (uuids: string[], date: string) => {
   const errorNotifier = useErrorNotification();
-  return useMutation(() => getSnapshotsByDate(uuids, date), {
+  return useMutation({
+    mutationFn: () => getSnapshotsByDate(uuids, date),
+
     onError: (err) => {
       errorNotifier(
         'Error deleting items from content list',
@@ -573,8 +600,10 @@ export const useGetSnapshotsByDates = (uuids: string[], date: string) => {
 };
 
 export const useRepositoryParams = () =>
-  useQuery<RepositoryParamsResponse>([REPOSITORY_PARAMS_KEY], getRepositoryParams, {
-    keepPreviousData: true,
+  useQuery({
+    queryKey: [REPOSITORY_PARAMS_KEY],
+    queryFn: getRepositoryParams,
+    placeholderData: keepPreviousData,
     staleTime: Infinity,
   });
 
@@ -604,26 +633,17 @@ export const useFetchGpgKey = () => {
   return { fetchGpgKey, isLoading };
 };
 
-export const useGetSnapshotList = (uuid: string, page: number, limit: number, sortBy: string) => {
-  const errorNotifier = useErrorNotification();
-  return useQuery<SnapshotListResponse>(
-    [LIST_SNAPSHOTS_KEY, uuid, page, limit, sortBy],
-    () => getSnapshotList(uuid, page, limit, sortBy),
-    {
-      keepPreviousData: true,
-      staleTime: 60000,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) => {
-        errorNotifier(
-          'Unable to find snapshots with the given UUID.',
-          'An error occurred',
-          err,
-          'snapshot-list-error',
-        );
-      },
+export const useGetSnapshotList = (uuid: string, page: number, limit: number, sortBy: string) =>
+  useQuery({
+    queryKey: [LIST_SNAPSHOTS_KEY, uuid, page, limit, sortBy],
+    queryFn: () => getSnapshotList(uuid, page, limit, sortBy),
+    placeholderData: keepPreviousData,
+    staleTime: 60000,
+    meta: {
+      title: 'Unable to find snapshots with the given UUID.',
+      id: 'snapshot-list-error',
     },
-  );
-};
+  });
 
 export const useGetPackagesQuery = (
   uuid: string,
@@ -631,52 +651,34 @@ export const useGetPackagesQuery = (
   limit: number,
   searchQuery: string,
   sortBy?: string,
-) => {
-  const errorNotifier = useErrorNotification();
-  return useQuery<PackagesResponse>(
-    [PACKAGES_KEY, uuid, page, limit, searchQuery, sortBy],
-    () => getPackages(uuid, page, limit, searchQuery, sortBy),
-    {
-      keepPreviousData: true,
-      staleTime: 60000,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) => {
-        errorNotifier(
-          'Unable to find packages with the given UUID.',
-          'An error occurred',
-          err,
-          'packages-list-error',
-        );
-      },
+) =>
+  useQuery({
+    queryKey: [PACKAGES_KEY, uuid, page, limit, searchQuery, sortBy],
+    queryFn: () => getPackages(uuid, page, limit, searchQuery, sortBy),
+    placeholderData: keepPreviousData,
+    staleTime: 60000,
+    meta: {
+      title: 'Unable to find packages with the given UUID.',
+      id: 'packages-list-error',
     },
-  );
-};
+  });
 
 export const useGetSnapshotPackagesQuery = (
   snap_uuid: string,
   page: number,
   limit: number,
   searchQuery: string,
-) => {
-  const errorNotifier = useErrorNotification();
-  return useQuery<PackagesResponse>(
-    [SNAPSHOT_PACKAGES_KEY, snap_uuid, page, limit, searchQuery],
-    () => getSnapshotPackages(snap_uuid, page, limit, searchQuery),
-    {
-      keepPreviousData: true,
-      staleTime: 60000,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) => {
-        errorNotifier(
-          'Unable to find packages with the given UUID.',
-          'An error occurred',
-          err,
-          'snapshot-package-list-error',
-        );
-      },
+) =>
+  useQuery({
+    queryKey: [SNAPSHOT_PACKAGES_KEY, snap_uuid, page, limit, searchQuery],
+    queryFn: () => getSnapshotPackages(snap_uuid, page, limit, searchQuery),
+    placeholderData: keepPreviousData,
+    staleTime: 60000,
+    meta: {
+      title: 'Unable to find packages with the given UUID.',
+      id: 'snapshot-package-list-error',
     },
-  );
-};
+  });
 
 export const useGetSnapshotErrataQuery = (
   snap_uuid: string,
@@ -686,31 +688,23 @@ export const useGetSnapshotErrataQuery = (
   type: string[],
   severity: string[],
   sortBy: string,
-) => {
-  const errorNotifier = useErrorNotification();
-  return useQuery<ErrataResponse>(
-    [SNAPSHOT_ERRATA_KEY, snap_uuid, page, limit, search, type, severity, sortBy],
-    () => getSnapshotErrata(snap_uuid, page, limit, search, type, severity, sortBy),
-    {
-      keepPreviousData: true,
-      staleTime: 60000,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) => {
-        errorNotifier(
-          'Unable to find errata with the given UUID.',
-          'An error occurred',
-          err,
-          'snapshot-errata-list-error',
-        );
-      },
+) =>
+  useQuery({
+    queryKey: [SNAPSHOT_ERRATA_KEY, snap_uuid, page, limit, search, type, severity, sortBy],
+    queryFn: () => getSnapshotErrata(snap_uuid, page, limit, search, type, severity, sortBy),
+    placeholderData: keepPreviousData,
+    staleTime: 60000,
+    meta: {
+      title: 'Unable to find errata with the given UUID.',
+      id: 'snapshot-errata-list-error',
     },
-  );
-};
+  });
 
 export const useTriggerSnapshot = (queryClient: QueryClient) => {
   const errorNotifier = useErrorNotification();
   const { notify } = useNotification();
-  return useMutation(triggerSnapshot, {
+  return useMutation({
+    mutationFn: triggerSnapshot,
     onSuccess: () => {
       notify({
         variant: AlertVariant.success,
@@ -746,10 +740,13 @@ export const useIntrospectRepositoryMutate = (
   const errorNotifier = useErrorNotification();
   const { notify } = useNotification();
   let hasSnapshottingEnabled: boolean | undefined = false;
-  return useMutation(introspectRepository, {
+  return useMutation({
+    mutationFn: introspectRepository,
     onMutate: async (item: IntrospectRepositoryRequestItem) => {
       // Cancel any outgoing refetches (so they don't overwrite our optimistic update)
-      await queryClient.cancelQueries(contentListKeyArray);
+      await queryClient.cancelQueries({
+        queryKey: contentListKeyArray,
+      });
       // Snapshot the previous value
       const previousData: Partial<ContentListResponse> =
         queryClient.getQueryData(contentListKeyArray) || {};
@@ -803,40 +800,38 @@ export const useIntrospectRepositoryMutate = (
 
 export const useGetRepoConfigFileQuery = (repo_uuid: string, snapshot_uuid: string) => {
   const errorNotifier = useErrorNotification();
-  return useMutation<string>(
-    [REPO_CONFIG_FILE_KEY, repo_uuid, snapshot_uuid],
-    async () => await getRepoConfigFile(snapshot_uuid),
-    {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) => {
-        errorNotifier(
-          'Unable to find config.repo with the given UUID.',
-          'An error occurred',
-          err,
-          'repo-config-error',
-        );
-      },
+  return useMutation({
+    mutationKey: [REPO_CONFIG_FILE_KEY, repo_uuid, snapshot_uuid],
+    mutationFn: async () => await getRepoConfigFile(snapshot_uuid),
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any) => {
+      errorNotifier(
+        'Unable to find config.repo with the given UUID.',
+        'An error occurred',
+        err,
+        'repo-config-error',
+      );
     },
-  );
+  });
 };
 
 export const useGetLatestRepoConfigFileQuery = (repo_uuid: string) => {
   const errorNotifier = useErrorNotification();
-  return useMutation<string>(
-    [LATEST_REPO_CONFIG_FILE_KEY, repo_uuid],
-    async () => await getLatestRepoConfigFile(repo_uuid),
-    {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      onError: (err: any) => {
-        errorNotifier(
-          'Unable to find config.repo with the given UUID.',
-          'An error occurred',
-          err,
-          'repo-config-error',
-        );
-      },
+  return useMutation({
+    mutationKey: [LATEST_REPO_CONFIG_FILE_KEY, repo_uuid],
+    mutationFn: async () => await getLatestRepoConfigFile(repo_uuid),
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (err: any) => {
+      errorNotifier(
+        'Unable to find config.repo with the given UUID.',
+        'An error occurred',
+        err,
+        'repo-config-error',
+      );
     },
-  );
+  });
 };
 
 export const useBulkDeleteSnapshotsMutate = (
@@ -848,9 +843,13 @@ export const useBulkDeleteSnapshotsMutate = (
   const snapshotListKeyArray = [LIST_SNAPSHOTS_KEY, repoUuid];
   const errorNotifier = useErrorNotification();
 
-  return useMutation(() => deleteSnapshots(repoUuid, uuids), {
+  return useMutation({
+    mutationFn: () => deleteSnapshots(repoUuid, uuids),
+
     onMutate: async (checkedSnapshots: Set<string>) => {
-      await queryClient.cancelQueries(snapshotListKeyArray);
+      await queryClient.cancelQueries({
+        queryKey: snapshotListKeyArray,
+      });
       const previousData: Partial<SnapshotListResponse> =
         queryClient.getQueryData(snapshotListKeyArray) || {};
 
@@ -868,12 +867,13 @@ export const useBulkDeleteSnapshotsMutate = (
       }));
       return { previousData, newMeta, queryClient };
     },
+
     onSuccess: (_data, _variables, context) => {
       const { newMeta } = context as {
         newMeta: Meta;
       };
       queryClient.setQueriesData(
-        [LIST_SNAPSHOTS_KEY],
+        { queryKey: [LIST_SNAPSHOTS_KEY] },
         (data: Partial<SnapshotListResponse> = {}) => {
           if (data?.meta?.count) {
             data.meta.count = newMeta?.count;
@@ -894,6 +894,7 @@ export const useBulkDeleteSnapshotsMutate = (
       queryClient.invalidateQueries({ queryKey: [REPO_CONFIG_FILE_KEY] });
       queryClient.invalidateQueries({ queryKey: [LATEST_REPO_CONFIG_FILE_KEY] });
     },
+
     onError: (err: { response?: { data: ErrorResponse } }, _newData, context) => {
       if (context) {
         const { previousData } = context as {

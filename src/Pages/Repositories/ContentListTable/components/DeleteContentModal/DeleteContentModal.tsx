@@ -97,14 +97,14 @@ export default function DeleteContentModal() {
   const {
     isError: isRepoError,
     data: repos = { data: [] as ContentItem[], meta: { count: 0, limit: 20, offset: 0 } },
-    isInitialLoading: isRepoLoading,
+    isLoading: isRepoLoading,
   } = useContentListQuery(selectedPage, selectedPerPage, repoFilterData, '', [
     ContentOrigin.CUSTOM,
   ]);
 
   const reposToDelete = new Map(repos.data.map((repo) => [repo.uuid, repo]));
 
-  const { mutateAsync: deleteItems, isLoading: isDeletingItems } = useBulkDeleteContentItemMutate(
+  const { mutateAsync: deleteItems, isPending: isDeletingItems } = useBulkDeleteContentItemMutate(
     queryClient,
     reposToDelete,
     page,
@@ -136,7 +136,7 @@ export default function DeleteContentModal() {
   const {
     isError: isTemplateError,
     data: templates = { data: [], meta: { count: 0, limit: 20, offset: 0 } },
-    isInitialLoading: isTemplateLoading,
+    isLoading: isTemplateLoading,
   } = useTemplateList(page, perPage, '', templateFilterData);
 
   useEffect(() => {

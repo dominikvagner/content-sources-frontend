@@ -143,7 +143,7 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
     [ContentOrigin.REDHAT],
     coreRepoURLs.length > 0,
     false,
-    { keepPreviousData: false, staleTime: 0 },
+    { placeholderData: undefined, staleTime: 0 },
   );
 
   useEffect(() => {
