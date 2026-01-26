@@ -55,7 +55,7 @@ export default function DeleteTemplateModal() {
 
   const { data: templateData, isLoading: isTemplateLoading } = useFetchTemplate(uuid);
 
-  const { mutateAsync: deleteTemplate, isLoading: isDeleting } =
+  const { mutateAsync: deleteTemplate, isPending: isDeleting } =
     useDeleteTemplateItemMutate(queryClient);
 
   const onClose = () => navigate(`${rootPath}/${TEMPLATES_ROUTE}`);

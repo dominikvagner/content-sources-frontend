@@ -99,11 +99,7 @@ const AddContent = ({ isEdit = false }: Props) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isActionOpen, setIsActionOpen] = useState(false);
 
-  const {
-    data,
-    isInitialLoading: isLoadingInitialContent,
-    isSuccess,
-  } = useFetchContent(uuid!, isEdit);
+  const { data, isLoading: isLoadingInitialContent, isSuccess } = useFetchContent(uuid!, isEdit);
 
   const [values, setValues] = useState(getDefaultValues({}));
   const [changeVerified, setChangeVerified] = useState(false);
@@ -114,7 +110,7 @@ const AddContent = ({ isEdit = false }: Props) => {
     }
   }, [isLoadingInitialContent, isSuccess]);
 
-  const { mutateAsync: editContent, isLoading: isEditing } = useEditContentQuery(
+  const { mutateAsync: editContent, isPending: isEditing } = useEditContentQuery(
     mapFormikToAPIValues(values),
   );
 
@@ -176,7 +172,7 @@ const AddContent = ({ isEdit = false }: Props) => {
     }
   };
 
-  const { mutateAsync: addContent, isLoading: isAdding } = useAddContentQuery([
+  const { mutateAsync: addContent, isPending: isAdding } = useAddContentQuery([
     mapFormikToAPIValues(values),
   ]);
 
@@ -217,7 +213,7 @@ const AddContent = ({ isEdit = false }: Props) => {
   const {
     mutateAsync: validateContent,
     data: validationList,
-    isLoading: isValidating,
+    isPending: isValidating,
   } = useValidateContentList();
 
   useEffect(() => {

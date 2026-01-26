@@ -162,7 +162,7 @@ export default function AddSystemModal() {
     return selectableSystems.every(({ id }) => selectedList.has(id));
   }, [selectedList, systemsList, allSystemsAreVersionLocked, uuid]);
 
-  const { mutateAsync: addSystems, isLoading: isAdding } = useAddTemplateToSystemsQuery(
+  const { mutateAsync: addSystems, isPending: isAdding } = useAddTemplateToSystemsQuery(
     queryClient,
     uuid,
     selected,

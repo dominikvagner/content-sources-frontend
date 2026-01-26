@@ -41,7 +41,7 @@ const UploadContent = () => {
 
   const onClose = () => navigate(`${rootPath}/${REPOSITORIES_ROUTE}`);
 
-  const { mutateAsync: uploadItems, isLoading } = useAddUploadsQuery({
+  const { mutateAsync: uploadItems, isPending } = useAddUploadsQuery({
     repoUUID: uuid!,
     uploads: fileUUIDs
       .filter(({ href }) => !href)
@@ -76,7 +76,7 @@ const UploadContent = () => {
           descriptorId='upload-content-modal-description'
         />
         <ModalBody>
-          <FileUploader {...{ isLoading, setFileUUIDs, setChildLoading }} />
+          <FileUploader {...{ isLoading: isPending, setFileUUIDs, setChildLoading }} />
         </ModalBody>
         <ModalFooter>
           <Stack>
@@ -86,7 +86,7 @@ const UploadContent = () => {
                 key='confirm'
                 ouiaId='modal_save'
                 variant='primary'
-                isLoading={isLoading}
+                isLoading={isPending}
                 isDisabled={!fileUUIDs.length || childLoading}
                 onClick={() => uploadItems().then(onClose)}
               >
