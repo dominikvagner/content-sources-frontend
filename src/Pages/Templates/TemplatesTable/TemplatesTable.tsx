@@ -37,7 +37,7 @@ import { formatDateDDMMMYYYY, formatDateUTC } from 'helpers';
 import Header from 'components/Header/Header';
 import useRootPath from 'Hooks/useRootPath';
 import { DELETE_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
-import useArchVersion from 'Hooks/useArchVersion';
+import useDistributionDetails from '../../../Hooks/useDistributionDetails';
 import { useTemplateList } from 'services/Templates/TemplateQueries';
 import StatusIcon from './components/StatusIcon';
 import { ExclamationTriangleIcon, ExternalLinkAltIcon } from '@patternfly/react-icons';
@@ -187,9 +187,9 @@ const TemplatesTable = () => {
     isLoading: repositoryParamsLoading,
     error: repositoryParamsError,
     isError: repositoryParamsIsError,
-    archesDisplay,
-    versionDisplay,
-  } = useArchVersion();
+    getArchName,
+    getVersionName,
+  } = useDistributionDetails();
 
   const actionTakingPlace = isLoading || isFetching || repositoryParamsLoading;
 
@@ -343,8 +343,8 @@ const TemplatesTable = () => {
                         </Flex>
                       </Td>
                       <Td>{description}</Td>
-                      <Td>{archesDisplay(arch)}</Td>
-                      <Td>{versionDisplay([version])}</Td>
+                      <Td>{getArchName(arch)}</Td>
+                      <Td>{getVersionName(version)}</Td>
                       <Td>
                         <ConditionalTooltip
                           show={!use_latest}

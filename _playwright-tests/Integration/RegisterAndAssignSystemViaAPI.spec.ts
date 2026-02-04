@@ -24,12 +24,11 @@ test.describe('Register and assign template to systems via API', () => {
 
     await test.step('Create template via UI', async () => {
       await navigateToTemplates(page);
-      page.getByRole('button', { name: 'Create template' }).click();
-
-      await page.getByRole('button', { name: 'filter architecture' }).click();
-      await page.getByRole('menuitem', { name: 'x86_64' }).click();
+      await page.getByRole('button', { name: 'Create template' }).click();
       await page.getByRole('button', { name: 'filter OS version' }).click();
       await page.getByRole('menuitem', { name: 'RHEL 9' }).click();
+      await page.getByRole('button', { name: 'filter architecture' }).click();
+      await page.getByRole('menuitem', { name: 'x86_64' }).click();
       await page.getByRole('button', { name: 'Next', exact: true }).click();
 
       await expect(
@@ -62,7 +61,7 @@ test.describe('Register and assign template to systems via API', () => {
       const row = await getRowByNameOrUrl(page, templateName);
       await row.getByRole('button', { name: templateName }).click();
       await expect(page.getByRole('heading', { level: 1 })).toHaveText(templateName);
-      page.getByRole('link', { name: 'Register and assign via API' }).click();
+      await page.getByRole('link', { name: 'Register and assign via API' }).click();
       await expect(modalPage).toBeVisible();
     });
 

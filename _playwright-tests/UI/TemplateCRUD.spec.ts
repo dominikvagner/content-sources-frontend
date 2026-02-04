@@ -68,10 +68,10 @@ test.describe('Templates CRUD', () => {
     await test.step('Create a template', async () => {
       await navigateToTemplates(page);
       await page.getByRole('button', { name: 'Create template' }).click();
-      await page.getByRole('button', { name: 'filter architecture' }).click();
-      await page.getByRole('menuitem', { name: 'aarch64' }).click();
       await page.getByRole('button', { name: 'filter OS version' }).click();
       await page.getByRole('menuitem', { name: 'RHEL 9' }).click();
+      await page.getByRole('button', { name: 'filter architecture' }).click();
+      await page.getByRole('menuitem', { name: 'aarch64' }).click();
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       const modalPage = page.getByTestId('add_template_modal');
       const rowRHELRepo = await getRowByNameOrUrl(modalPage, smallRHRepo);
@@ -121,7 +121,7 @@ test.describe('Templates CRUD', () => {
       await page.getByRole('button', { name: 'Actions' }).click();
       await page.getByRole('menuitem', { name: 'Edit' }).click();
       await expect(
-        page.getByRole('heading', { name: 'Define template content', exact: true }),
+        page.getByRole('heading', { name: 'OS and architecture', exact: true }),
       ).toBeVisible();
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       await expect(

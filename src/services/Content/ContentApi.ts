@@ -2,7 +2,6 @@ import axios from 'axios';
 import { objectToUrlParams } from 'helpers';
 import { AdminTask } from '../Admin/AdminTaskApi';
 import { MAX_CHUNK_SIZE } from 'Pages/Repositories/ContentListTable/components/UploadContent/components/helpers';
-import { featureNameToExtendedRelease } from '../../Pages/Templates/TemplatesTable/components/templateHelpers';
 
 export interface ContentItem {
   uuid: string;
@@ -335,7 +334,10 @@ export const getContentList: (
   const statusParam = filterData.statuses?.join(',');
   const urlParam = filterData.urls?.join(',');
   const uuidsParam = filterData.uuids?.join(',');
-  const extendedReleaseParam = featureNameToExtendedRelease(filterData.extended_release);
+  // The repositories endpoint accepts 'none' as a filter value to exclude extended release repos
+  // We convert '' to 'none' because objectToUrlParams strips empty strings, which would result in no filter being applied
+  const extendedReleaseParam =
+    filterData.extended_release === '' ? 'none' : filterData.extended_release;
   const { data } = await axios.get(
     `/api/content-sources/v1/repositories/?${objectToUrlParams({
       origin: contentOrigin.length ? contentOrigin.join(',') : undefined,
@@ -415,7 +417,12 @@ export const EditContentListItem: (request: EditContentRequestItem) => Promise<v
 
 export const getRepositoryParams: () => Promise<RepositoryParamsResponse> = async () => {
   const { data } = await axios.get('/api/content-sources/v1/repository_parameters/');
-  return data;
+  return {
+    ...data,
+    // Normalize null values before they're consumed by the frontend
+    extended_release_features: data.extended_release_features ?? [],
+    distribution_minor_versions: data.distribution_minor_versions ?? [],
+  };
 };
 
 export const validateContentListItems: (

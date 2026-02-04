@@ -9,35 +9,46 @@ import {
 import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { useMemo, useState } from 'react';
 import { formatDateDDMMMYYYY } from 'helpers';
+import useDistributionDetails from '../../../../../../Hooks/useDistributionDetails';
+import { STANDARD_STREAM } from '../../templateHelpers';
 
 export default function ReviewStep() {
   const [expanded, setExpanded] = useState(new Set([0]));
+  const { templateRequest, selectedRedHatRepos, redHatCoreRepos, selectedCustomRepos, isEdit } =
+    useAddOrEditTemplateContext();
+
   const {
-    templateRequest,
-    selectedRedhatRepos,
-    hardcodedRedhatRepositoryUUIDS,
-    selectedCustomRepos,
-    distribution_arches,
-    distribution_versions,
-    isEdit,
-  } = useAddOrEditTemplateContext();
+    getVersionName,
+    getStreamName,
+    getMinorVersionName,
+    isExtendedSupportAvailable,
+    getArchName,
+  } = useDistributionDetails();
 
-  const archesDisplay = (arch?: string) =>
-    distribution_arches.find(({ label }) => arch === label)?.name || 'Select architecture';
+  const review = useMemo(() => {
+    const {
+      arch,
+      version: major,
+      extended_release_version: minor,
+      extended_release: stream,
+      date,
+      name,
+      description,
+    } = templateRequest;
 
-  const versionDisplay = (version?: string): string =>
-    // arm64 aarch64
-    distribution_versions.find(({ label }) => version === label)?.name || 'Select version';
-
-  const reviewTemplate = useMemo(() => {
-    const { arch, version, date, name, description } = templateRequest;
-    const review = {
+    return {
       Content: {
-        Architecture: archesDisplay(arch),
-        'OS version': versionDisplay(version),
-        'Pre-selected Red Hat repositories': hardcodedRedhatRepositoryUUIDS.size,
-        'Additional Red Hat repositories':
-          selectedRedhatRepos.size - hardcodedRedhatRepositoryUUIDS.size,
+        ...(isExtendedSupportAvailable
+          ? {
+              'Release stream':
+                getStreamName(templateRequest.extended_release) || STANDARD_STREAM.name,
+            }
+          : {}),
+        'Operating system version':
+          stream && minor ? getMinorVersionName(minor) : getVersionName(major) || 'Select version',
+        Architecture: getArchName(arch) || 'Select architecture',
+        'Core Red Hat repositories': redHatCoreRepos.size,
+        'Additional Red Hat repositories': selectedRedHatRepos.size - redHatCoreRepos.size,
         'Custom repositories': selectedCustomRepos.size,
       },
       Date: {
@@ -50,8 +61,6 @@ export default function ReviewStep() {
         Description: description,
       },
     } as Record<string, { [key: string]: string | number | undefined }>;
-
-    return review;
   }, [templateRequest]);
 
   const setToggle = (index: number) => {
@@ -71,7 +80,7 @@ export default function ReviewStep() {
       <Content component={ContentVariants.p}>
         Review the information and then click <b>{isEdit ? 'Confirm changes' : 'Create'}</b>.
       </Content>
-      {Object.keys(reviewTemplate).map((key, index) => (
+      {Object.keys(review).map((key, index) => (
         <ExpandableSection
           key={key}
           isIndented
@@ -84,14 +93,14 @@ export default function ReviewStep() {
         >
           <Flex direction={{ default: 'row' }}>
             <Flex direction={{ default: 'column' }}>
-              {Object.keys(reviewTemplate[key]).map((title) => (
+              {Object.keys(review[key]).map((title) => (
                 <Content component='p' key={title + '' + index}>
                   {title}
                 </Content>
               ))}
             </Flex>
             <Flex direction={{ default: 'column' }}>
-              {Object.values(reviewTemplate[key]).map((value, index) => (
+              {Object.values(review[key]).map((value, index) => (
                 <Content component='p' key={value + '' + index}>
                   {value}
                 </Content>

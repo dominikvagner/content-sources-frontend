@@ -16,7 +16,7 @@ import {
   AddOrEditTemplateContextProvider,
   useAddOrEditTemplateContext,
 } from './AddOrEditTemplateContext';
-import RedhatRepositoriesStep from './steps/RedhatRepositoriesStep';
+import RedHatRepositoriesStep from './steps/RedHatRepositoriesStep';
 import CustomRepositoriesStep from './steps/CustomRepositoriesStep';
 import { TemplateRequest } from 'services/Templates/TemplateApi';
 
@@ -30,9 +30,7 @@ import { useEffect, useRef } from 'react';
 import { AddTemplateButton } from './AddTemplateButton';
 import useRootPath from 'Hooks/useRootPath';
 import { TEMPLATES_ROUTE } from 'Routes/constants';
-import DefineContentStep from './steps/DefineContentStep';
-import ExtendedSupportStep from './steps/ExtendedSupportStep';
-import { hasExtendedSupport, SUPPORTED_EUS_ARCHES } from '../templateHelpers';
+import OSAndArchitectureStep from './steps/OSAndArchitectureStep';
 
 const useStyles = createUseStyles({
   minHeightForSpinner: {
@@ -40,27 +38,20 @@ const useStyles = createUseStyles({
   },
 });
 
-const DEFAULT_STEP_ID = 'define-content';
+const DEFAULT_STEP_ID = 'os-and-architecture';
 const DEFAULT_STEP_INDEX = 2;
 
 const stepIdToIndex: Record<string, number> = {
   [DEFAULT_STEP_ID]: DEFAULT_STEP_INDEX,
-  'content-versioning': 3,
-  'redhat-repositories': 4,
-  'custom-repositories': 5,
-  'set-up-date': 6,
-  detail: 7,
-  review: 8,
+  'redhat-repositories': 3,
+  'custom-repositories': 4,
+  'set-up-date': 5,
+  detail: 6,
+  review: 7,
 };
 
-// Component to sync URL with wizard state (must be inside Wizard)
-const WizardUrlSync = ({
-  onCancel,
-  isArchSupportedByEUS,
-}: {
-  onCancel: () => void;
-  isArchSupportedByEUS: boolean;
-}) => {
+/** Component to sync URL with wizard state (must be inside Wizard). */
+const WizardUrlSync = ({ onCancel }: { onCancel: () => void }) => {
   const { goToStepById, activeStep } = useWizardContext();
   const [urlSearchParams] = useSearchParams();
 
@@ -70,18 +61,13 @@ const WizardUrlSync = ({
     if (tabParam && tabParam !== activeStep?.id) {
       if (stepIdToIndex[tabParam]) {
         goToStepById(tabParam);
-      } else if (tabParam === 'define-content') {
-        // ARM architecture doesn't support extended support releases, so skip the content versioning step
-        if (!isArchSupportedByEUS) {
-          goToStepById('redhat-repositories');
-          return;
-        }
+      } else if (tabParam === 'os-and-architecture') {
         goToStepById(DEFAULT_STEP_ID);
       } else {
         onCancel();
       }
     }
-  }, [tabParam, activeStep?.id, goToStepById, onCancel, isArchSupportedByEUS]);
+  }, [tabParam, activeStep?.id, goToStepById, onCancel]);
 
   return null;
 };
@@ -96,22 +82,7 @@ const AddOrEditTemplateBase = () => {
   // Store the original 'from' value on mount (before step navigation changes location.state)
   const fromRef = useRef(location.state?.from);
 
-  const {
-    isEdit,
-    templateRequest,
-    hasInvalidSteps,
-    editUUID,
-    extended_release_features,
-    distribution_minor_versions,
-  } = useAddOrEditTemplateContext();
-
-  const isArchSupportedByEUS = !!(
-    templateRequest?.arch && SUPPORTED_EUS_ARCHES.includes(templateRequest.arch)
-  );
-
-  const isVersionSupportedByEUS =
-    templateRequest?.version &&
-    distribution_minor_versions?.some((dist) => dist.major === templateRequest.version);
+  const { isEdit, templateRequest, hasInvalidSteps, editUUID } = useAddOrEditTemplateContext();
 
   // useSafeUUIDParam in AddOrEditTemplateContext already validates the UUID
   // If in edit mode and UUID is invalid, it will be an empty string
@@ -174,7 +145,7 @@ const AddOrEditTemplateBase = () => {
         <Wizard
           header={
             <>
-              <WizardUrlSync onCancel={onCancel} isArchSupportedByEUS={isArchSupportedByEUS} />
+              <WizardUrlSync onCancel={onCancel} />
               <WizardHeader
                 title={`${isEdit ? 'Edit' : 'Create'} content template`}
                 titleId={`${isEdit ? 'edit' : 'create'}_content_template`}
@@ -198,38 +169,28 @@ const AddOrEditTemplateBase = () => {
             isExpandable
             steps={[
               <WizardStep
-                name='Define content'
-                id='define-content'
-                key='define-content-key'
+                name='OS and architecture'
+                id='os-and-architecture'
+                key='os-and-architecture-key'
                 footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(1) }}
               >
-                <DefineContentStep />
+                <OSAndArchitectureStep />
               </WizardStep>,
               <WizardStep
-                key='content-versioning-key'
-                isDisabled={hasInvalidSteps(1) || !isVersionSupportedByEUS || !isArchSupportedByEUS}
-                isHidden={!hasExtendedSupport(extended_release_features)}
-                name='Content versioning'
-                id='content-versioning'
-                footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(2) }}
-              >
-                <ExtendedSupportStep />
-              </WizardStep>,
-              <WizardStep
-                isDisabled={hasInvalidSteps(2)}
+                isDisabled={hasInvalidSteps(1)}
                 name='Red Hat repositories'
                 id='redhat-repositories'
                 key='redhat-repositories-key'
-                footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(3) }}
+                footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(2) }}
               >
-                <RedhatRepositoriesStep />
+                <RedHatRepositoriesStep />
               </WizardStep>,
               <WizardStep
-                isDisabled={hasInvalidSteps(3)}
+                isDisabled={hasInvalidSteps(2)}
                 name='Other repositories'
                 id='custom-repositories'
                 key='custom-repositories-key'
-                footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(4) }}
+                footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(3) }}
               >
                 <CustomRepositoriesStep />
               </WizardStep>,
@@ -238,22 +199,22 @@ const AddOrEditTemplateBase = () => {
           <WizardStep
             name='Set up date'
             id='set-up-date'
-            isDisabled={hasInvalidSteps(4)}
-            footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(5) }}
+            isDisabled={hasInvalidSteps(3)}
+            footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(4) }}
           >
             <SetUpDateStep />
           </WizardStep>
           {/* <WizardStep name='Systems (optional)' id='systems' /> */}
           <WizardStep
-            isDisabled={hasInvalidSteps(5)}
-            footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(6) }}
+            isDisabled={hasInvalidSteps(4)}
+            footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(5) }}
             name='Detail'
             id='detail'
           >
             <DetailStep />
           </WizardStep>
           <WizardStep
-            isDisabled={hasInvalidSteps(6)}
+            isDisabled={hasInvalidSteps(5)}
             name='Review'
             id='review'
             footer={

@@ -26,7 +26,6 @@ import { useAppContext } from 'middleware/AppContext';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import { useNavigate } from 'react-router-dom';
 import { TemplateFilterData } from 'services/Templates/TemplateApi';
-
 interface Props {
   isLoading?: boolean;
   setFilterData: (filterData: TemplateFilterData) => void;

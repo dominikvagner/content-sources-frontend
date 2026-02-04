@@ -49,7 +49,7 @@ import { AddRepo } from './components/AddRepo';
 
 import { DELETE_ROUTE } from 'Routes/constants';
 import { Outlet, useNavigate, useOutletContext } from 'react-router-dom';
-import useArchVersion from 'Hooks/useArchVersion';
+import useDistributionDetails from '../../../Hooks/useDistributionDetails';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
 const useStyles = createUseStyles({
@@ -109,12 +109,12 @@ const PopularRepositoriesTable = () => {
   const [isActionOpen, setIsActionOpen] = useState(false);
 
   const {
-    archesDisplay,
-    versionDisplay,
+    getArchName,
+    getVersionName,
     isLoading: repositoryParamsLoading,
     isError: repositoryParamsIsError,
     error: repositoryParamsError,
-  } = useArchVersion();
+  } = useDistributionDetails();
 
   const onDropdownToggle = () => {
     setIsActionOpen((prev) => !prev);
@@ -515,8 +515,8 @@ const PopularRepositoriesTable = () => {
                           <UrlWithExternalIcon href={url} />
                         </>
                       </Td>
-                      <Td>{archesDisplay(distribution_arch)}</Td>
-                      <Td>{versionDisplay(distribution_versions)}</Td>
+                      <Td>{getArchName(distribution_arch)}</Td>
+                      <Td>{getVersionName(distribution_versions)}</Td>
                       <Td width={10}>
                         <ConditionalTooltip
                           content='You do not have the required permissions to perform this action.'

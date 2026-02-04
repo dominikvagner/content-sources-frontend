@@ -43,33 +43,26 @@ const useStyles = createUseStyles({
   },
 });
 
-export default function RedhatRepositoriesStep() {
+export default function RedHatRepositoriesStep() {
   const classes = useStyles();
   const path = useHref('content');
   const pathname = path.split('content')[0] + 'content';
 
-  const {
-    hardcodedRedhatRepositoryUUIDS,
-    templateRequest,
-    selectedRedhatRepos,
-    setSelectedRedhatRepos,
-    useExtendedSupport,
-  } = useAddOrEditTemplateContext();
+  const { redHatCoreRepos, templateRequest, selectedRedHatRepos, setSelectedRedHatRepos } =
+    useAddOrEditTemplateContext();
 
-  const noAdditionalRepos = selectedRedhatRepos.size - hardcodedRedhatRepositoryUUIDS.size === 0;
+  const [showAllToggle, setShowAllToggle] = useState(true);
 
-  const [toggled, setToggled] = useState(false);
+  const hasOnlyCoreRepos = selectedRedHatRepos.size - redHatCoreRepos.size === 0;
 
-  const setUUIDForList = (uuid: string) => {
-    if (selectedRedhatRepos.has(uuid)) {
-      selectedRedhatRepos.delete(uuid);
-      if (noAdditionalRepos) {
-        setToggled(false);
-      }
+  const handleRepoSelection = (uuid: string) => {
+    const newSelectedRepos = new Set(selectedRedHatRepos);
+    if (newSelectedRepos.has(uuid)) {
+      newSelectedRepos.delete(uuid);
     } else {
-      selectedRedhatRepos.add(uuid);
+      newSelectedRepos.add(uuid);
     }
-    setSelectedRedhatRepos(new Set(selectedRedhatRepos));
+    setSelectedRedHatRepos(newSelectedRepos);
   };
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -115,16 +108,17 @@ export default function RedhatRepositoriesStep() {
       perPage,
       {
         search: searchQuery === '' ? searchQuery : debouncedSearch,
-        availableForArch: templateRequest.arch as string,
-        availableForVersion: templateRequest.version as string,
-        ...(useExtendedSupport && {
-          extended_release: templateRequest.extended_release as string,
-          extended_release_version: templateRequest.extended_release_version as string,
-        }),
-        uuids: toggled ? [...selectedRedhatRepos] : undefined,
+        availableForArch: templateRequest.arch!,
+        availableForVersion: templateRequest.version!,
+        extended_release: templateRequest.extended_release,
+        extended_release_version: templateRequest.extended_release_version,
+        uuids: showAllToggle ? undefined : [...selectedRedHatRepos],
       },
       sortString(),
       [ContentOrigin.REDHAT],
+      true,
+      false,
+      { keepPreviousData: false, staleTime: 0 },
     );
 
   const {
@@ -133,9 +127,6 @@ export default function RedhatRepositoriesStep() {
   } = data;
 
   const countIsZero = count === 0;
-  const showLoader = countIsZero && !isLoading;
-  const additionalReposAvailableToSelect =
-    contentList.length - hardcodedRedhatRepositoryUUIDS.size > 0;
 
   return (
     <Grid hasGutter>
@@ -148,12 +139,14 @@ export default function RedhatRepositoriesStep() {
         </Title>
       </Flex>
       <Flex direction={{ default: 'row' }}>
-        <Content component={ContentVariants.p}>
-          {additionalReposAvailableToSelect
-            ? 'You can select additional Red Hat repositories. '
-            : ''}
-          Core repositories of your OS version have been added.
-        </Content>
+        <Hide hide={countIsZero}>
+          <Content component={ContentVariants.p}>
+            Core repositories for your release version are already included.{' '}
+            {contentList.length - redHatCoreRepos.size > 0
+              ? 'Select additional Red Hat repositories below.'
+              : ''}
+          </Content>
+        </Hide>
       </Flex>
       <Hide hide={(countIsZero && !searchQuery) || isLoading}>
         <Flex className={classes.topBottomContainers}>
@@ -181,16 +174,16 @@ export default function RedhatRepositoriesStep() {
                     text='All'
                     buttonId='redhat-repositories-toggle-button'
                     data-ouia-component-id='all-selected-repositories-toggle'
-                    isSelected={!toggled}
-                    onChange={() => setToggled(false)}
+                    isSelected={showAllToggle}
+                    onChange={() => setShowAllToggle(true)}
                   />
                   <ToggleGroupItem
                     text='Selected'
                     buttonId='redhat-repositories-selected-toggle-button'
                     data-ouia-component-id='redhat-selected-repositories-toggle'
-                    isSelected={toggled}
-                    isDisabled={noAdditionalRepos}
-                    onChange={() => setToggled(true)}
+                    isSelected={!showAllToggle}
+                    isDisabled={hasOnlyCoreRepos}
+                    onChange={() => setShowAllToggle(false)}
                   />
                 </ToggleGroup>
               </FlexItem>
@@ -213,13 +206,13 @@ export default function RedhatRepositoriesStep() {
           </Hide>
         </Flex>
       </Hide>
-      {showLoader ? (
+      {countIsZero ? (
         <Bullseye data-ouia-component-id='redhat_repositories_table'>
           <EmptyTableState
             notFiltered={searchQuery === ''}
             clearFilters={() => setSearchQuery('')}
             itemName='Red Hat repositories'
-            notFilteredBody='No Red Hat repositories match the version and arch'
+            notFilteredBody='No Red Hat repositories match the release version and architecture'
           />
         </Bullseye>
       ) : (
@@ -257,20 +250,20 @@ export default function RedhatRepositoriesStep() {
                       <TdWithTooltip
                         show={
                           !(rowData.snapshot && rowData.last_snapshot_uuid) ||
-                          hardcodedRedhatRepositoryUUIDS.has(uuid)
+                          redHatCoreRepos.has(uuid)
                         }
                         tooltipProps={{
-                          content: hardcodedRedhatRepositoryUUIDS.has(uuid)
-                            ? 'This item is pre-selected for the chosen architecture and OS version.'
+                          content: redHatCoreRepos.has(uuid)
+                            ? 'This item is pre-selected for the chosen architecture and release version.'
                             : 'A snapshot is not yet available for this repository.',
                         }}
                         select={{
                           rowIndex,
-                          onSelect: () => setUUIDForList(uuid),
-                          isSelected: selectedRedhatRepos.has(uuid),
+                          onSelect: () => handleRepoSelection(uuid),
+                          isSelected: selectedRedHatRepos.has(uuid),
                           isDisabled:
                             !(rowData.snapshot && rowData.last_snapshot_uuid) ||
-                            hardcodedRedhatRepositoryUUIDS.has(uuid),
+                            redHatCoreRepos.has(uuid),
                         }}
                       />
                       <Td>

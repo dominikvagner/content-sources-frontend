@@ -21,11 +21,11 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
-jest.mock('Hooks/useArchVersion', () => () => ({
+jest.mock('../../../Hooks/useDistributionDetails', () => () => ({
   isError: false,
   isLoading: false,
-  archesDisplay: () => 'x86_64',
-  versionDisplay: () => 'Rhel9',
+  getArchName: () => 'x86_64',
+  getVersionName: () => 'el9',
 }));
 
 it('expect TemplateDetails to render correctly', () => {
@@ -33,6 +33,6 @@ it('expect TemplateDetails to render correctly', () => {
 
   expect(queryByText('TemplateDetailsTabs')).toBeInTheDocument();
   expect(queryByText('x86_64')).toBeInTheDocument();
-  expect(queryByText('Rhel9')).toBeInTheDocument();
+  expect(queryByText('el9')).toBeInTheDocument();
   expect(queryAllByText(defaultTemplateItem.name)).toHaveLength(2);
 });

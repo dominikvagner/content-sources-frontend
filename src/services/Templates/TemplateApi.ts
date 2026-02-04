@@ -13,8 +13,8 @@ import { AdminTask } from 'services/Admin/AdminTaskApi';
 export interface TemplateRequest {
   arch: string;
   version: string;
-  extended_release?: string;
-  extended_release_version?: string;
+  extended_release: string;
+  extended_release_version: string;
   date: string | null;
   description: string;
   name: string;

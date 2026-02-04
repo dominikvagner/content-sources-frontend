@@ -44,7 +44,7 @@ it('expect Set snapshot date step to render dates', () => {
   (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     templateRequest: { date: '2024-01-22' },
     setTemplateRequest: () => undefined,
-    selectedRedhatRepos: new Set(),
+    selectedRedHatRepos: new Set(),
     selectedCustomRepos: new Set(),
   }));
 
@@ -73,7 +73,7 @@ it('expect Set snapshot date step to render use latest', () => {
   (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     templateRequest: { date: '', use_latest: true },
     setTemplateRequest: () => undefined,
-    selectedRedhatRepos: new Set(),
+    selectedRedHatRepos: new Set(),
     selectedCustomRepos: new Set(),
   }));
 

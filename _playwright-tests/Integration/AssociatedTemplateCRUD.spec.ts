@@ -37,10 +37,10 @@ test.describe('Associated Template CRUD', () => {
       await navigateToTemplates(page);
       await closeGenericPopupsIfExist(page);
       await page.getByRole('button', { name: 'Create template' }).click();
-      await page.getByRole('button', { name: 'filter architecture' }).click();
-      await page.getByRole('menuitem', { name: 'x86_64' }).click();
       await page.getByRole('button', { name: 'filter OS version' }).click();
       await page.getByRole('menuitem', { name: 'RHEL 9' }).click();
+      await page.getByRole('button', { name: 'filter architecture' }).click();
+      await page.getByRole('menuitem', { name: 'x86_64' }).click();
       await page.getByRole('button', { name: 'Next', exact: true }).click();
 
       await expect(

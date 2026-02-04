@@ -6,71 +6,67 @@ export const E4S = 'RHEL-E4S-x86_64' as const;
 export const EXTENDED_SUPPORT_FEATURES = [EUS, E4S] as const;
 export const SUPPORTED_EUS_ARCHES = ['x86_64'];
 
-type ExtendedRelease = 'eus' | 'e4s' | 'none'; // Values supported by the API
+export const SUPPORTED_MAJOR_VERSIONS = ['8', '9', '10'];
+export const SUPPORTED_ARCHES = ['x86_64', 'aarch64'];
 
-/**
- * Converts a feature name to an extended release name.
- * @param featureName
- */
-export const featureNameToExtendedRelease = (featureName: string | undefined): ExtendedRelease =>
-  featureName === EUS ? 'eus' : featureName === E4S ? 'e4s' : 'none';
+export const STANDARD_STREAM: NameLabel = { label: '', name: 'Standard' };
+const STANDARD_STREAM_PATH = 'dist';
+const MAJOR_RELEASE_VERSIONS = ['', '8', '8.0', '9', '9.0', '10', '10.0'];
 
-/**
- * Checks if the user has extended support features enabled.
- * @param extended_release_features
- */
-export const hasExtendedSupport = (extended_release_features?: NameLabel[]) =>
-  (extended_release_features?.length ?? 0) > 0;
+/** Converts a feature name label (e.g., 'RHEL-EUS-x86_64') to the API format ('eus'/'e4s'/''). */
+export const featureNameToExtendedRelease = (featureName: string | undefined) =>
+  featureName === EUS ? 'eus' : featureName === E4S ? 'e4s' : (featureName ?? '');
 
-export const hardcodeRedHatReposByArchAndVersion = (
+/** Converts an API format value ('eus'/'e4s') back to the feature name label used by repository_parameters. */
+export const extendedReleaseToFeatureName = (release: string | undefined) =>
+  release === 'eus' ? EUS : release === 'e4s' ? E4S : '';
+
+export const calculateMajorVersion = (minorVersion: string) => minorVersion.split('.')[0];
+
+const validateRedHatRepoParams = (
   arch?: string,
-  version?: string,
-): string[] | undefined => {
-  if (!arch || !version) return;
-  switch (true) {
-    case arch === 'x86_64' && version === '8':
-      return [
-        'https://cdn.redhat.com/content/dist/rhel8/8/x86_64/appstream/os',
-        'https://cdn.redhat.com/content/dist/rhel8/8/x86_64/baseos/os',
-      ];
-    case arch === 'x86_64' && version === '9':
-      return [
-        'https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os',
-        'https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os',
-      ];
-    case arch === 'x86_64' && version === '10':
-      return [
-        'https://cdn.redhat.com/content/dist/rhel10/10/x86_64/appstream/os',
-        'https://cdn.redhat.com/content/dist/rhel10/10/x86_64/baseos/os',
-      ];
-    case arch === 'aarch64' && version === '8':
-      return [
-        'https://cdn.redhat.com/content/dist/rhel8/8/aarch64/appstream/os',
-        'https://cdn.redhat.com/content/dist/rhel8/8/aarch64/baseos/os',
-      ];
-    case arch === 'aarch64' && version === '9':
-      return [
-        'https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os',
-        'https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/os',
-      ];
-    case arch === 'aarch64' && version === '10':
-      return [
-        'https://cdn.redhat.com/content/dist/rhel10/10/aarch64/appstream/os',
-        'https://cdn.redhat.com/content/dist/rhel10/10/aarch64/baseos/os',
-      ];
+  majorVersion?: string,
+  featureName?: string,
+  minorVersion?: string,
+): boolean => {
+  if (!arch || !majorVersion) return false;
+  if (!SUPPORTED_ARCHES.includes(arch)) return false;
+  if (!SUPPORTED_MAJOR_VERSIONS.includes(majorVersion)) return false;
 
-    default:
-      return;
-  }
+  // Standard stream: only arch and major version are needed
+  if (!featureName) return true;
+
+  // Extended stream (EUS/E4S): all four params are required
+  if (!minorVersion) return false;
+  if (!SUPPORTED_EUS_ARCHES.includes(arch)) return false;
+
+  return ['eus', 'e4s'].includes(featureName);
 };
+
+export const getRedHatCoreRepoUrls = (
+  arch?: string,
+  majorVersion?: string,
+  releaseStream?: string,
+  minorVersion?: string,
+): string[] | undefined => {
+  const areParamsValid = validateRedHatRepoParams(arch, majorVersion, releaseStream, minorVersion);
+  if (!areParamsValid) return;
+
+  const stream = releaseStream || STANDARD_STREAM_PATH;
+  const versionNumber = stream === STANDARD_STREAM_PATH ? majorVersion : minorVersion;
+
+  return [
+    `https://cdn.redhat.com/content/${stream}/rhel${majorVersion}/${versionNumber}/${arch}/appstream/os/`,
+    `https://cdn.redhat.com/content/${stream}/rhel${majorVersion}/${versionNumber}/${arch}/baseos/os/`,
+  ];
+};
+
+export const isMinorRelease = (distributionVersion: string) =>
+  !MAJOR_RELEASE_VERSIONS.includes(distributionVersion);
 
 export const TemplateValidationSchema = Yup.object().shape({
   name: Yup.string().max(255, 'Too Long!').required('Required'),
   description: Yup.string().max(255, 'Too Long!'),
 });
-
-export const isMinorRelease = (rhsm: string) =>
-  // Empty string means that the RHEL release version is unset and should be treated as a major release
-  !['', '8', '8.0', '9', '9.0', '10', '10.0'].includes(rhsm);
 
 export const TEMPLATE_SYSTEMS_UPDATE_LIMIT = 1000;

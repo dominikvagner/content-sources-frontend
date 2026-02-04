@@ -1,6 +1,6 @@
 import { AlertVariant } from '@patternfly/react-core';
 import { useState } from 'react';
-import { QueryClient, useMutation, useQuery, useQueryClient } from 'react-query';
+import { QueryClient, useMutation, useQuery, useQueryClient, UseQueryOptions } from 'react-query';
 import { cloneDeep } from 'lodash';
 
 import {
@@ -80,7 +80,7 @@ const buildContentListKey = (
     '',
   )}${filterData?.versions?.join('')}${filterData?.urls?.join('')}${filterData?.uuids?.join(
     '',
-  )}${filterData?.statuses?.join('')}${filterData?.availableForArch}${filterData?.availableForVersion}${filterData?.search}`;
+  )}${filterData?.statuses?.join('')}${filterData?.availableForArch}${filterData?.availableForVersion}${filterData?.search}${filterData?.extended_release}${filterData?.extended_release_version}`;
 
 export const useFetchContent = (uuid: string, enabled = true) => {
   const errorNotifier = useErrorNotification();
@@ -132,6 +132,7 @@ export const useContentListQuery = (
   contentOrigin: ContentOrigin[],
   enabled: boolean = true,
   polling: boolean = false,
+  overrides?: Partial<UseQueryOptions<ContentListResponse>>,
 ) => {
   const errorNotifier = useErrorNotification();
   return useQuery<ContentListResponse>(
@@ -153,6 +154,7 @@ export const useContentListQuery = (
       keepPreviousData: true,
       staleTime: 20000,
       enabled,
+      ...overrides,
     },
   );
 };
