@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'test-utils';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
 import { closeGenericPopupsIfExist } from '../UI/helpers/helpers';
 
