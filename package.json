@@ -6,6 +6,7 @@
     "test-ui": "yarn install && yarn playwright install && yarn playwright test",
     "build": "fec build",
     "build:prod": "yarn build",
+    "build:coverage": "COVERAGE=true fec build",
     "deploy": "npm-run-all build lint test",
     "lint": "eslint '{src,_playwright-tests}/**/*.{js,jsx,ts,tsx}' --no-error-on-unmatched-pattern --ignore-pattern '_playwright-tests/test-utils/*'",
     "lint:fix": "eslint --fix '{src,_playwright-tests}/**/*.{js,jsx,ts,tsx}' --no-error-on-unmatched-pattern --ignore-pattern '_playwright-tests/test-utils/*'",
