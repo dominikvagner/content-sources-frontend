@@ -295,6 +295,7 @@ export default function CustomRepositoriesStep() {
                     isEPELRepository(rowData) &&
                     isAnyEPELRepoSelected() &&
                     !selectedCustomRepos.has(uuid);
+                  const isCustomEPEL = origin === ContentOrigin.EXTERNAL && isEPELUrl(url);
 
                   return (
                     <Tr key={uuid}>
@@ -309,7 +310,8 @@ export default function CustomRepositoriesStep() {
                           isSelected: selectedCustomRepos.has(uuid),
                           isDisabled:
                             !(rowData.snapshot && rowData.last_snapshot_uuid) ||
-                            shouldDisableOtherEPEL,
+                            shouldDisableOtherEPEL ||
+                            (!selectedCustomRepos.has(uuid) && isCustomEPEL),
                         }}
                       />
                       <Td>
