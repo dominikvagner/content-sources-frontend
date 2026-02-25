@@ -25,6 +25,7 @@ import {
   STANDARD_STREAM,
   featureNameToExtendedRelease,
   extendedReleaseToFeatureName,
+  isMinorVersionOfMajor,
 } from '../../templateHelpers';
 import useDistributionDetails from '../../../../../../Hooks/useDistributionDetails';
 import Hide from '../../../../../../components/Hide/Hide';
@@ -144,18 +145,25 @@ export default function OSAndArchitectureStep() {
               isOpen={isReleaseStreamOpen}
               onOpenChange={(isOpen) => setIsReleaseStreamOpen(isOpen)}
               toggle={(toggleRef) => (
-                <MenuToggle
-                  ref={toggleRef}
-                  isFullWidth
-                  aria-label='Release stream toggle'
-                  id='release-stream-toggle'
-                  ouiaId='select-release-stream'
-                  isExpanded={isReleaseStreamOpen}
-                  onClick={() => setIsReleaseStreamOpen((prev) => !prev)}
-                  className={classes.fullWidth}
+                <ConditionalTooltip
+                  position='top-start'
+                  content='Release stream cannot be changed after creation.'
+                  show={!!isEdit}
+                  setDisabled
                 >
-                  {getStreamName(templateRequest.extended_release) || STANDARD_STREAM.name}
-                </MenuToggle>
+                  <MenuToggle
+                    ref={toggleRef}
+                    isFullWidth
+                    aria-label='Release stream toggle'
+                    id='release-stream-toggle'
+                    ouiaId='select-release-stream'
+                    isExpanded={isReleaseStreamOpen}
+                    onClick={() => setIsReleaseStreamOpen((prev) => !prev)}
+                    className={classes.fullWidth}
+                  >
+                    {getStreamName(templateRequest.extended_release) || STANDARD_STREAM.name}
+                  </MenuToggle>
+                </ConditionalTooltip>
               )}
             >
               <DropdownList>
@@ -187,7 +195,7 @@ export default function OSAndArchitectureStep() {
               <ConditionalTooltip
                 position='top-start'
                 content='OS version cannot be changed after creation.'
-                show={!!isEdit}
+                show={!!isEdit && isStandardStream}
                 setDisabled
               >
                 <MenuToggle
@@ -235,6 +243,10 @@ export default function OSAndArchitectureStep() {
                       <DropdownItem
                         key={minor}
                         value={minor}
+                        // Disable minor versions outside the selected major version when editing
+                        isDisabled={
+                          !!isEdit && !isMinorVersionOfMajor(minor, templateRequest?.version)
+                        }
                         isSelected={minor === templateRequest?.extended_release_version}
                         component='button'
                         data-ouia-component-id={`filter_${minor}`}

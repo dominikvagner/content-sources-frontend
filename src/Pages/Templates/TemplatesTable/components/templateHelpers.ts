@@ -11,6 +11,8 @@ export const SUPPORTED_ARCHES = ['x86_64', 'aarch64'];
 
 export const STANDARD_STREAM: NameLabel = { label: '', name: 'Standard' };
 const STANDARD_STREAM_PATH = 'dist';
+
+// Empty string means the release version is unset, i.e., a major release
 const MAJOR_RELEASE_VERSIONS = ['', '8', '8.0', '9', '9.0', '10', '10.0'];
 
 /** Converts a feature name label (e.g., 'RHEL-EUS-x86_64') to the API format ('eus'/'e4s'/''). */
@@ -48,9 +50,9 @@ export const getRedHatCoreRepoUrls = (
   majorVersion?: string,
   releaseStream?: string,
   minorVersion?: string,
-): string[] | undefined => {
+): string[] => {
   const areParamsValid = validateRedHatRepoParams(arch, majorVersion, releaseStream, minorVersion);
-  if (!areParamsValid) return;
+  if (!areParamsValid) return [];
 
   const stream = releaseStream || STANDARD_STREAM_PATH;
   const versionNumber = stream === STANDARD_STREAM_PATH ? majorVersion : minorVersion;
@@ -63,6 +65,29 @@ export const getRedHatCoreRepoUrls = (
 
 export const isMinorRelease = (distributionVersion: string) =>
   !MAJOR_RELEASE_VERSIONS.includes(distributionVersion);
+
+export const canAssignSystemToTemplate = (
+  version: string,
+  satelliteManaged: boolean,
+  notAlreadyAssigned: boolean,
+  templateUsesExtendedSupport: boolean,
+) =>
+  notAlreadyAssigned &&
+  !satelliteManaged &&
+  // Cannot assign standard template to minor RHEL versions
+  !templateUsesExtendedSupport &&
+  !isMinorRelease(version);
+
+/** Extracts the abbreviation from parentheses, e.g., "Extended Update Support (EUS)" to "EUS". */
+export const abbreviateStreamName = (streamName: string) =>
+  streamName.match(/\(([^)]+)\)/)?.[1] ?? '';
+
+export const isMinorVersionOfMajor = (minorVersion?: string, majorVersion?: string) => {
+  if (minorVersion && majorVersion) {
+    return minorVersion.split('.')[0] === majorVersion;
+  }
+  return false;
+};
 
 export const TemplateValidationSchema = Yup.object().shape({
   name: Yup.string().max(255, 'Too Long!').required('Required'),

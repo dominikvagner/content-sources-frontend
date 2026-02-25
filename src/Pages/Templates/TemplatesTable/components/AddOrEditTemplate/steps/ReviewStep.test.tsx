@@ -3,7 +3,9 @@ import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import {
   defaultTemplateItem,
   testRepositoryParamsResponse,
+  testEUSRepositoryParamsResponse,
   ReactQueryTestWrapper,
+  defaultEUSupportTemplateItem,
 } from 'testingHelpers';
 import ReviewStep from './ReviewStep';
 import { formatDateDDMMMYYYY } from 'helpers';
@@ -18,7 +20,7 @@ jest.mock('../../../../../../Hooks/useDistributionDetails', () => ({
   default: jest.fn(),
 }));
 
-it('expect Review step to render correctly', () => {
+it('renders template details for a standard template', () => {
   (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     templateRequest: defaultTemplateItem,
     selectedRedHatRepos: new Set(['item1', 'item2']),
@@ -50,4 +52,38 @@ it('expect Review step to render correctly', () => {
   expect(getByText(versionName)).toBeInTheDocument();
   expect(getByText(formatDateDDMMMYYYY(defaultTemplateItem.date))).toBeInTheDocument();
   expect(getByText(defaultTemplateItem.name)).toBeInTheDocument();
+});
+
+it('renders release stream and minor version for an EUS template', () => {
+  (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
+    templateRequest: defaultEUSupportTemplateItem,
+    selectedRedHatRepos: new Set(['rhel-9-for-x86_64-baseos-eus-rpms']),
+    selectedCustomRepos: new Set(['epel-9-x86_64']),
+    redHatCoreRepos: new Set('rhel-9-for-x86_64-baseos-eus-rpms'),
+    distribution_arches: testEUSRepositoryParamsResponse.distribution_arches,
+    distribution_versions: testEUSRepositoryParamsResponse.distribution_versions,
+    extended_release_features: testEUSRepositoryParamsResponse.extended_release_features,
+    distribution_minor_versions: testEUSRepositoryParamsResponse.distribution_minor_versions,
+    isEdit: false,
+  }));
+
+  const versionName = `el${defaultEUSupportTemplateItem.extended_release_version}`;
+  const streamName = 'Extended Update Support (EUS)';
+
+  (useDistributionDetails as jest.Mock).mockImplementation(() => ({
+    getMinorVersionName: () => versionName,
+    getArchName: () => defaultEUSupportTemplateItem.arch,
+    getStreamName: () => streamName,
+    isExtendedSupportAvailable: true,
+  }));
+
+  const { getByText } = render(
+    <ReactQueryTestWrapper>
+      <ReviewStep />
+    </ReactQueryTestWrapper>,
+  );
+
+  expect(getByText('Release stream')).toBeInTheDocument();
+  expect(getByText(streamName)).toBeInTheDocument();
+  expect(getByText(versionName)).toBeInTheDocument();
 });

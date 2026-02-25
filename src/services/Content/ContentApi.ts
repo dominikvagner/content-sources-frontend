@@ -419,7 +419,7 @@ export const getRepositoryParams: () => Promise<RepositoryParamsResponse> = asyn
   const { data } = await axios.get('/api/content-sources/v1/repository_parameters/');
   return {
     ...data,
-    // Normalize null values before they're consumed by the frontend
+    // Backend returns [] when no subscriptions match, but guard against null just in case
     extended_release_features: data.extended_release_features ?? [],
     distribution_minor_versions: data.distribution_minor_versions ?? [],
   };

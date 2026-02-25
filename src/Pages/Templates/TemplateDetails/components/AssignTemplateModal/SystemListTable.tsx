@@ -22,7 +22,7 @@ import { TEMPLATES_ROUTE } from 'Routes/constants';
 import TdWithTooltip from 'components/TdWithTooltip/TdWithTooltip';
 import { useParams } from 'react-router-dom';
 import SystemNameCell from './components/SystemNameCell';
-import { isMinorRelease } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
+import { canAssignSystemToTemplate } from '../../../TemplatesTable/components/templateHelpers';
 
 const useStyles = createUseStyles({
   mainContainer: {
@@ -51,6 +51,7 @@ interface Props {
   sortParams?: (columnIndex: number) => ThProps['sort'];
   selectAllToggle: () => void;
   isPageSelected: boolean;
+  isExtendedSupportTemplate?: boolean;
 }
 
 export default function SystemListTable({
@@ -63,6 +64,7 @@ export default function SystemListTable({
   selected,
   selectAllToggle,
   isPageSelected,
+  isExtendedSupportTemplate = false,
 }: Props) {
   const classes = useStyles();
   const [prevLength, setPrev] = useState(perPage || 10);
@@ -135,9 +137,13 @@ export default function SystemListTable({
                     }}
                     select={{
                       rowIndex,
-                      // If a system uses a minor release or is satellite-managed, it cannot be in an active state
-                      isDisabled:
-                        template_uuid === uuid || isMinorRelease(rhsm) || satellite_managed,
+                      // If a system is incompatible with the template to be assigned, it cannot be in an active state
+                      isDisabled: !canAssignSystemToTemplate(
+                        rhsm,
+                        satellite_managed,
+                        template_uuid !== uuid,
+                        isExtendedSupportTemplate,
+                      ),
                       onSelect: () => setSelected(id),
                       isSelected: selected.has(id) || template_uuid === uuid,
                     }}
@@ -149,6 +155,7 @@ export default function SystemListTable({
                       rhsm={rhsm}
                       basePath={basePath}
                       satellite_managed={satellite_managed}
+                      isExtendedSupportTemplate={isExtendedSupportTemplate}
                     />
                   </Td>
                   <Td className={tags.length ? '' : classes.forceDisabled}>

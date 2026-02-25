@@ -5,6 +5,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { TemplateRequest } from 'services/Templates/TemplateApi';
@@ -58,6 +59,8 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
   const [selectedRedHatRepos, setSelectedRedHatRepos] = useState<Set<string>>(new Set());
   const [selectedCustomRepos, setSelectedCustomRepos] = useState<Set<string>>(new Set());
 
+  const editExtendedReleaseVersionRef = useRef<string | undefined>();
+
   const {
     data: {
       distribution_versions = [],
@@ -101,14 +104,14 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
     [selectedRedHatRepos.size, stepValidationSequence],
   );
 
-  // Template creation //
+  // Template creation and editing //
 
   useEffect(() => {
     if (!uuid && arch && version) setSelectedCustomRepos(new Set());
   }, [uuid, arch, version, extended_release, extended_release_version]);
 
   const coreRepoURLs = useMemo(
-    () => getRedHatCoreRepoUrls(arch, version, extended_release, extended_release_version) ?? [],
+    () => getRedHatCoreRepoUrls(arch, version, extended_release, extended_release_version),
     [arch, version, extended_release, extended_release_version],
   );
 
@@ -127,13 +130,19 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
     if (coreRepos?.data?.length) {
       const coreRepoUUIDs = new Set(coreRepos?.data.map((repo) => repo.uuid));
       setRedHatCoreRepos(new Set(coreRepoUUIDs));
-      // Only pre-select core repos during template creation
-      // In edit mode, selected repos are loaded from the existing template
-      if (!uuid) setSelectedRedHatRepos(new Set(coreRepoUUIDs));
-    }
-  }, [coreRepos?.data, uuid]);
 
-  // Editing existing template //
+      const hasMinorDiverged =
+        usesExtendedSupportStream &&
+        editExtendedReleaseVersionRef.current !== undefined &&
+        extended_release_version !== editExtendedReleaseVersionRef.current;
+
+      // Pre-select core repos if we're creating a new template OR the user edits the minor version
+      if (!uuid || hasMinorDiverged) {
+        setSelectedRedHatRepos(new Set(coreRepoUUIDs));
+        if (hasMinorDiverged) editExtendedReleaseVersionRef.current = extended_release_version;
+      }
+    }
+  }, [coreRepos?.data, uuid, extended_release_version]);
 
   const { data: existingRepositoryInformation, isLoading } = useContentListQuery(
     1,
@@ -147,12 +156,19 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
   // If editing, we want to load the data from the existing template
   useEffect(() => {
     if (uuid && !!editTemplateData && !isLoading && !!existingRepositoryInformation) {
+      const { extended_release, extended_release_version } = editTemplateData;
+
+      if (extended_release && extended_release_version) {
+        editExtendedReleaseVersionRef.current = extended_release_version;
+      }
+
       const startingState = {
         ...editTemplateData,
-        extended_release: editTemplateData.extended_release || STANDARD_STREAM.label,
+        extended_release: extended_release || STANDARD_STREAM.label,
       };
 
       setTemplateRequest(startingState);
+
       const redHatReposToAdd: string[] = [];
       const customReposToAdd: string[] = [];
 

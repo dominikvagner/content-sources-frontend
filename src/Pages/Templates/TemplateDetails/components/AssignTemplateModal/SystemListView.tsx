@@ -36,6 +36,7 @@ import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import {
   isMinorRelease,
   TEMPLATE_SYSTEMS_UPDATE_LIMIT,
+  canAssignSystemToTemplate,
 } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
 
 const useStyles = createUseStyles({
@@ -61,7 +62,9 @@ type FilterType = 'Name' | 'Tags';
 type Props = {
   selectedSystems: string[];
   setSelectedSystems: React.Dispatch<React.SetStateAction<string[]>>;
-  template: Pick<TemplateItem, 'arch' | 'version'>;
+  template: Partial<
+    Pick<TemplateItem, 'version' | 'arch' | 'extended_release' | 'extended_release_version'>
+  >;
   setCanAssignTemplate: React.Dispatch<React.SetStateAction<boolean>>;
   handleModalClose: () => void;
 };
@@ -69,7 +72,7 @@ type Props = {
 const SystemListView = ({
   selectedSystems,
   setSelectedSystems,
-  template: { version, arch },
+  template: { version, arch, extended_release, extended_release_version },
   setCanAssignTemplate,
   handleModalClose,
 }: Props) => {
@@ -114,50 +117,65 @@ const SystemListView = ({
     tags: selectedTags,
   });
 
+  const isExtendedSupportTemplate = !!(extended_release && extended_release_version);
+
   const {
     data: systemsList = [],
     meta: { total_items = 0 },
   } = data;
 
-  // Systems that are not allowed to be selected
-  const minorReleaseSystems = useMemo(
+  const minorSystems = useMemo(
     () =>
       systemsList.filter((system) => isMinorRelease(system.attributes.rhsm)).map(({ id }) => id),
     [systemsList],
   );
-  const satelliteManagedSystems = useMemo(
+
+  const majorSystems = useMemo(
+    () =>
+      systemsList.filter((system) => !isMinorRelease(system.attributes.rhsm)).map(({ id }) => id),
+    [systemsList],
+  );
+
+  const satelliteSystems = useMemo(
     () => systemsList.filter((system) => system.attributes.satellite_managed).map(({ id }) => id),
     [systemsList],
   );
 
-  const allSystemsAreMinorReleases = minorReleaseSystems.length === systemsList.length;
-  const allSystemsAreSatelliteManaged = satelliteManagedSystems.length === systemsList.length;
+  const allMinor = minorSystems.length === systemsList.length;
+  const allMajor = majorSystems.length === systemsList.length;
+  const allSatellite = satelliteSystems.length === systemsList.length;
+
+  // True when at least some systems on the page have a compatible release version and are not satellite-managed
+  const canEnableAssignButton =
+    !allSatellite && (isExtendedSupportTemplate ? !allMajor : !allMinor);
+
+  // Systems that are compatible with the template, not satellite-managed, and not already assigned
+  const selectableSystems = useMemo(
+    () =>
+      systemsList.filter(({ attributes: { template_uuid, rhsm, satellite_managed } }) =>
+        canAssignSystemToTemplate(
+          rhsm,
+          satellite_managed,
+          template_uuid !== uuid,
+          isExtendedSupportTemplate,
+        ),
+      ),
+    [systemsList, uuid, isExtendedSupportTemplate],
+  );
 
   // Informs the parent modal whether it is safe to enable the template "Assign" button
   useEffect(() => {
     setCanAssignTemplate(
       selectedSystems.length > 0 &&
         selectedSystems.length <= TEMPLATE_SYSTEMS_UPDATE_LIMIT &&
-        !allSystemsAreMinorReleases &&
-        !allSystemsAreSatelliteManaged,
+        canEnableAssignButton,
     );
-  }, [selectedSystems, allSystemsAreMinorReleases, allSystemsAreSatelliteManaged]);
+  }, [selectedSystems, canEnableAssignButton]);
 
-  // A state for when the "Select All" toggle checkbox is checked
   const isPageSelected = useMemo(() => {
-    if (allSystemsAreMinorReleases || allSystemsAreSatelliteManaged) return false;
-
-    // Get all systems that can actually be selected (not minor releases, not satellite-managed, and not already assigned)
-    const selectableSystems = systemsList.filter(
-      ({ attributes: { template_uuid, rhsm, satellite_managed } }) =>
-        template_uuid !== uuid && !isMinorRelease(rhsm) && !satellite_managed,
-    );
-
-    if (selectableSystems.length === 0) return false;
-
-    // Check if all selectable systems are in the selected list
+    if (!canEnableAssignButton || selectableSystems.length === 0) return false;
     return selectableSystems.every(({ id }) => selectedList.has(id));
-  }, [selectedList, systemsList, allSystemsAreMinorReleases, allSystemsAreSatelliteManaged, uuid]);
+  }, [canEnableAssignButton, selectableSystems, selectedList]);
 
   useEffect(() => {
     if (isError) {
@@ -165,10 +183,10 @@ const SystemListView = ({
     }
   }, [isError]);
 
-  const onSetPage = (_, newPage) => setPage(newPage);
+  const onSetPage = (_, newPage: number) => setPage(newPage);
 
-  const onPerPageSelect = (_, newPerPage, newPage) => {
-    // Save this value through page refresh for use on next reload
+  const onPerPageSelect = (_, newPerPage: number, newPage: number) => {
+    // Save this value through page refresh for use on the next reload
     setPerPage(newPerPage);
     setPage(newPage);
     localStorage.setItem(perPageKey, newPerPage.toString());
@@ -195,16 +213,7 @@ const SystemListView = ({
       setSelectedSystems([...selectedSystems.filter((id) => !systemsListSet.has(id))]);
     } else {
       setSelectedSystems((prev) => [
-        ...new Set([
-          ...prev,
-          ...systemsList
-            .filter(
-              ({ attributes: { template_uuid, rhsm, satellite_managed } }) =>
-                // Filter out systems which are minor releases or satellite-managed as they cannot be assigned to a template
-                template_uuid !== uuid && !isMinorRelease(rhsm) && !satellite_managed,
-            )
-            .map(({ id }) => id),
-        ]),
+        ...new Set([...prev, ...selectableSystems.map(({ id }) => id)]),
       ]);
     }
   };
@@ -348,6 +357,7 @@ const SystemListView = ({
 
           <Hide hide={isLoading}>
             <SystemListTable
+              isExtendedSupportTemplate={isExtendedSupportTemplate}
               perPage={perPage}
               isFetchingOrLoading={fetchingOrLoading}
               isLoadingOrZeroCount={loadingOrZeroCount}

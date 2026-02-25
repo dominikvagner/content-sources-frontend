@@ -45,6 +45,7 @@ import SystemListTable from './SystemListTable';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import useNotification from 'Hooks/useNotification';
 import TagsFilter from 'components/TagsFilter/TagsFilter';
+import { isMinorRelease } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
 
 const useStyles = createUseStyles({
   mainContainer: {
@@ -78,10 +79,6 @@ const useStyles = createUseStyles({
 
 const perPageKey = 'templatesPerPage';
 type FilterType = 'Name' | 'Tags';
-
-export const isMinorRelease = (rhsm: string) =>
-  // Empty string means that the RHEL release version is unset and should be treated as a major release
-  !['', '8', '8.0', '9', '9.0', '10', '10.0'].includes(rhsm);
 
 export default function AddSystemModal() {
   const queryClient = useQueryClient();

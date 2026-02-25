@@ -85,6 +85,12 @@ export const testRepositoryParamsResponse: RepositoryParamsResponse = {
       label: 'aarch64',
     },
   ],
+  extended_release_features: [],
+  distribution_minor_versions: [],
+};
+
+export const testEUSRepositoryParamsResponse: RepositoryParamsResponse = {
+  ...testRepositoryParamsResponse,
   extended_release_features: [
     { name: 'Extended Update Support (EUS)', label: EUS },
     { name: 'Update Services for SAP Solutions (E4S)', label: E4S },
@@ -353,13 +359,11 @@ export const defaultContentItemWithSnapshot: ContentItem = {
 
 export const defaultTemplateItem: TemplateItem = {
   uuid: '50412eda-7df5-4fac-8556-278f45e2ef9b',
-  name: 'Billybob!',
+  name: 'Standard Template',
   org_id: '16758779',
-  description: 'Tatata bala tu!',
+  description: 'Standard template description',
   arch: 'aarch64',
   version: '9',
-  extended_release: '',
-  extended_release_version: '',
   date: '2024-01-22T00:00:00-07:00',
   repository_uuids: [
     '31c06bb4-ef1b-42f5-8c91-0ff67e7d8a1b',
@@ -377,6 +381,21 @@ export const defaultTemplateItem: TemplateItem = {
   last_update_task_uuid: '60412eda-7df5-4fac-8556-278f45e2ef9c',
   last_update_task: defaultUpdateTemplateTaskCompleted,
   rhsm_environment_created: true,
+};
+
+export const defaultEUSupportTemplateItem: TemplateItem = {
+  ...defaultTemplateItem,
+  uuid: '60412aca-7df5-4fac-8556-278f45e2ef9a',
+  name: 'EUS Template',
+  description: 'EUS template description',
+  arch: 'x86_64',
+  extended_release: 'RHEL-EUS-x86_64',
+  extended_release_version: '9.6',
+  repository_uuids: [
+    '71c06bb4-ef1b-42f5-8c91-0ff67e7d8a1b',
+    '72b8d2b1-e4d6-4d8a-be12-1104601fb96e',
+    '053603c7-6ef0-4abe-8542-feacb8f7d575', // EPEL 9 Everything x86_64
+  ],
 };
 
 // Template used for testing delete modal where repo is not in any templates
