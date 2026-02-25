@@ -10,7 +10,7 @@ describe('AssignmentMethodSelect', () => {
       <AssignmentMethodSelect
         selected={AssignmentMethods.ApiAssignment}
         setSelected={mockSetSelected}
-        hasRegisteredSystems={true}
+        hasCompatibleSystems={true}
       />,
     );
 
@@ -24,7 +24,7 @@ describe('AssignmentMethodSelect', () => {
       <AssignmentMethodSelect
         selected={AssignmentMethods.ApiRegistration}
         setSelected={mockSetSelected}
-        hasRegisteredSystems={false}
+        hasCompatibleSystems={false}
       />,
     );
 

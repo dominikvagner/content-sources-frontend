@@ -4,7 +4,7 @@ import TemplateSystemsTab from './TemplateSystemsTab';
 import { defaultTemplateSystemsListItem } from 'testingHelpers';
 import type { IDSystemItem } from 'services/Systems/SystemsApi';
 import { useAppContext } from 'middleware/AppContext';
-import useHasRegisteredSystems from 'Hooks/useHasRegisteredSystems';
+import useCompatibleSystems from 'Hooks/useCompatibleSystems';
 import { ADD_ROUTE, SYSTEMS_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
 import { AssignmentMethods } from '../AssignTemplateModal/components/AssignmentMethodSelect';
 
@@ -22,7 +22,7 @@ jest.mock('Hooks/useRootPath', () => () => mockRootPath);
 
 jest.mock('Hooks/useSafeUUIDParam', () => () => templateUUID);
 
-jest.mock('Hooks/useHasRegisteredSystems');
+jest.mock('Hooks/useCompatibleSystems');
 
 jest.mock('react-query');
 
@@ -38,10 +38,10 @@ jest.mock('middleware/AppContext');
   subscriptions: { red_hat_enterprise_linux: true },
 }));
 
-(useHasRegisteredSystems as jest.Mock).mockReturnValue({
-  hasRegisteredSystems: true,
-  isFetchingRegSystems: false,
-  isErrorFetchingRegSystems: false,
+(useCompatibleSystems as jest.Mock).mockReturnValue({
+  hasCompatibleSystems: true,
+  isFetchingCompatibility: false,
+  isCompatibilityError: false,
 });
 
 (useListSystemsByTemplateId as jest.Mock).mockImplementation(() => ({
@@ -110,10 +110,10 @@ it("shows empty state with register action when there are no registered systems 
     isError: false,
   }));
 
-  (useHasRegisteredSystems as jest.Mock).mockReturnValue({
-    hasRegisteredSystems: false,
-    isFetchingRegSystems: false,
-    isErrorFetchingRegSystems: false,
+  (useCompatibleSystems as jest.Mock).mockReturnValue({
+    hasCompatibleSystems: false,
+    isFetchingCompatibility: false,
+    isCompatibilityError: false,
   });
 
   render(<TemplateSystemsTab />);
@@ -134,10 +134,10 @@ it('shows empty state with both assign and register actions when compatible, reg
     isError: false,
   }));
 
-  (useHasRegisteredSystems as jest.Mock).mockReturnValue({
-    hasRegisteredSystems: true,
-    isFetchingRegSystems: false,
-    isErrorFetchingRegSystems: false,
+  (useCompatibleSystems as jest.Mock).mockReturnValue({
+    hasCompatibleSystems: true,
+    isFetchingCompatibility: false,
+    isCompatibilityError: false,
   });
 
   render(<TemplateSystemsTab />);

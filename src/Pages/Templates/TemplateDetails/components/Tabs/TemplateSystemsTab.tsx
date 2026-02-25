@@ -30,7 +30,7 @@ import SystemsDeleteKebab from 'components/SharedTables/SystemsTable/Components/
 import { SearchIcon } from '@patternfly/react-icons';
 import { AssignmentMethods } from '../AssignTemplateModal/components/AssignmentMethodSelect';
 import useDebounce from 'Hooks/useDebounce';
-import useHasRegisteredSystems from 'Hooks/useHasRegisteredSystems';
+import useCompatibleSystems from 'Hooks/useCompatibleSystems';
 import useRootPath from 'Hooks/useRootPath';
 import useSafeUUIDParam from '../../../../../Hooks/useSafeUUIDParam';
 import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
@@ -108,16 +108,15 @@ export default function TemplateSystemsTab() {
     [activeSortIndex, activeSortDirection],
   );
 
+  const { hasCompatibleSystems, isFetchingCompatibility, isCompatibilityError } =
+    useCompatibleSystems(uuid);
+
   const {
     isLoading,
     error,
     isError,
     data = { data: [], meta: { total_items: 0, limit: 20, offset: 0 } },
   } = useListSystemsByTemplateId(uuid, page, perPage, debouncedSearchQuery, sortString);
-
-  // Check if there are registered systems compatible with this template
-  const { hasRegisteredSystems, isFetchingRegSystems, isErrorFetchingRegSystems } =
-    useHasRegisteredSystems(uuid);
 
   const { mutateAsync: deleteFromSystems, isLoading: isDeleting } =
     useDeleteTemplateFromSystems(queryClient);
@@ -169,7 +168,7 @@ export default function TemplateSystemsTab() {
 
   const loadingOrDeleting = isLoading || isDeleting;
 
-  const errorState = isError || isErrorFetchingRegSystems;
+  const errorState = isError || isCompatibilityError;
 
   const sortParams = (columnIndex: number): ThProps['sort'] | undefined =>
     columnSortAttributes[columnIndex]
@@ -192,7 +191,7 @@ export default function TemplateSystemsTab() {
   const missingRequirements =
     rbac?.templateWrite && !hasRHELSubscription ? 'subscription (RHEL)' : 'permission';
 
-  if (isLoading || isFetchingRegSystems) {
+  if (isLoading || isFetchingCompatibility) {
     return <Loader />;
   }
 
@@ -271,7 +270,7 @@ export default function TemplateSystemsTab() {
             clearFilters={() => setSearchQuery('')}
             itemName='associated systems'
             notFilteredBody={
-              hasRegisteredSystems
+              hasCompatibleSystems
                 ? 'To get started, assign this template to a system.'
                 : 'To get started, assign this template to a system. You have no registered systems yet.'
             }
@@ -289,24 +288,24 @@ export default function TemplateSystemsTab() {
                       variant='primary'
                       isDisabled={isLoading}
                       onClick={() => {
-                        const method = hasRegisteredSystems
+                        const method = hasCompatibleSystems
                           ? '' // If there are some registered systems, open the system list view
                           : `?method=${AssignmentMethods.ApiRegistration}`;
                         navigate(`${ADD_ROUTE}${method}`);
                       }}
                     >
-                      {hasRegisteredSystems ? 'Assign to systems' : 'Register and assign via API'}
+                      {hasCompatibleSystems ? 'Assign to systems' : 'Register and assign via API'}
                     </Button>
                   </FlexItem>
 
-                  {hasRegisteredSystems ? (
+                  {hasCompatibleSystems ? (
                     <FlexItem>
                       <Button
                         id='register-assign-systems-via-api-button'
                         ouiaId='register_assign_systems_via_api'
                         component='a'
                         variant='link'
-                        isDisabled={isFetchingRegSystems}
+                        isDisabled={isFetchingCompatibility}
                         href={`${rootPath}/${TEMPLATES_ROUTE}/${uuid}/${SYSTEMS_ROUTE}/${ADD_ROUTE}?method=${AssignmentMethods.ApiRegistration}`}
                         onClick={(event) => {
                           // Prevent the browser's default anchor behavior to ensure that `navigate` performs client-side routing instead of a full page reload

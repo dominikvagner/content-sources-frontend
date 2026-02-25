@@ -95,6 +95,7 @@ export interface IDSystemsCollectionResponse {
 
 export interface SystemsFilters {
   os?: string;
+  osminor?: string;
   stale?: string;
   arch?: string;
   ids?: string[];
@@ -155,15 +156,34 @@ export const listSystemsByTemplateId: (
   search: string,
   sortBy?: string,
 ) => Promise<IDSystemsCollectionResponse> = async (id, page, limit, search, sortBy) => {
-  const { data } = await axios.get(
-    `${patchApiVersionUrl}/templates/${id}/systems?${objectToUrlParams({
-      offset: ((page - 1) * limit).toString(),
-      limit: limit?.toString(),
-      search,
-      sort: sortBy,
-    })}`,
-  );
-  return data;
+  try {
+    const { data } = await axios.get(
+      `${patchApiVersionUrl}/templates/${id}/systems?${objectToUrlParams({
+        offset: ((page - 1) * limit).toString(),
+        limit: limit?.toString(),
+        search,
+        sort: sortBy,
+      })}`,
+    );
+    return data;
+  } catch (err) {
+    // The Patch API returns 404 when no systems are assigned to the template
+    // We normalize this to an empty response to avoid the UI from crashing on the 404 error
+    if (axios.isAxiosError(err) && err.response?.status === 404) {
+      return {
+        data: [],
+        links: { first: '', last: '' },
+        meta: {
+          total_items: 0,
+          limit,
+          offset: 0,
+          has_systems: false,
+          subtotals: { patched: 0, stale: 0, unpatched: 0 },
+        },
+      };
+    }
+    throw err;
+  }
 };
 
 export const listSystemsIDsByTemplateId: (

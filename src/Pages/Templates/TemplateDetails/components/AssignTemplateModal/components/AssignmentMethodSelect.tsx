@@ -2,7 +2,7 @@ import React, { useRef, useMemo } from 'react';
 import { SimpleSelectOption, SimpleSelect } from '@patternfly/react-templates';
 import { Form, FormGroup, FormGroupLabelHelp, List, ListItem } from '@patternfly/react-core';
 import HelpPopover from '../../../../../../components/HelpPopover';
-import { TEMPLATE_DOCS_URL } from '../AssignTemplateModal';
+import { MANAGING_TEMPLATES_DOCS_URL } from '../AssignTemplateModal';
 
 export const AssignmentMethods = {
   SystemList: 'list',
@@ -16,10 +16,10 @@ export type AssignmentMethodOption = (typeof AssignmentMethods)[keyof typeof Ass
 type Props = {
   selected: AssignmentMethodOption;
   setSelected: (option: AssignmentMethodOption) => void;
-  hasRegisteredSystems: boolean;
+  hasCompatibleSystems: boolean;
 };
 
-const AssignmentMethodSelect = ({ selected, setSelected, hasRegisteredSystems }: Props) => {
+const AssignmentMethodSelect = ({ selected, setSelected, hasCompatibleSystems }: Props) => {
   const labelHelpRef = useRef(null);
 
   const assignmentOptions: SimpleSelectOption[] = [
@@ -46,9 +46,9 @@ const AssignmentMethodSelect = ({ selected, setSelected, hasRegisteredSystems }:
       assignmentOptions.map((option) => ({
         ...option,
         selected: option.value === selected,
-        isDisabled: option.value === AssignmentMethods.SystemList ? !hasRegisteredSystems : false,
+        isDisabled: option.value === AssignmentMethods.SystemList ? !hasCompatibleSystems : false,
       })),
-    [selected, hasRegisteredSystems],
+    [selected, hasCompatibleSystems],
   );
 
   return (
@@ -80,7 +80,7 @@ const AssignmentMethodSelect = ({ selected, setSelected, hasRegisteredSystems }:
               </>
             }
             linkText='Learn more about content templates'
-            linkUrl={TEMPLATE_DOCS_URL}
+            linkUrl={MANAGING_TEMPLATES_DOCS_URL}
           >
             <FormGroupLabelHelp ref={labelHelpRef} aria-label='More info for name field' />
           </HelpPopover>

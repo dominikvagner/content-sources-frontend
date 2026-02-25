@@ -28,11 +28,11 @@ import ManualConfigView from './ManualConfigView';
 import SystemListView from './SystemListView';
 import ApiView from './ApiView';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import useHasRegisteredSystems from '../../../../../Hooks/useHasRegisteredSystems';
+import useCompatibleSystems from '../../../../../Hooks/useCompatibleSystems';
 import Loader from '../../../../../components/Loader';
 import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
 
-export const TEMPLATE_DOCS_URL =
+export const MANAGING_TEMPLATES_DOCS_URL =
   'https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/managing_system_content_and_patch_updates_on_rhel_systems/patching-using-content-templates_patch-service-overview#managing-content-templates_patching-using-content-templates';
 
 const AssignTemplateModal = () => {
@@ -137,28 +137,28 @@ const AssignTemplateModal = () => {
       !canAssignTemplate ||
       (!rhsm_environment_created && last_update_task?.status !== 'completed'));
 
-  const { hasRegisteredSystems, isFetchingRegSystems, isErrorFetchingRegSystems } =
-    useHasRegisteredSystems(uuid);
+  const { hasCompatibleSystems, isFetchingCompatibility, isCompatibilityError } =
+    useCompatibleSystems(uuid);
 
   useEffect(() => {
-    if (isErrorFetchingRegSystems) {
+    if (isCompatibilityError) {
       onClose();
     }
-  }, [isErrorFetchingRegSystems, onClose]);
+  }, [isCompatibilityError, onClose]);
 
-  // Redirect to registration view if user has no registered systems yet still ended up at SystemList view (by manually specifying the method param)
+  // Redirect to registration view if user has no compatible systems yet still ended up at SystemList view (by manually specifying the method param)
   useEffect(() => {
     if (
-      !isFetchingRegSystems &&
-      !hasRegisteredSystems &&
+      !isFetchingCompatibility &&
+      !hasCompatibleSystems &&
       assignmentMethod === AssignmentMethods.SystemList
     ) {
       setAssignmentMethod(AssignmentMethods.ApiRegistration);
       setSearchParams({ method: AssignmentMethods.ApiRegistration });
     }
-  }, [hasRegisteredSystems, isFetchingRegSystems, assignmentMethod, setSearchParams]);
+  }, [hasCompatibleSystems, isFetchingCompatibility, assignmentMethod, setSearchParams]);
 
-  const fetchingOrLoading = isFetchingRegSystems || isAdding || isFetchingTemplate;
+  const fetchingOrLoading = isFetchingCompatibility || isAdding || isFetchingTemplate;
 
   return (
     <Modal
@@ -188,7 +188,7 @@ const AssignTemplateModal = () => {
               <AssignmentMethodSelect
                 selected={assignmentMethod}
                 setSelected={handleSetAssignmentMethod}
-                hasRegisteredSystems={hasRegisteredSystems}
+                hasCompatibleSystems={hasCompatibleSystems}
               />
             </FlexItem>
           </Flex>
@@ -205,7 +205,7 @@ const AssignTemplateModal = () => {
                 <p>This overrides any previously assigned templates on the targeted systems.</p>
               </>
             }
-            linkUrl={TEMPLATE_DOCS_URL}
+            linkUrl={MANAGING_TEMPLATES_DOCS_URL}
             linkText='Learn more about content templates'
           />
         }
@@ -220,7 +220,12 @@ const AssignTemplateModal = () => {
                   <SystemListView
                     selectedSystems={selectedSystems}
                     setSelectedSystems={setSelectedSystems}
-                    template={{ arch: template.arch!, version: template.version! }}
+                    template={{
+                      arch: template.arch!,
+                      version: template.version!,
+                      extended_release: template?.extended_release,
+                      extended_release_version: template?.extended_release_version,
+                    }}
                     setCanAssignTemplate={setCanAssignTemplate}
                     handleModalClose={onClose}
                   />

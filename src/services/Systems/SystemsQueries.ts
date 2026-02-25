@@ -76,7 +76,7 @@ export const useListSystemsByTemplateId = (
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       onError: (err: any) => {
         errorNotifier(
-          `Unable to find systems with the given template id: ${id}`,
+          'Unable to fetch systems assigned to this template',
           'An error occurred',
           err,
           'systems-list-error',

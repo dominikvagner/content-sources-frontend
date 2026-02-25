@@ -10,7 +10,7 @@ import {
   satelliteManagedSystemsListItem,
 } from 'testingHelpers';
 import type { SystemItem } from 'services/Systems/SystemsApi';
-import useHasRegisteredSystems from 'Hooks/useHasRegisteredSystems';
+import useCompatibleSystems from 'Hooks/useCompatibleSystems';
 import React from 'react';
 import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
 import userEvent from '@testing-library/user-event';
@@ -25,7 +25,7 @@ jest.mock('react-router-dom', () => ({
 
 jest.mock('Hooks/useRootPath', () => () => 'someUrl');
 
-jest.mock('Hooks/useHasRegisteredSystems');
+jest.mock('Hooks/useCompatibleSystems');
 
 jest.mock('react-query');
 
@@ -84,10 +84,10 @@ afterEach(() => {
   mockSelectedSystemsCount = 0;
 });
 
-(useHasRegisteredSystems as jest.Mock).mockReturnValue({
-  hasRegisteredSystems: true,
-  isFetchingRegSystems: false,
-  isErrorFetchingRegSystems: false,
+(useCompatibleSystems as jest.Mock).mockReturnValue({
+  hasCompatibleSystems: true,
+  isFetchingCompatibility: false,
+  isCompatibilityError: false,
 });
 
 (useSystemsListQuery as jest.Mock).mockImplementation(() => ({
@@ -98,20 +98,20 @@ afterEach(() => {
 }));
 
 it('shows registration view if no systems are present', async () => {
-  (useHasRegisteredSystems as jest.Mock).mockImplementation(() => ({
-    hasRegisteredSystems: false,
-    isFetchingRegSystems: false,
-    isErrorFetchingRegSystems: false,
+  (useCompatibleSystems as jest.Mock).mockImplementation(() => ({
+    hasCompatibleSystems: false,
+    isFetchingCompatibility: false,
+    isCompatibilityError: false,
   }));
   render(<AssignTemplateModal />);
   expect(screen.getByText('Non-registered systems')).toBeInTheDocument();
 });
 
 it('renders systems list and pre-selects systems already assigned to template', async () => {
-  (useHasRegisteredSystems as jest.Mock).mockImplementation(() => ({
-    hasRegisteredSystems: true,
-    isFetchingRegSystems: false,
-    isErrorFetchingRegSystems: false,
+  (useCompatibleSystems as jest.Mock).mockImplementation(() => ({
+    hasCompatibleSystems: true,
+    isFetchingCompatibility: false,
+    isCompatibilityError: false,
   }));
   (useSystemsListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
@@ -142,10 +142,10 @@ it('renders systems list and pre-selects systems already assigned to template', 
 });
 
 it('prevents selection of systems with minor release versions and shows warning icon', async () => {
-  (useHasRegisteredSystems as jest.Mock).mockImplementation(() => ({
-    hasRegisteredSystems: true,
-    isFetchingRegSystems: false,
-    isErrorFetchingRegSystems: false,
+  (useCompatibleSystems as jest.Mock).mockImplementation(() => ({
+    hasCompatibleSystems: true,
+    isFetchingCompatibility: false,
+    isCompatibilityError: false,
   }));
   (useSystemsListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
@@ -179,10 +179,10 @@ it('prevents selection of systems with minor release versions and shows warning 
 });
 
 it('prevents selection of satellite-managed systems and shows warning icon', async () => {
-  (useHasRegisteredSystems as jest.Mock).mockImplementation(() => ({
-    hasRegisteredSystems: true,
-    isFetchingRegSystems: false,
-    isErrorFetchingRegSystems: false,
+  (useCompatibleSystems as jest.Mock).mockImplementation(() => ({
+    hasCompatibleSystems: true,
+    isFetchingCompatibility: false,
+    isCompatibilityError: false,
   }));
   (useSystemsListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
