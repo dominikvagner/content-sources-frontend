@@ -5,9 +5,26 @@ import {
   CurrentsWorkerFixtures,
 } from '@currents/playwright';
 import { defineConfig, devices } from '@playwright/test';
-import { config } from 'dotenv';
+import { config, populate } from 'dotenv';
+import fs from 'fs';
 import path from 'path';
+
 config({ path: path.join(__dirname, './.env'), quiet: true });
+
+let creds: Record<string, string> = {};
+try {
+  const credsPath = path.join(__dirname, 'creds.json');
+  const rawCreds = fs.readFileSync(credsPath, 'utf-8');
+  creds = JSON.parse(rawCreds);
+} catch (error) {
+  const err = error as NodeJS.ErrnoException;
+
+  if (err.code !== 'ENOENT') {
+    // Do not log the actual error, to prevent leaking stuff.
+    console.error('Failed to read or parse creds.json. Check the file and/or setup.');
+  }
+}
+populate(process.env, creds);
 
 // Coverage setup flag: when true, run globalSetup to prepare coverage
 const enableCoverageSetup = process.env.COVERAGE === 'true';

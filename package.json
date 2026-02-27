@@ -3,7 +3,6 @@
   "version": "0.0.2",
   "private": false,
   "scripts": {
-    "test-ui": "yarn install && yarn playwright install && yarn playwright test",
     "build": "fec build",
     "build:prod": "yarn build",
     "build:coverage": "COVERAGE=true fec build",
@@ -25,6 +24,9 @@
     "test:coverage": "TZ=UTC jest --verbose --coverage",
     "test-ci": "TZ=UTC jest --verbose --no-cache",
     "test-ci:coverage": "TZ=UTC jest --verbose --no-cache --coverage",
+    "test-ui": "yarn install && yarn playwright install && yarn playwright test",
+    "test-use-creds:stage": "ln -sf creds-stage.json creds.json",
+    "test-use-creds:prod": "ln -sf creds-prod.json creds.json",
     "coverage:report": "mkdir -p .nyc_output && nyc report --reporter=html --reporter=text --reporter=lcov",
     "coverage:clean": "rm -rf .nyc_output coverage-e2e",
     "testAllPreviewFailures": "npm-run-all -p test jestPreview",

@@ -29,45 +29,7 @@ jobs:
 
       - name: Create front-end .env file
         run: |
-          # Check if the secrets are set
-          if [ -z "$ADMIN_USERNAME" ]; then
-            echo "Error: ADMIN_USERNAME secret is not set."
-            exit 1
-          fi
-
-          if [ -z "$ADMIN_PASSWORD" ]; then
-            echo "Error: ADMIN_PASSWORD secret is not set."
-            exit 1
-          fi
-
-          if [ -z "$READONLY_USERNAME" ]; then
-            echo "Error: READONLY_USERNAME secret is not set."
-            exit 1
-          fi
-
-          if [ -z "$READONLY_PASSWORD" ]; then
-            echo "Error: READONLY_PASSWORD secret is not set."
-            exit 1
-          fi
-
-          if [ -z "$RHEL_OPERATOR_USERNAME" ]; then
-            echo "Error: RHEL_OPERATOR_USERNAME secret is not set."
-            exit 1
-          fi
-
-          if [ -z "$RHEL_OPERATOR_PASSWORD" ]; then
-            echo "Error: RHEL_OPERATOR_PASSWORD secret is not set."
-            exit 1
-          fi
-
-          # Create the .env file and write the secrets and other variables to it
           {
-            echo "ADMIN_USERNAME=$ADMIN_USERNAME"
-            echo "ADMIN_PASSWORD=$ADMIN_PASSWORD"
-            echo "READONLY_USERNAME=$READONLY_USERNAME"
-            echo "READONLY_PASSWORD=$READONLY_PASSWORD"
-            echo "RHEL_OPERATOR_USERNAME=$RHEL_OPERATOR_USERNAME"
-            echo "RHEL_OPERATOR_PASSWORD=$RHEL_OPERATOR_PASSWORD"
             echo "BASE_URL=https://stage.foo.redhat.com:1337"
             echo "CI=true"
             echo "RBAC=true"
@@ -75,6 +37,13 @@ jobs:
           } >> .env
 
           echo ".env file created successfully."
+
+          if [ -z "$PW_CREDENTIALS" ]; then
+            echo "Error: PW_CREDENTIALS secret is not set."
+            exit 1
+          fi
+
+          printf '%s' "$PW_CREDENTIALS" > creds.json
 
       - name: Get current PR URL
         id: get-pr-url

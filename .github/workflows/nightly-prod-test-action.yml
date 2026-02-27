@@ -54,27 +54,14 @@ jobs:
           echo "BASE_URL=$PROD_BASE_URL" >> .env
           echo "PROXY=$RH_PROXY_URL" >> .env
           echo "RH_CLIENT_PROXY=$RH_PROXY_URL" >> .env
-          echo "ADMIN_USERNAME=$PROD_ADMIN_USERNAME" >> .env
-          echo "ADMIN_PASSWORD=$PROD_ADMIN_PASSWORD" >> .env
-          echo "READONLY_USERNAME=$PROD_READONLY_USERNAME" >> .env
-          echo "READONLY_PASSWORD=$PROD_READONLY_PASSWORD" >> .env
-          echo "RHEL_OPERATOR_USERNAME=$PROD_RHEL_OPERATOR_USERNAME" >> .env
-          echo "RHEL_OPERATOR_PASSWORD=$PROD_RHEL_OPERATOR_PASSWORD" >> .env
-          echo "LAYERED_REPO_ACCESS_USERNAME=$PROD_LAYERED_REPO_ACCESS_USERNAME" >> .env
-          echo "LAYERED_REPO_ACCESS_PASSWORD=$PROD_LAYERED_REPO_ACCESS_PASSWORD" >> .env
-          echo "RHEL_ONLY_ACCESS_USERNAME=$PROD_RHEL_ONLY_ACCESS_USERNAME" >> .env
-          echo "RHEL_ONLY_ACCESS_PASSWORD=$PROD_RHEL_ONLY_ACCESS_PASSWORD" >> .env
-          echo "NO_SUBS_USER_USERNAME=$PROD_NO_SUBS_USER_USERNAME" >> .env
-          echo "NO_SUBS_USER_PASSWORD=$PROD_NO_SUBS_USER_PASSWORD" >> .env
-          echo "NO_SUBS_USER_ACTIVATION_KEY=$PROD_NO_SUBS_USER_ACTIVATION_KEY" >> .env
-          echo "NO_SUBS_USER_ORG_ID=$PROD_NO_SUBS_USER_ORG_ID" >> .env
-          echo "ORG_ID_1=$PROD_ORG_ID" >> .env
-          echo "ACTIVATION_KEY_1=$PROD_ACTIVATION_KEY" >> .env
-          echo "LAYERED_REPO_ACCESS_ORG_ID=$PROD_LAYERED_REPO_ACCESS_ORG_ID" >> .env
-          echo "LAYERED_REPO_ACCESS_ACTIVATION_KEY=$PROD_LAYERED_REPO_ACCESS_ACTIVATION_KEY" >> .env
           echo "DOCKER_SOCKET=/var/run/docker.sock" >> .env
-          echo "STABLE_SAM_USERNAME=$PROD_STABLE_SAM_USERNAME" >> .env
-          echo "STABLE_SAM_PASSWORD=$PROD_STABLE_SAM_PASSWORD" >> .env
+
+          if [ -z "$PW_CREDENTIALS" ]; then
+            echo "Error: PW_CREDENTIALS secret is not set."
+            exit 1
+          fi
+
+          printf '%s' "$PW_CREDENTIALS" > creds.json
 
       - name: Run Playwright tests
         run: CURRENTS_PROJECT_ID=jRJFbV CURRENTS_RECORD_KEY=$CURRENTS_RECORD_KEY CURRENTS_CI_BUILD_ID="${{ github.repository }}-${{ github.run_id }}-${{ github.run_attempt }}" yarn playwright test
