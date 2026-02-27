@@ -55,27 +55,7 @@ jobs:
             echo "CI=true"
             echo "RBAC=true"
             echo "INTEGRATION=true"
-            echo "ADMIN_USERNAME=\"$STAGE_ADMIN_USERNAME\""
-            echo "ADMIN_PASSWORD=\"$STAGE_ADMIN_PASSWORD\""
-            echo "READONLY_USERNAME=\"$STAGE_READONLY_USERNAME\""
-            echo "READONLY_PASSWORD=\"$STAGE_READONLY_PASSWORD\""
-            echo "RHEL_OPERATOR_USERNAME=\"$STAGE_RHEL_OPERATOR_USERNAME\""
-            echo "RHEL_OPERATOR_PASSWORD=\"$STAGE_RHEL_OPERATOR_PASSWORD\""
-            echo "LAYERED_REPO_ACCESS_USERNAME=\"$STAGE_LAYERED_REPO_ACCESS_USERNAME\""
-            echo "LAYERED_REPO_ACCESS_PASSWORD=\"$STAGE_LAYERED_REPO_ACCESS_PASSWORD\""
-            echo "RHEL_ONLY_ACCESS_USERNAME=\"$STAGE_RHEL_ONLY_ACCESS_USERNAME\""
-            echo "RHEL_ONLY_ACCESS_PASSWORD=\"$STAGE_RHEL_ONLY_ACCESS_PASSWORD\""
-            echo "NO_SUBS_USER_USERNAME=\"$STAGE_NO_SUBS_USER_USERNAME\""
-            echo "NO_SUBS_USER_PASSWORD=\"$STAGE_NO_SUBS_USER_PASSWORD\""
-            echo "NO_SUBS_USER_ACTIVATION_KEY=\"$STAGE_NO_SUBS_USER_ACTIVATION_KEY\""
-            echo "NO_SUBS_USER_ORG_ID=\"$STAGE_NO_SUBS_USER_ORG_ID\""
-            echo "ORG_ID_1=\"$STAGE_ORG_ID\""
-            echo "ACTIVATION_KEY_1=\"$STAGE_ACTIVATION_KEY\""
-            echo "LAYERED_REPO_ACCESS_ORG_ID=\"$STAGE_LAYERED_REPO_ACCESS_ORG_ID\""
-            echo "LAYERED_REPO_ACCESS_ACTIVATION_KEY=\"$STAGE_LAYERED_REPO_ACCESS_ACTIVATION_KEY\""
             echo "DOCKER_SOCKET=/var/run/docker.sock"
-            echo "STABLE_SAM_USERNAME=\"$STAGE_STABLE_SAM_USERNAME\""
-            echo "STABLE_SAM_PASSWORD=\"$STAGE_STABLE_SAM_PASSWORD\""
             echo "RH_CLIENT_PROXY=\"$RH_PROXY_URL\""
           } >> .env 2>/dev/null
           if [[ "${{ github.event_name }}" == "pull_request" ]]; then
@@ -85,6 +65,13 @@ jobs:
             echo "PROXY=$RH_PROXY_URL" >> .env
           fi
           echo "✅ Environment file created successfully"
+
+          if [ -z "$STAGE_PW_CREDENTIALS" ]; then
+            echo "Error: STAGE_PW_CREDENTIALS secret is not set."
+            exit 1
+          fi
+
+          printf '%s' "$STAGE_PW_CREDENTIALS" > creds.json
 
       - name: Compare .nvmrc files
         id: compare-nvmrc

@@ -87,6 +87,7 @@ One can also: `yarn test` to run the unit tests directly.
 
 2. Copy the [example env file](playwright_example.env) and create a file named:`.env`
    For local development only the BASE*URL:`https://stage.foo.redhat.com:1337` and `ADMIN*\*` credentials (stage user) are required, which is already set in the example config.
+   _Optional: Use credentials json (`creds.json`) file for splitting the credentials from environment configuration._
 
 3. Install Playwright browsers and dependencies
    `yarn playwright install`

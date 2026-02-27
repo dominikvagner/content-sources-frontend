@@ -40,3 +40,5 @@ playwright/.cache/
 .auth
 bin
 dist-coverage
+
+creds*
