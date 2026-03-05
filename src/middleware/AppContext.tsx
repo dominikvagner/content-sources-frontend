@@ -1,16 +1,13 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { Features } from 'services/Features/FeatureApi';
-import PackageJson from '../../package.json';
 import { useFetchFeaturesQuery } from 'services/Features/FeatureQueries';
 import { ContentOrigin } from 'services/Content/ContentApi';
 import useChrome from '@redhat-cloud-services/frontend-components/useChrome';
 import { ChromeAPI } from '@redhat-cloud-services/types';
-import getRBAC from '@redhat-cloud-services/frontend-components-utilities/RBAC';
 import { Subscriptions } from 'services/Subscriptions/SubscriptionApi';
 import { useFetchSubscriptionsQuery } from 'services/Subscriptions/SubscriptionQueries';
 import { useFlag } from '@unleash/proxy-client-react';
-
-const { appname } = PackageJson.insights;
+import { useKesselWorkspace, useKesselRbac, useTraditionalRbac } from './rbacHelpers';
 
 // Add permissions here
 export enum RbacPermissions {
@@ -36,37 +33,32 @@ export interface AppContextInterface {
 export const AppContext = createContext({} as AppContextInterface);
 
 export const ContextProvider = ({ children }: { children: ReactNode }) => {
-  const [rbac, setRbac] = useState<Record<keyof typeof RbacPermissions, boolean> | undefined>(
-    undefined,
-  );
   const [zeroState, setZeroState] = useState(true);
   const [features, setFeatures] = useState<Features | null>(null);
-  const chrome = useChrome();
   const [contentOrigin, setContentOrigin] = useState<ContentOrigin[]>([
     ContentOrigin.EXTERNAL,
     ContentOrigin.UPLOAD,
   ]);
+
+  const chrome = useChrome();
   const { fetchFeatures, isLoading: isFetchingFeatures } = useFetchFeaturesQuery();
   const { data: subscriptions, isLoading: isFetchingSubscriptions } = useFetchSubscriptionsQuery();
   const isLightspeedEnabled = useFlag('platform.lightspeed-rebrand') || false;
 
+  // Determine which permission system to use
+  const useKessel = !!(features?.kessel?.enabled && features.kessel?.accessible);
+
+  // Fetch workspace and permissions based on the enabled system
+  const { workspaceId, loading: workspaceLoading } = useKesselWorkspace(useKessel);
+  const kesselPermissions = useKesselRbac(workspaceId, workspaceLoading);
+  const traditionalPermissions = useTraditionalRbac(chrome, features, !useKessel);
+
+  // Select the appropriate RBAC and loading state
+  const rbac = useKessel ? kesselPermissions.rbac : traditionalPermissions.rbac;
+  const rbacLoading = useKessel ? kesselPermissions.loading : traditionalPermissions.loading;
+
+  // Fetch features on mount and update content origin
   useEffect(() => {
-    if (chrome && !rbac) {
-      // Get permissions and store them in context
-      chrome.auth.getUser().then(async () =>
-        getRBAC(appname).then((res) => {
-          const rbacSet = new Set(res.permissions.map(({ permission }) => permission));
-
-          setRbac({
-            repoRead: rbacSet.has('content-sources:repositories:read'),
-            repoWrite: rbacSet.has('content-sources:repositories:write'),
-            templateRead: rbacSet.has('content-sources:templates:read'),
-            templateWrite: rbacSet.has('content-sources:templates:write'),
-          });
-        }),
-      );
-    }
-
     (async () => {
       const fetchedFeatures = await fetchFeatures();
       setFeatures(fetchedFeatures);
@@ -79,15 +71,15 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
         setContentOrigin((prev) => prev.filter((origin) => origin !== ContentOrigin.COMMUNITY));
       }
     })();
-  }, [!!chrome]);
+  }, []);
 
   return (
     <AppContext.Provider
       value={{
-        rbac: rbac,
-        features: features,
-        isFetchingPermissions: isFetchingFeatures || isFetchingSubscriptions,
-        subscriptions: subscriptions,
+        rbac,
+        features,
+        isFetchingPermissions: isFetchingFeatures || isFetchingSubscriptions || rbacLoading,
+        subscriptions,
         contentOrigin,
         setContentOrigin,
         chrome: chrome as ChromeAPI,

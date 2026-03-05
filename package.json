@@ -43,6 +43,7 @@
     "@redhat-cloud-services/frontend-components": "^7.0.41",
     "@redhat-cloud-services/frontend-components-config": "^6.7.52",
     "@redhat-cloud-services/frontend-components-notifications": "^6.1.42",
+    "@project-kessel/react-kessel-access-check": "^0.4.0",
     "@redhat-cloud-services/frontend-components-utilities": "^7.0.37",
     "@testing-library/dom": "^10.4.1",
     "@types/dockerode": "^4.0.1",

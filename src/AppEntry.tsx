@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Provider as ReduxProvider } from 'react-redux';
 import * as Redux from 'redux';
+import { AccessCheck } from '@project-kessel/react-kessel-access-check';
 
 import App from './App';
 
@@ -32,13 +33,15 @@ export default function AppEntry({ logger }: AppEntryProps) {
   useEffect(() => {
     insights?.chrome?.appAction?.('view-list-page');
   }, []);
-
+  const kesselBaseUrl = window.location.origin;
   return (
     <ReduxProvider store={store}>
       <QueryClientProvider client={queryClient}>
-        <ContextProvider>
-          <App />
-        </ContextProvider>
+        <AccessCheck.Provider baseUrl={kesselBaseUrl} apiPath='/api/kessel/v1beta2'>
+          <ContextProvider>
+            <App />
+          </ContextProvider>
+        </AccessCheck.Provider>
       </QueryClientProvider>
     </ReduxProvider>
   );

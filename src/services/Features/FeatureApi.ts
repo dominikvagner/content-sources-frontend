@@ -9,6 +9,7 @@ export interface Features {
   snapshots?: Feature;
   admintasks?: Feature;
   communityrepos?: Feature;
+  kessel?: Feature;
 }
 
 export const getFeatures: () => Promise<Features> = async () => {
