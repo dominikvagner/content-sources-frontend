@@ -49,7 +49,7 @@ test.describe('Test System With Template', () => {
       await page.getByRole('button', { name: 'filter architecture' }).click();
       await page.getByRole('menuitem', { name: 'x86_64' }).click();
       await page.getByRole('button', { name: 'filter OS version' }).click();
-      await page.getByRole('menuitem', { name: 'el9' }).click();
+      await page.getByRole('menuitem', { name: 'RHEL 9' }).click();
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       await expect(
         page.getByRole('heading', { name: 'Additional Red Hat repositories', exact: true }),

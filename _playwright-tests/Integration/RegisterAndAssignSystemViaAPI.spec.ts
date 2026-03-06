@@ -29,7 +29,7 @@ test.describe('Register and assign template to systems via API', () => {
       await page.getByRole('button', { name: 'filter architecture' }).click();
       await page.getByRole('menuitem', { name: 'x86_64' }).click();
       await page.getByRole('button', { name: 'filter OS version' }).click();
-      await page.getByRole('menuitem', { name: 'el9' }).click();
+      await page.getByRole('menuitem', { name: 'RHEL 9' }).click();
       await page.getByRole('button', { name: 'Next', exact: true }).click();
 
       await expect(
