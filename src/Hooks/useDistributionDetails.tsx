@@ -1,9 +1,7 @@
 import { useCallback, useMemo } from 'react';
 import { useRepositoryParams } from 'services/Content/ContentQueries';
-import {
-  EXTENDED_SUPPORT_FEATURES,
-  extendedReleaseToFeatureName,
-} from '../Pages/Templates/TemplatesTable/components/templateHelpers';
+import { EXTENDED_SUPPORT_FEATURES } from '../Pages/Templates/TemplatesTable/constants';
+import { extendedReleaseToFeatureName } from '../Pages/Templates/TemplatesTable/helpers';
 
 export default function useDistributionDetails() {
   const {
@@ -19,7 +17,7 @@ export default function useDistributionDetails() {
   } = useRepositoryParams();
 
   const labelToName: Record<string, string> = useMemo(() => {
-    const result = {};
+    const result: Record<string, string> = {};
     distArches.forEach(({ name, label }) => {
       result[label] = name;
     });

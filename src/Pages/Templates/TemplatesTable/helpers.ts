@@ -1,19 +1,13 @@
 import * as Yup from 'yup';
-import { NameLabel } from 'services/Content/ContentApi';
-
-export const EUS = 'RHEL-EUS-x86_64' as const;
-export const E4S = 'RHEL-E4S-x86_64' as const;
-export const EXTENDED_SUPPORT_FEATURES = [EUS, E4S] as const;
-export const SUPPORTED_EUS_ARCHES = ['x86_64'];
-
-export const SUPPORTED_MAJOR_VERSIONS = ['8', '9', '10'];
-export const SUPPORTED_ARCHES = ['x86_64', 'aarch64'];
-
-export const STANDARD_STREAM: NameLabel = { label: '', name: 'Standard' };
-const STANDARD_STREAM_PATH = 'dist';
-
-// Empty string means the release version is unset, i.e., a major release
-const MAJOR_RELEASE_VERSIONS = ['', '8', '8.0', '9', '9.0', '10', '10.0'];
+import {
+  EUS,
+  E4S,
+  SUPPORTED_ARCHES,
+  SUPPORTED_MAJOR_VERSIONS,
+  SUPPORTED_EUS_ARCHES,
+  STANDARD_STREAM_PATH,
+  MAJOR_RELEASE_VERSIONS,
+} from './constants';
 
 /** Converts a feature name label (e.g., 'RHEL-EUS-x86_64') to the API format ('eus'/'e4s'/''). */
 export const featureNameToExtendedRelease = (featureName: string | undefined) =>
@@ -66,6 +60,12 @@ export const getRedHatCoreRepoUrls = (
 export const isMinorRelease = (distributionVersion: string) =>
   !MAJOR_RELEASE_VERSIONS.includes(distributionVersion);
 
+/** Checks if a template uses extended support (EUS or E4S) based on its configuration. */
+export const isExtendedSupportTemplate = (
+  extended_release?: string,
+  extended_release_version?: string,
+) => !!(extended_release && extended_release_version);
+
 export const canAssignSystemToTemplate = (
   version: string,
   satelliteManaged: boolean,
@@ -74,9 +74,9 @@ export const canAssignSystemToTemplate = (
 ) =>
   notAlreadyAssigned &&
   !satelliteManaged &&
-  // Cannot assign standard template to minor RHEL versions
-  !templateUsesExtendedSupport &&
-  !isMinorRelease(version);
+  // Standard templates: cannot be assigned to systems on minor release versions
+  // Extended support templates: can be assigned to systems on both minor and major versions (HMS-10156)
+  (templateUsesExtendedSupport || !isMinorRelease(version));
 
 /** Extracts the abbreviation from parentheses, e.g., "Extended Update Support (EUS)" to "EUS". */
 export const abbreviateStreamName = (streamName: string) =>
@@ -93,5 +93,3 @@ export const TemplateValidationSchema = Yup.object().shape({
   name: Yup.string().max(255, 'Too Long!').required('Required'),
   description: Yup.string().max(255, 'Too Long!'),
 });
-
-export const TEMPLATE_SYSTEMS_UPDATE_LIMIT = 1000;

@@ -45,7 +45,7 @@ import SystemListTable from './SystemListTable';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import useNotification from 'Hooks/useNotification';
 import TagsFilter from 'components/TagsFilter/TagsFilter';
-import { isMinorRelease } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
+import { isMinorRelease } from '../../../TemplatesTable/helpers';
 
 const useStyles = createUseStyles({
   mainContainer: {

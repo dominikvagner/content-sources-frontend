@@ -18,7 +18,8 @@ import useRootPath from 'Hooks/useRootPath';
 import { isDateValid } from 'helpers';
 import useSafeUUIDParam from 'Hooks/useSafeUUIDParam';
 import useDistributionDetails from '../../../../../Hooks/useDistributionDetails';
-import { getRedHatCoreRepoUrls, STANDARD_STREAM } from '../templateHelpers';
+import { getRedHatCoreRepoUrls, isExtendedSupportTemplate } from '../../helpers';
+import { STANDARD_STREAM } from '../../constants';
 
 export interface AddOrEditTemplateContextInterface {
   queryClient: QueryClient;
@@ -44,11 +45,11 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
   const uuid = useSafeUUIDParam('templateUUID');
   const { data: editTemplateData, isError } = useFetchTemplate(uuid, !!uuid);
 
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const rootPath = useRootPath();
-  if (isError) navigate(rootPath);
 
-  const queryClient = useQueryClient();
+  if (isError) navigate(rootPath);
 
   const [templateRequest, setTemplateRequest] = useState<Partial<TemplateRequest>>({
     extended_release: STANDARD_STREAM.label,
@@ -59,7 +60,8 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
   const [selectedRedHatRepos, setSelectedRedHatRepos] = useState<Set<string>>(new Set());
   const [selectedCustomRepos, setSelectedCustomRepos] = useState<Set<string>>(new Set());
 
-  const editExtendedReleaseVersionRef = useRef<string | undefined>();
+  const hasLoadedEditData = useRef(false);
+  const lastLoadedMinorVersion = useRef<string | undefined>();
 
   const {
     data: {
@@ -74,11 +76,9 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
 
   const { isExtendedSupportAvailable } = useDistributionDetails();
 
-  const usesExtendedSupportStream = !!(
+  const usesExtendedSupportStream =
     isExtendedSupportAvailable &&
-    extended_release &&
-    extended_release_version
-  );
+    isExtendedSupportTemplate(extended_release, extended_release_version);
 
   // Step validation //
 
@@ -131,15 +131,15 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
       const coreRepoUUIDs = new Set(coreRepos?.data.map((repo) => repo.uuid));
       setRedHatCoreRepos(new Set(coreRepoUUIDs));
 
-      const hasMinorDiverged =
+      const didMinorVersionChange =
         usesExtendedSupportStream &&
-        editExtendedReleaseVersionRef.current !== undefined &&
-        extended_release_version !== editExtendedReleaseVersionRef.current;
+        lastLoadedMinorVersion.current !== undefined &&
+        extended_release_version !== lastLoadedMinorVersion.current;
 
       // Pre-select core repos if we're creating a new template OR the user edits the minor version
-      if (!uuid || hasMinorDiverged) {
+      if (!uuid || didMinorVersionChange) {
         setSelectedRedHatRepos(new Set(coreRepoUUIDs));
-        if (hasMinorDiverged) editExtendedReleaseVersionRef.current = extended_release_version;
+        if (didMinorVersionChange) lastLoadedMinorVersion.current = extended_release_version;
       }
     }
   }, [coreRepos?.data, uuid, extended_release_version]);
@@ -155,11 +155,18 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
 
   // If editing, we want to load the data from the existing template
   useEffect(() => {
-    if (uuid && !!editTemplateData && !isLoading && !!existingRepositoryInformation) {
+    const shouldLoadEditData =
+      uuid &&
+      !!editTemplateData &&
+      !isLoading &&
+      !!existingRepositoryInformation &&
+      !hasLoadedEditData.current;
+
+    if (shouldLoadEditData) {
       const { extended_release, extended_release_version } = editTemplateData;
 
       if (extended_release && extended_release_version) {
-        editExtendedReleaseVersionRef.current = extended_release_version;
+        lastLoadedMinorVersion.current = extended_release_version;
       }
 
       const startingState = {
@@ -187,6 +194,7 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
       if (customReposToAdd.length) {
         setSelectedCustomRepos(new Set(customReposToAdd));
       }
+      hasLoadedEditData.current = true;
     }
   }, [editTemplateData, isLoading, existingRepositoryInformation]);
 

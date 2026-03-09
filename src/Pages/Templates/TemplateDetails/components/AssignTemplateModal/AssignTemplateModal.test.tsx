@@ -12,7 +12,7 @@ import {
 import type { SystemItem } from 'services/Systems/SystemsApi';
 import useCompatibleSystems from 'Hooks/useCompatibleSystems';
 import React from 'react';
-import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
+import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/constants';
 import userEvent from '@testing-library/user-event';
 
 const bananaUUID = 'banana-uuid';

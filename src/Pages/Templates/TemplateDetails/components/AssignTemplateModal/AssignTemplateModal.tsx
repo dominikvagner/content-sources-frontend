@@ -30,7 +30,7 @@ import ApiView from './ApiView';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import useCompatibleSystems from '../../../../../Hooks/useCompatibleSystems';
 import Loader from '../../../../../components/Loader';
-import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
+import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/constants';
 
 export const MANAGING_TEMPLATES_DOCS_URL =
   'https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/managing_system_content_and_patch_updates_on_rhel_systems/patching-using-content-templates_patch-service-overview#managing-content-templates_patching-using-content-templates';

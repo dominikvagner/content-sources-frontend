@@ -3,7 +3,10 @@ import { useRepositoryParams } from '../services/Content/ContentQueries';
 import { useSystemsListQuery } from '../services/Systems/SystemsQueries';
 import { TemplateItem } from '../services/Templates/TemplateApi';
 import { FETCH_TEMPLATE_KEY } from '../services/Templates/TemplateQueries';
-import { extendedReleaseToFeatureName } from '../Pages/Templates/TemplatesTable/components/templateHelpers';
+import {
+  extendedReleaseToFeatureName,
+  isExtendedSupportTemplate,
+} from '../Pages/Templates/TemplatesTable/helpers';
 
 /**
  * Checks if any Insights-registered systems are compatible with a given template's configuration.
@@ -17,11 +20,14 @@ const useCompatibleSystems = (uuid: string) => {
 
   const { arch, version, extended_release, extended_release_version } = template || {};
 
-  const isExtendedSupportTemplate = !!(extended_release && extended_release_version);
+  const templateUsesExtendedSupport = isExtendedSupportTemplate(
+    extended_release,
+    extended_release_version,
+  );
 
   const queryParams = {
     ...{ os: version, arch: arch },
-    ...(isExtendedSupportTemplate ? { osminor: extended_release_version } : {}),
+    ...(templateUsesExtendedSupport ? { osminor: extended_release_version } : {}),
   };
 
   const {
@@ -37,7 +43,7 @@ const useCompatibleSystems = (uuid: string) => {
   let hasCompatibleSystems = data.meta.total_items > 0;
 
   // For extended support templates, verify the template's stream is available for the minor version of at least one returned system
-  if (isExtendedSupportTemplate && hasCompatibleSystems) {
+  if (templateUsesExtendedSupport && hasCompatibleSystems) {
     const featureName = extendedReleaseToFeatureName(extended_release);
     hasCompatibleSystems = data.data.some((system) => {
       const minorEntry = distribution_minor_versions.find(

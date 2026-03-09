@@ -15,18 +15,20 @@ import {
 } from '@patternfly/react-core';
 import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
 import {
   SUPPORTED_EUS_ARCHES,
   SUPPORTED_MAJOR_VERSIONS,
   SUPPORTED_ARCHES,
-  calculateMajorVersion,
   STANDARD_STREAM,
+} from '../../../constants';
+import {
+  calculateMajorVersion,
   featureNameToExtendedRelease,
   extendedReleaseToFeatureName,
   isMinorVersionOfMajor,
-} from '../../templateHelpers';
+} from '../../../helpers';
 import useDistributionDetails from '../../../../../../Hooks/useDistributionDetails';
 import Hide from '../../../../../../components/Hide/Hide';
 import HelpPopover from '../../../../../../components/HelpPopover';
@@ -85,6 +87,14 @@ export default function OSAndArchitectureStep() {
       arch: '',
     }));
   };
+
+  const isArchDisabledForStream = useCallback(
+    (arch: string) =>
+      isExtendedSupportAvailable &&
+      !SUPPORTED_EUS_ARCHES.includes(arch) &&
+      templateRequest.extended_release !== STANDARD_STREAM.label,
+    [isExtendedSupportAvailable, templateRequest.extended_release],
+  );
 
   const classes = useStyles();
 
@@ -297,11 +307,7 @@ export default function OSAndArchitectureStep() {
                     key={label}
                     value={label}
                     isSelected={label === templateRequest?.arch}
-                    isDisabled={
-                      isExtendedSupportAvailable &&
-                      !SUPPORTED_EUS_ARCHES.includes(label) &&
-                      templateRequest.extended_release !== STANDARD_STREAM.label
-                    }
+                    isDisabled={isArchDisabledForStream(label)}
                     component='button'
                     data-ouia-component-id={`filter_${label}`}
                   >

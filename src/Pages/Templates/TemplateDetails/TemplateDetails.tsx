@@ -25,7 +25,7 @@ import { formatDateDDMMMYYYY } from 'helpers';
 import Loader from 'components/Loader';
 import TemplateActionDropdown from './components/TemplateActionDropdown';
 import TemplateDetailsTabs from './components/TemplateDetailsTabs';
-import { abbreviateStreamName } from '../TemplatesTable/components/templateHelpers';
+import { abbreviateStreamName } from '../TemplatesTable/helpers';
 
 const useStyles = createUseStyles({
   fullHeight: {

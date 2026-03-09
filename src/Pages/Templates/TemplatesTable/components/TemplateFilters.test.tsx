@@ -73,7 +73,7 @@ it('Select a filter of each type and ensure chips are present ContentListFilters
   expect(versionSelector).toBeInTheDocument();
   await userEvent.click(versionSelector);
 
-  const versionItem = getByRole('menuitem', { name: 'el7' }) as Element;
+  const versionItem = getByRole('menuitem', { name: 'RHEL 7' }) as Element;
   expect(versionItem).toBeInTheDocument();
   await userEvent.click(versionItem);
 
@@ -93,7 +93,7 @@ it('Select a filter of each type and ensure chips are present ContentListFilters
   await userEvent.click(archItem);
 
   // Check all the chips are there
-  expect(queryByText('el7')).toBeInTheDocument();
+  expect(queryByText('RHEL 7')).toBeInTheDocument();
   expect(queryAllByText('aarch64')).toHaveLength(3);
   expect(queryByText('EPEL')).toBeInTheDocument();
 });

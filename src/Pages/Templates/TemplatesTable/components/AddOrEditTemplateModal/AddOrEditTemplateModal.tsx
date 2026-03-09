@@ -61,7 +61,7 @@ const WizardUrlSync = ({ onCancel }: { onCancel: () => void }) => {
     if (tabParam && tabParam !== activeStep?.id) {
       if (stepIdToIndex[tabParam]) {
         goToStepById(tabParam);
-      } else if (tabParam === 'os-and-architecture') {
+      } else if (tabParam === DEFAULT_STEP_ID) {
         goToStepById(DEFAULT_STEP_ID);
       } else {
         onCancel();
@@ -170,7 +170,7 @@ const AddOrEditTemplateBase = () => {
             steps={[
               <WizardStep
                 name='OS and architecture'
-                id='os-and-architecture'
+                id={DEFAULT_STEP_ID}
                 key='os-and-architecture-key'
                 footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(1) }}
               >

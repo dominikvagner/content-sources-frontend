@@ -10,7 +10,7 @@ import {
 } from '@patternfly/react-core';
 import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { useState } from 'react';
-import { TemplateValidationSchema } from '../../templateHelpers';
+import { TemplateValidationSchema } from '../../../helpers';
 import CustomHelperText from 'components/CustomHelperText/CustomHelperText';
 
 export default function DetailStep() {

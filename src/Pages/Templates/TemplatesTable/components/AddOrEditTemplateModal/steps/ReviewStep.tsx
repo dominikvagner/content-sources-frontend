@@ -10,10 +10,11 @@ import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { useMemo, useState } from 'react';
 import { formatDateDDMMMYYYY } from 'helpers';
 import useDistributionDetails from '../../../../../../Hooks/useDistributionDetails';
-import { STANDARD_STREAM } from '../../templateHelpers';
+import { STANDARD_STREAM } from '../../../constants';
 
 export default function ReviewStep() {
   const [expanded, setExpanded] = useState(new Set([0]));
+
   const { templateRequest, selectedRedHatRepos, redHatCoreRepos, selectedCustomRepos, isEdit } =
     useAddOrEditTemplateContext();
 

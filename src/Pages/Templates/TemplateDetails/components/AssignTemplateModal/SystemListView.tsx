@@ -33,11 +33,12 @@ import SystemListTable from './SystemListTable';
 import Loader from '../../../../../components/Loader';
 import { createUseStyles } from 'react-jss';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/constants';
 import {
   isMinorRelease,
-  TEMPLATE_SYSTEMS_UPDATE_LIMIT,
   canAssignSystemToTemplate,
-} from 'Pages/Templates/TemplatesTable/components/templateHelpers';
+  isExtendedSupportTemplate,
+} from '../../../TemplatesTable/helpers';
 
 const useStyles = createUseStyles({
   topContainer: {
@@ -117,7 +118,10 @@ const SystemListView = ({
     tags: selectedTags,
   });
 
-  const isExtendedSupportTemplate = !!(extended_release && extended_release_version);
+  const templateUsesExtendedSupport = isExtendedSupportTemplate(
+    extended_release,
+    extended_release_version,
+  );
 
   const {
     data: systemsList = [],
@@ -147,7 +151,7 @@ const SystemListView = ({
 
   // True when at least some systems on the page have a compatible release version and are not satellite-managed
   const canEnableAssignButton =
-    !allSatellite && (isExtendedSupportTemplate ? !allMajor : !allMinor);
+    !allSatellite && (templateUsesExtendedSupport ? !allMajor : !allMinor);
 
   // Systems that are compatible with the template, not satellite-managed, and not already assigned
   const selectableSystems = useMemo(
@@ -157,10 +161,10 @@ const SystemListView = ({
           rhsm,
           satellite_managed,
           template_uuid !== uuid,
-          isExtendedSupportTemplate,
+          templateUsesExtendedSupport,
         ),
       ),
-    [systemsList, uuid, isExtendedSupportTemplate],
+    [systemsList, uuid, templateUsesExtendedSupport],
   );
 
   // Informs the parent modal whether it is safe to enable the template "Assign" button
@@ -357,7 +361,7 @@ const SystemListView = ({
 
           <Hide hide={isLoading}>
             <SystemListTable
-              isExtendedSupportTemplate={isExtendedSupportTemplate}
+              isExtendedSupportTemplate={templateUsesExtendedSupport}
               perPage={perPage}
               isFetchingOrLoading={fetchingOrLoading}
               isLoadingOrZeroCount={loadingOrZeroCount}

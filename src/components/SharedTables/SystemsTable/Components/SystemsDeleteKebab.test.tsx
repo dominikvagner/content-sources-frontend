@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import SystemsDeleteKebab from './SystemsDeleteKebab';
 import userEvent from '@testing-library/user-event';
 import { defaultSystemsListItem } from 'testingHelpers';
-import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/components/templateHelpers';
+import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/constants';
 
 jest.mock('middleware/AppContext', () => ({
   useAppContext: () => ({ rbac: { templateWrite: true } }),
