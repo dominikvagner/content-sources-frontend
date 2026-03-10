@@ -6,6 +6,7 @@ import { FETCH_TEMPLATE_KEY } from '../services/Templates/TemplateQueries';
 import {
   extendedReleaseToFeatureName,
   isExtendedSupportTemplate,
+  extractMinorVersion,
 } from '../Pages/Templates/TemplatesTable/helpers';
 
 /**
@@ -27,7 +28,9 @@ const useCompatibleSystems = (uuid: string) => {
 
   const queryParams = {
     ...{ os: version, arch: arch },
-    ...(templateUsesExtendedSupport ? { osminor: extended_release_version } : {}),
+    ...(templateUsesExtendedSupport
+      ? { osminor: extractMinorVersion(extended_release_version!) }
+      : {}),
   };
 
   const {

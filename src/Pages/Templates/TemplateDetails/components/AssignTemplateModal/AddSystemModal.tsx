@@ -45,7 +45,7 @@ import SystemListTable from './SystemListTable';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import useNotification from 'Hooks/useNotification';
 import TagsFilter from 'components/TagsFilter/TagsFilter';
-import { isMinorRelease } from '../../../TemplatesTable/helpers';
+import { isVersionLockedSystem } from '../../../TemplatesTable/helpers';
 
 const useStyles = createUseStyles({
   mainContainer: {
@@ -136,29 +136,31 @@ export default function AddSystemModal() {
     meta: { total_items = 0 },
   } = data;
 
-  // Systems that are not allowed to be selected
-  const minorReleaseSystems = useMemo(
+  const versionLockedSystems = useMemo(
     () =>
-      systemsList.filter((system) => isMinorRelease(system.attributes.rhsm)).map(({ id }) => id),
+      systemsList
+        .filter((system) => isVersionLockedSystem(system.attributes.rhsm))
+        .map(({ id }) => id),
     [systemsList],
   );
 
-  const allSystemsAreMinorReleases = minorReleaseSystems.length === systemsList.length;
+  const allSystemsAreVersionLocked = versionLockedSystems.length === systemsList.length;
 
   // A state for when the "Select All" toggle checkbox is checked
   const isPageSelected = useMemo(() => {
-    if (allSystemsAreMinorReleases) return false;
+    if (allSystemsAreVersionLocked) return false;
 
-    // Get all systems that can actually be selected (not minor releases and not already assigned)
+    // Get all systems that can actually be selected (not version-locked and not already assigned)
     const selectableSystems = systemsList.filter(
-      ({ attributes: { template_uuid, rhsm } }) => template_uuid !== uuid && !isMinorRelease(rhsm),
+      ({ attributes: { template_uuid, rhsm } }) =>
+        template_uuid !== uuid && !isVersionLockedSystem(rhsm),
     );
 
     if (selectableSystems.length === 0) return false;
 
     // Check if all selectable systems are in the selected list
     return selectableSystems.every(({ id }) => selectedList.has(id));
-  }, [selectedList, systemsList, allSystemsAreMinorReleases, uuid]);
+  }, [selectedList, systemsList, allSystemsAreVersionLocked, uuid]);
 
   const { mutateAsync: addSystems, isLoading: isAdding } = useAddTemplateToSystemsQuery(
     queryClient,
@@ -254,8 +256,8 @@ export default function AddSystemModal() {
           ...systemsList
             .filter(
               ({ attributes: { template_uuid, rhsm } }) =>
-                // Filter out systems which are minor releases as they cannot be assigned to a template
-                template_uuid !== uuid && !isMinorRelease(rhsm),
+                // Filter out version-locked systems as they cannot be assigned to standard templates
+                template_uuid !== uuid && !isVersionLockedSystem(rhsm),
             )
             .map(({ id }) => id),
         ]),
@@ -473,7 +475,7 @@ export default function AddSystemModal() {
               isLoading={isAdding}
               isDisabled={
                 isAdding ||
-                allSystemsAreMinorReleases ||
+                allSystemsAreVersionLocked ||
                 !selected.length ||
                 (!template?.rhsm_environment_created &&
                   template?.last_update_task?.status !== 'completed')

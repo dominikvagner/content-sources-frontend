@@ -142,6 +142,7 @@ export const getSystemsList: (
         : encodeURI('in:true,false'),
       [encodeURI('filter[osname]')]: 'RHEL', // Hardcoded for now
       [encodeURI('filter[osmajor]')]: filter.os,
+      ...(filter.osminor ? { [encodeURI('filter[osminor]')]: filter.osminor } : {}),
       [encodeURI('filter[arch]')]: filter?.arch,
     })}`,
     {},

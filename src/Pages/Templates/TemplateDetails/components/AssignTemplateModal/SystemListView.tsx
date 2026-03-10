@@ -35,7 +35,7 @@ import { createUseStyles } from 'react-jss';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/constants';
 import {
-  isMinorRelease,
+  isVersionLockedSystem,
   canAssignSystemToTemplate,
   isExtendedSupportTemplate,
 } from '../../../TemplatesTable/helpers';
@@ -128,15 +128,19 @@ const SystemListView = ({
     meta: { total_items = 0 },
   } = data;
 
-  const minorSystems = useMemo(
+  const versionLockedSystems = useMemo(
     () =>
-      systemsList.filter((system) => isMinorRelease(system.attributes.rhsm)).map(({ id }) => id),
+      systemsList
+        .filter((system) => isVersionLockedSystem(system.attributes.rhsm))
+        .map(({ id }) => id),
     [systemsList],
   );
 
-  const majorSystems = useMemo(
+  const standardSystems = useMemo(
     () =>
-      systemsList.filter((system) => !isMinorRelease(system.attributes.rhsm)).map(({ id }) => id),
+      systemsList
+        .filter((system) => !isVersionLockedSystem(system.attributes.rhsm))
+        .map(({ id }) => id),
     [systemsList],
   );
 
@@ -145,13 +149,13 @@ const SystemListView = ({
     [systemsList],
   );
 
-  const allMinor = minorSystems.length === systemsList.length;
-  const allMajor = majorSystems.length === systemsList.length;
+  const allVersionLocked = versionLockedSystems.length === systemsList.length;
+  const allStandard = standardSystems.length === systemsList.length;
   const allSatellite = satelliteSystems.length === systemsList.length;
 
   // True when at least some systems on the page have a compatible release version and are not satellite-managed
   const canEnableAssignButton =
-    !allSatellite && (templateUsesExtendedSupport ? !allMajor : !allMinor);
+    !allSatellite && (templateUsesExtendedSupport ? !allStandard : !allVersionLocked);
 
   // Systems that are compatible with the template, not satellite-managed, and not already assigned
   const selectableSystems = useMemo(

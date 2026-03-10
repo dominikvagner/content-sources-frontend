@@ -11,7 +11,4 @@ export const SUPPORTED_EUS_ARCHES = ['x86_64'];
 export const STANDARD_STREAM: NameLabel = { label: '', name: 'Standard' };
 export const STANDARD_STREAM_PATH = 'dist';
 
-// Empty string means the release version is unset, i.e., a major release
-export const MAJOR_RELEASE_VERSIONS = ['', '8', '8.0', '9', '9.0', '10', '10.0'];
-
 export const TEMPLATE_SYSTEMS_UPDATE_LIMIT = 1000;

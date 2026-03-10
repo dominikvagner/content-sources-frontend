@@ -1,4 +1,4 @@
-import { getRedHatCoreRepoUrls, isMinorVersionOfMajor } from './helpers';
+import { getRedHatCoreRepoUrls, isMinorVersionOfMajor, extractMinorVersion } from './helpers';
 
 describe('getRedHatCoreRepoUrls', () => {
   it('returns standard stream URLs when no release stream is specified', () => {
@@ -51,5 +51,11 @@ describe('isMinorVersionOfMajor', () => {
 
   it('returns false when minor version is empty string', () => {
     expect(isMinorVersionOfMajor('', '9')).toBe(false);
+  });
+});
+
+describe('extractMinorVersion', () => {
+  it('returns only the minor number when given the full version', () => {
+    expect(extractMinorVersion('9.4')).toEqual('4');
   });
 });

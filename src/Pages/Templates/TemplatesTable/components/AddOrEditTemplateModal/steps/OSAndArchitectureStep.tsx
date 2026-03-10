@@ -24,7 +24,7 @@ import {
   STANDARD_STREAM,
 } from '../../../constants';
 import {
-  calculateMajorVersion,
+  extractMajorVersion,
   featureNameToExtendedRelease,
   extendedReleaseToFeatureName,
   isMinorVersionOfMajor,
@@ -72,7 +72,7 @@ export default function OSAndArchitectureStep() {
   const handleVersionChange = (newVersion: string) => {
     setTemplateRequest((prev) => ({
       ...prev,
-      version: isStandardStream ? newVersion : calculateMajorVersion(newVersion),
+      version: isStandardStream ? newVersion : extractMajorVersion(newVersion),
       ...(isStandardStream ? {} : { extended_release_version: newVersion }),
     }));
   };

@@ -5,7 +5,7 @@ import { PATCH_SYSTEMS_ROUTE } from '../../../../../../Routes/constants';
 import type { SystemItem } from '../../../../../../services/Systems/SystemsApi';
 import HelpPopover from '../../../../../../components/HelpPopover';
 import React from 'react';
-import { isMinorRelease } from '../../../../TemplatesTable/helpers';
+import { isVersionLockedSystem } from '../../../../TemplatesTable/helpers';
 
 type Props = Pick<SystemItem, 'id'> &
   Pick<SystemItem['attributes'], 'display_name' | 'rhsm' | 'satellite_managed'> & {
@@ -24,8 +24,6 @@ const ABOUT_TEMPLATES_DOCS_URL =
 
 /**
  * Renders a system name with a warning icon if the system is incompatible with the template.
- * Incompatibility reasons: satellite-managed, or release type mismatch (standard templates
- * require major release systems while extended support templates require minor release systems).
  */
 export default function SystemNameCell({
   id,
@@ -43,11 +41,11 @@ export default function SystemNameCell({
 
   const warnings: WarningItem[] = [];
 
-  if (!isExtendedSupportTemplate && isMinorRelease(rhsm)) {
+  if (!isExtendedSupportTemplate && isVersionLockedSystem(rhsm)) {
     warnings.push({
-      key: 'minor-release-warning',
-      title: `This system is on a minor release version: ${rhsm}`,
-      description: 'Unset the minor release version to associate a standard template.',
+      key: 'version-lock-warning',
+      title: `This system is locked to version ${rhsm}`,
+      description: 'Remove the version lock to assign a standard template.',
     });
   }
 
