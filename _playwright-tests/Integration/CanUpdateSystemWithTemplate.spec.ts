@@ -18,7 +18,15 @@ import {
 const templateNamePrefix = 'integration_test_template';
 const templateName = `${templateNamePrefix}-${randomName()}`;
 const regClient = new RHSMClient(`RHSMClientTest-${randomName()}`);
-let firstCount;
+
+/** Poll config for errata count checks (content propagation in CI can be slow) */
+const ERRATA_POLL = {
+  timeout: 120000,
+  intervals: [15000, 20000, 25000] as const,
+  dnfTimeout: 2 * 60 * 1000,
+};
+
+let firstCountNumber: number;
 
 test.describe('Test System With Template', () => {
   test.use({
@@ -102,7 +110,9 @@ test.describe('Test System With Template', () => {
         regClient,
         10 * 60 * 1000,
       );
-      firstCount = count?.stdout?.toString().trim();
+      const raw = count?.stdout?.toString().trim() ?? '0';
+      firstCountNumber = Number.parseInt(raw, 10);
+      if (Number.isNaN(firstCountNumber)) firstCountNumber = 0;
     });
 
     await test.step('Update the template date to latest', async () => {
@@ -166,24 +176,26 @@ test.describe('Test System With Template', () => {
       // Refresh subscription manager so the client picks up the updated template content
       await refreshSubscriptionManager(regClient);
 
-      // Poll for errata count to increase. (Allows time for content propagation in CI
+      // Poll for errata count to increase (allows time for content propagation in CI)
       await expect
         .poll(
           async () => {
             await regClient.Exec(['dnf', 'clean', 'all']);
             const result = await regClient.Exec(
               ['sh', '-c', 'dnf updateinfo --list --all | grep RH | wc -l'],
-              2 * 60 * 1000,
+              ERRATA_POLL.dnfTimeout,
             );
-            return result?.stdout?.toString().trim();
+            const raw = result?.stdout?.toString().trim() ?? '0';
+            const count = Number.parseInt(raw, 10);
+            return Number.isNaN(count) ? 0 : count;
           },
           {
             message: 'Expect that there are more erratas after template update',
-            timeout: 120000,
-            intervals: [15000, 20000, 25000],
+            timeout: ERRATA_POLL.timeout,
+            intervals: [...ERRATA_POLL.intervals],
           },
         )
-        .not.toBe(firstCount);
+        .toBeGreaterThan(firstCountNumber);
 
       await runCmd(
         'vim-enhanced should not be installed',
