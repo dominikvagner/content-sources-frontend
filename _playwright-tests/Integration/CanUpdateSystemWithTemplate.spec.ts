@@ -102,7 +102,7 @@ test.describe('Test System With Template', () => {
         regClient,
         10 * 60 * 1000,
       );
-      firstCount = count?.stdout?.toString();
+      firstCount = count?.stdout?.toString().trim();
     });
 
     await test.step('Update the template date to latest', async () => {
@@ -163,16 +163,27 @@ test.describe('Test System With Template', () => {
     });
 
     await test.step('Install from the updated template', async () => {
-      await runCmd('Clean cached metadata', ['dnf', 'clean', 'all'], regClient);
+      // Refresh subscription manager so the client picks up the updated template content
+      await refreshSubscriptionManager(regClient);
 
-      const updateCount = await runCmd(
-        'List available packages',
-        ['sh', '-c', 'dnf updateinfo --list --all | grep RH | wc -l'],
-        regClient,
-        10 * 60 * 1000,
-      );
-      const secondCount = updateCount?.stdout?.toString();
-      expect(secondCount, 'Expect that there are more erratas').not.toBe(firstCount);
+      // Poll for errata count to increase. (Allows time for content propagation in CI
+      await expect
+        .poll(
+          async () => {
+            await regClient.Exec(['dnf', 'clean', 'all']);
+            const result = await regClient.Exec(
+              ['sh', '-c', 'dnf updateinfo --list --all | grep RH | wc -l'],
+              2 * 60 * 1000,
+            );
+            return result?.stdout?.toString().trim();
+          },
+          {
+            message: 'Expect that there are more erratas after template update',
+            timeout: 120000,
+            intervals: [15000, 20000, 25000],
+          },
+        )
+        .not.toBe(firstCount);
 
       await runCmd(
         'vim-enhanced should not be installed',
