@@ -1,5 +1,4 @@
-import { expect, test } from 'test-utils';
-import { cleanupRepositories, randomName } from 'test-utils/helpers';
+import { expect, test, cleanupRepositories, cleanupTemplates, randomName } from 'test-utils';
 import { REPO_VALID_STATUS_TIMEOUT_MS, SNAPSHOT_DIALOG_TIMEOUT_MS } from '../testConstants';
 import {
   navigateToRepositories,
@@ -110,18 +109,18 @@ test.describe('Snapshot Repositories', () => {
   test('Snapshot deletion', async ({ page, client, cleanup }) => {
     const smallRHRepo = 'Red Hat CodeReady Linux Builder for RHEL 9 ARM 64 (RPMs)';
     const repoNamePrefix = 'snapshot-deletion';
+    const templateNamePrefix = 'Test-template-for-snapshot-deletion';
     const repoName = `${repoNamePrefix}-${randomName()}`;
-    const templateName = `Test-template-for-snapshot-deletion-${randomName()}`;
+    const templateName = `${templateNamePrefix}-${randomName()}`;
 
-    await test.step('Cleanup repositories using "zoo" URLs', async () => {
-      await cleanup.runAndAdd(() =>
-        cleanupRepositories(
-          client,
-          repoNamePrefix,
-          'https://fedorapeople.org/groups/katello/fakerepos/zoo',
-        ),
-      );
-    });
+    await cleanup.runAndAdd(() =>
+      cleanupRepositories(
+        client,
+        repoNamePrefix,
+        'https://fedorapeople.org/groups/katello/fakerepos/zoo',
+      ),
+    );
+    await cleanup.runAndAdd(() => cleanupTemplates(client, templateNamePrefix));
 
     await navigateToRepositories(page);
     await closeGenericPopupsIfExist(page);
