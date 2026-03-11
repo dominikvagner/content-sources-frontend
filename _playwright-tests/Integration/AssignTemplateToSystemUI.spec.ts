@@ -1,5 +1,5 @@
 import { test, expect, cleanupTemplates, randomName } from 'test-utils';
-import { refreshSubscriptionManager, RHSMClient } from './helpers/rhsmClient';
+import { refreshSubscriptionManager, RHSMClient, waitForRhcdActive } from './helpers/rhsmClient';
 import { runCmd } from './helpers/helpers';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
 import { closeGenericPopupsIfExist, getRowByNameOrUrl } from '../UI/helpers/helpers';
@@ -28,7 +28,9 @@ test.describe('Assign Template to System via UI', () => {
         console.log('Registration stdout:', reg?.stdout);
         console.log('Registration stderr:', reg?.stderr);
       }
+      expect(reg?.exitCode, 'Expect registering to be successful').toBe(0);
 
+      await waitForRhcdActive(regClient, 60, 2000);
       await waitInPatch(page, hostname, false);
 
       const packageUrl = await runCmd(

@@ -13,6 +13,8 @@ const regClient = new RHSMClient(`RHSMClientTest-${randomName()}`);
 
 test.describe('Register and assign template to systems via API', () => {
   test('Create template and assign to systems via API', async ({ page, client, cleanup }) => {
+    test.setTimeout(900000); // 15 min for CI (template creation, container boot, cleanup)
+
     const templateName = `${templateNamePrefix}-${randomName()}`;
 
     await test.step('Set up cleanup for repositories, templates, and RHSM client', async () => {
@@ -97,8 +99,8 @@ test.describe('Register and assign template to systems via API', () => {
       }
       expect(reg?.exitCode, 'Expect registering to be successful').toBe(0);
 
+      await waitForRhcdActive(regClient, 60, 2000);
       await refreshSubscriptionManager(regClient);
-      await waitForRhcdActive(regClient);
     });
 
     await test.step('Verify system is attached to template', async () => {

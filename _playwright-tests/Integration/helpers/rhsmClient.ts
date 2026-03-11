@@ -74,7 +74,7 @@ export class RHSMClient {
     }
 
     console.warn(
-      `Services may not be fully ready for container ${this.name} after ${maxAttempts} seconds`,
+      `Services might not be fully ready for container ${this.name} after ${maxAttempts} seconds`,
     );
   }
 
@@ -216,17 +216,18 @@ export class RHSMClient {
    * @returns
    */
   async Unregister(withRhc: boolean) {
+    const disconnectTimeoutMs = 10000; // Allow time for remote server communication
     if (withRhc) {
       console.log('Logging status of rhcd.service before attempting to disconnect');
-      const stream = await runCommand(this.name, ['systemctl', 'status', 'rhcd.service']);
+      const stream = await runCommand(this.name, ['systemctl', 'status', 'rhcd.service'], 5000);
       if (stream) {
         console.log(stream.stdout);
         console.log(stream.stderr);
         console.log(stream.exitCode);
       }
-      return runCommand(this.name, ['rhc', 'disconnect']);
+      return runCommand(this.name, ['rhc', 'disconnect'], disconnectTimeoutMs);
     } else {
-      return runCommand(this.name, ['subscription-manager', 'disconnect']);
+      return runCommand(this.name, ['subscription-manager', 'disconnect'], disconnectTimeoutMs);
     }
   }
 
