@@ -33,13 +33,14 @@ test.describe('Assign Template to System via UI', () => {
 
       const packageUrl = await runCmd(
         'Get download URL for vim-enhanced from base CDN',
-        ['dnf', 'repoquery', '--location', 'vim-enhanced'],
+        ['dnf', 'repoquery', '--quiet', '--location', 'vim-enhanced'],
         regClient,
         120000,
       );
-      console.log('Package download URL from base CDN:', packageUrl?.stdout);
+      const baseCdnOutput = [packageUrl?.stdout, packageUrl?.stderr].filter(Boolean).join('\n');
+      console.log('Package download URL from base CDN:', baseCdnOutput);
       expect(
-        packageUrl?.stdout,
+        baseCdnOutput,
         'Package download URL should be from base CDN, not template',
       ).not.toContain('/templates/');
     });
@@ -111,17 +112,21 @@ test.describe('Assign Template to System via UI', () => {
         1,
       );
 
-      const packageUrl = await runCmd(
-        'Get download URL for vim-enhanced from template',
-        ['dnf', 'repoquery', '--location', 'vim-enhanced'],
-        regClient,
-        120000,
-      );
-      console.log('Package download URL from template:', packageUrl?.stdout);
-      expect(
-        packageUrl?.stdout,
-        'Package download URL should be from template, not base CDN',
-      ).toContain('/templates/');
+      // Poll for template URL (content propagation can be slow in CI)
+      await expect
+        .poll(
+          async () => {
+            const res = await regClient.Exec(
+              ['dnf', 'repoquery', '--quiet', '--location', 'vim-enhanced'],
+              120000,
+            );
+            const output = [res?.stdout, res?.stderr].filter(Boolean).join('\n');
+            console.log('Package download URL from template:', output);
+            return output;
+          },
+          { timeout: 120000, intervals: [10000, 15000, 20000] },
+        )
+        .toContain('/templates/');
 
       await runCmd(
         'Install vim-enhanced',
