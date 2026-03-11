@@ -1,9 +1,14 @@
 import { type Page, type Locator } from '@playwright/test';
 import { test } from 'test-utils';
+import {
+  PAGE_NAVIGATION_TIMEOUT_MS,
+  PAGE_NAVIGATION_QUICK_TIMEOUT_MS,
+  PAGE_READY_TIMEOUT_MS,
+} from '../../testConstants';
 import { retry } from './helpers';
 
 const navigateToRepositoriesFunc = async (page: Page) => {
-  await page.goto('/insights/content/repositories', { timeout: 20000 });
+  await page.goto('/insights/content/repositories', { timeout: PAGE_NAVIGATION_TIMEOUT_MS });
 
   const zeroState = page.getByText('Start using Content management now');
 
@@ -12,8 +17,8 @@ const navigateToRepositoriesFunc = async (page: Page) => {
   // Wait for either list page or zerostate
   try {
     await Promise.race([
-      repositoriesListPage.waitFor({ state: 'visible', timeout: 30000 }),
-      zeroState.waitFor({ state: 'visible', timeout: 30000 }),
+      repositoriesListPage.waitFor({ state: 'visible', timeout: PAGE_READY_TIMEOUT_MS }),
+      zeroState.waitFor({ state: 'visible', timeout: PAGE_READY_TIMEOUT_MS }),
     ]);
   } catch (error) {
     throw new Error(
@@ -46,12 +51,12 @@ export const navigateToRepositories = async (page: Page) => {
 };
 
 const navigateToTemplatesFunc = async (page: Page) => {
-  await page.goto('/insights/content/templates', { timeout: 10000 });
+  await page.goto('/insights/content/templates', { timeout: PAGE_NAVIGATION_QUICK_TIMEOUT_MS });
 
   const templateText = page.getByText('View all content templates within your organization.');
 
   // Wait for either list page or zerostate
-  await templateText.waitFor({ state: 'visible', timeout: 30000 });
+  await templateText.waitFor({ state: 'visible', timeout: PAGE_READY_TIMEOUT_MS });
 };
 
 export const navigateToTemplates = async (page: Page) => {

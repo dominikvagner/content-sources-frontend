@@ -1,4 +1,5 @@
 import { URL } from 'url';
+import { RHSM } from '../../testConstants';
 import { ExecReturn, killContainer, runCommand, startNewContainer } from './containers';
 
 /**
@@ -51,7 +52,7 @@ export class RHSMClient {
         const dbusCheck = await runCommand(
           this.name,
           ['test', '-S', '/var/run/dbus/system_bus_socket'],
-          1000,
+          RHSM.dbusCheckTimeoutMs,
         );
         if (dbusCheck?.exitCode === 0) {
           console.log(`Services ready for container ${this.name}`);
@@ -61,7 +62,7 @@ export class RHSMClient {
         // If dbus socket doesn't exist, try to start dbus service
         if (attempts === 5) {
           console.log(`Attempting to start dbus service for container ${this.name}`);
-          await runCommand(this.name, ['systemctl', 'start', 'dbus'], 5000);
+          await runCommand(this.name, ['systemctl', 'start', 'dbus'], RHSM.dbusStartTimeoutMs);
         }
       } catch {
         console.log(
@@ -69,7 +70,7 @@ export class RHSMClient {
         );
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
+      await new Promise((resolve) => setTimeout(resolve, RHSM.pollDelayMs));
       attempts++;
     }
 
@@ -129,7 +130,7 @@ export class RHSMClient {
       connect.push('--content-template');
       connect.push(`${template}`);
     }
-    const result = await runCommand(this.name, connect, 75000);
+    const result = await runCommand(this.name, connect, RHSM.connectTimeoutMs);
 
     if (result && result.exitCode !== 0) {
       console.log('RHC registration failed with exit code:', result.exitCode);
@@ -204,7 +205,7 @@ export class RHSMClient {
    * @returns The host name of the container as a string
    */
   async GetHostname(): Promise<string> {
-    const result = await this.Exec(['hostname'], 5000);
+    const result = await this.Exec(['hostname'], RHSM.statusCheckTimeoutMs);
     if (result?.exitCode !== 0) {
       throw new Error(`Failed to get hostname: ${result?.stderr}`);
     }
@@ -216,18 +217,25 @@ export class RHSMClient {
    * @returns
    */
   async Unregister(withRhc: boolean) {
-    const disconnectTimeoutMs = 10000; // Allow time for remote server communication
     if (withRhc) {
       console.log('Logging status of rhcd.service before attempting to disconnect');
-      const stream = await runCommand(this.name, ['systemctl', 'status', 'rhcd.service'], 5000);
+      const stream = await runCommand(
+        this.name,
+        ['systemctl', 'status', 'rhcd.service'],
+        RHSM.serviceStatusTimeoutMs,
+      );
       if (stream) {
         console.log(stream.stdout);
         console.log(stream.stderr);
         console.log(stream.exitCode);
       }
-      return runCommand(this.name, ['rhc', 'disconnect'], disconnectTimeoutMs);
+      return runCommand(this.name, ['rhc', 'disconnect'], RHSM.disconnectTimeoutMs);
     } else {
-      return runCommand(this.name, ['subscription-manager', 'disconnect'], disconnectTimeoutMs);
+      return runCommand(
+        this.name,
+        ['subscription-manager', 'disconnect'],
+        RHSM.disconnectTimeoutMs,
+      );
     }
   }
 
@@ -293,7 +301,10 @@ export async function waitForRhcdActive(
 ): Promise<void> {
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      const result = await client.Exec(['systemctl', 'is-active', 'rhcd.service'], 5000);
+      const result = await client.Exec(
+        ['systemctl', 'is-active', 'rhcd.service'],
+        RHSM.statusCheckTimeoutMs,
+      );
 
       if (result && result.exitCode === 0 && result.stdout?.trim() === 'active') {
         console.log(`rhcd service is active (attempt ${attempt}/${maxAttempts})`);

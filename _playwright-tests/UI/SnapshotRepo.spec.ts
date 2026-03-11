@@ -1,5 +1,6 @@
 import { expect, test } from 'test-utils';
 import { cleanupRepositories, randomName } from 'test-utils/helpers';
+import { REPO_VALID_STATUS_TIMEOUT_MS, SNAPSHOT_DIALOG_TIMEOUT_MS } from '../testConstants';
 import {
   navigateToRepositories,
   navigateToSnapshotsOfRepository,
@@ -134,7 +135,7 @@ test.describe('Snapshot Repositories', () => {
         .getByRole('textbox', { name: 'URL', exact: true })
         .fill('https://fedorapeople.org/groups/katello/fakerepos/zoo/');
       await page.getByRole('button', { name: 'Save', exact: true }).click();
-      await waitForValidStatus(page, repoName, 70000);
+      await waitForValidStatus(page, repoName, REPO_VALID_STATUS_TIMEOUT_MS);
     });
 
     await test.step('Edit the repository', async () => {
@@ -155,7 +156,7 @@ test.describe('Snapshot Repositories', () => {
       const row = await waitForValidStatus(page, repoName);
       await navigateToSnapshotsOfRepository(page, row);
       await expect(page.getByRole('button', { name: '1 - 4 of 4' }).first()).toBeVisible({
-        timeout: 60000,
+        timeout: SNAPSHOT_DIALOG_TIMEOUT_MS,
       });
     });
 
@@ -211,7 +212,7 @@ test.describe('Snapshot Repositories', () => {
       await expect(page.getByText('Delete snapshots?')).toBeVisible();
       await page.getByText('Delete', { exact: true }).click();
       await expect(page.getByRole('button', { name: '1 - 3 of 3' }).first()).toBeVisible({
-        timeout: 60000,
+        timeout: SNAPSHOT_DIALOG_TIMEOUT_MS,
       });
       await page.getByText('Close').click();
     });
@@ -234,7 +235,7 @@ test.describe('Snapshot Repositories', () => {
       await page.getByText('Delete', { exact: true }).click();
 
       await expect(page.getByRole('button', { name: '1 - 1 of 1' }).first()).toBeVisible({
-        timeout: 60000,
+        timeout: SNAPSHOT_DIALOG_TIMEOUT_MS,
       });
       await page.getByText('Close').click();
     });

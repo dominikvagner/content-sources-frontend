@@ -1,4 +1,12 @@
 import { test, expect, cleanupTemplates, randomName } from 'test-utils';
+import {
+  CONTENT_PROPAGATION_POLL,
+  DNF_COMMAND_TIMEOUT_MS,
+  MODAL_VISIBILITY_TIMEOUT_MS,
+  RHSM_RHCD_WAIT,
+  SYSTEM_ROW_VISIBILITY_TIMEOUT_MS,
+  YUM_INSTALL_TIMEOUT_MS,
+} from '../testConstants';
 import { refreshSubscriptionManager, RHSMClient, waitForRhcdActive } from './helpers/rhsmClient';
 import { runCmd } from './helpers/helpers';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
@@ -30,14 +38,14 @@ test.describe('Assign Template to System via UI', () => {
       }
       expect(reg?.exitCode, 'Expect registering to be successful').toBe(0);
 
-      await waitForRhcdActive(regClient, 60, 2000);
+      await waitForRhcdActive(regClient, RHSM_RHCD_WAIT.maxAttempts, RHSM_RHCD_WAIT.delayMs);
       await waitInPatch(page, hostname, false);
 
       const packageUrl = await runCmd(
         'Get download URL for vim-enhanced from base CDN',
         ['dnf', 'repoquery', '--quiet', '--location', 'vim-enhanced'],
         regClient,
-        120000,
+        DNF_COMMAND_TIMEOUT_MS,
       );
       const baseCdnOutput = [packageUrl?.stdout, packageUrl?.stderr].filter(Boolean).join('\n');
       console.log('Package download URL from base CDN:', baseCdnOutput);
@@ -86,20 +94,20 @@ test.describe('Assign Template to System via UI', () => {
 
     await test.step('Assign template to systems', async () => {
       const modalPage = page.getByRole('dialog', { name: 'Assign template to systems' });
-      await expect(modalPage).toBeVisible({ timeout: 30000 });
+      await expect(modalPage).toBeVisible({ timeout: MODAL_VISIBILITY_TIMEOUT_MS });
 
       await expect(modalPage.getByRole('button', { name: 'Save', exact: true })).toBeDisabled({
-        timeout: 30000,
+        timeout: MODAL_VISIBILITY_TIMEOUT_MS,
       });
 
       const rowSystem = await getRowByNameOrUrl(modalPage, hostname);
       await rowSystem.getByRole('checkbox').check();
 
       await modalPage.getByRole('button', { name: 'Save', exact: true }).click();
-      await expect(modalPage).toBeHidden({ timeout: 30000 });
+      await expect(modalPage).toBeHidden({ timeout: MODAL_VISIBILITY_TIMEOUT_MS });
 
       const systemRow = await getRowByNameOrUrl(page, hostname);
-      await expect(systemRow).toBeVisible({ timeout: 30000 });
+      await expect(systemRow).toBeVisible({ timeout: SYSTEM_ROW_VISIBILITY_TIMEOUT_MS });
     });
 
     await test.step('Verify the host can install packages from the template', async () => {
@@ -110,7 +118,7 @@ test.describe('Assign Template to System via UI', () => {
         'vim-enhanced should not be installed',
         ['rpm', '-q', 'vim-enhanced'],
         regClient,
-        120000,
+        DNF_COMMAND_TIMEOUT_MS,
         1,
       );
 
@@ -120,13 +128,16 @@ test.describe('Assign Template to System via UI', () => {
           async () => {
             const res = await regClient.Exec(
               ['dnf', 'repoquery', '--quiet', '--location', 'vim-enhanced'],
-              120000,
+              DNF_COMMAND_TIMEOUT_MS,
             );
             const output = [res?.stdout, res?.stderr].filter(Boolean).join('\n');
             console.log('Package download URL from template:', output);
             return output;
           },
-          { timeout: 120000, intervals: [10000, 15000, 20000] },
+          {
+            timeout: CONTENT_PROPAGATION_POLL.timeout,
+            intervals: [...CONTENT_PROPAGATION_POLL.intervals],
+          },
         )
         .toContain('/templates/');
 
@@ -134,7 +145,7 @@ test.describe('Assign Template to System via UI', () => {
         'Install vim-enhanced',
         ['yum', 'install', '-y', 'vim-enhanced'],
         regClient,
-        120000,
+        YUM_INSTALL_TIMEOUT_MS,
       );
 
       await runCmd('vim-enhanced should be installed', ['rpm', '-q', 'vim-enhanced'], regClient);

@@ -7,6 +7,14 @@ import {
   randomName,
   waitWhileRepositoryIsPending,
 } from 'test-utils';
+import {
+  BULK_TASK_TIMEOUT_MS,
+  LONG_TEST_TIMEOUT_MS,
+  MODAL_VISIBILITY_TIMEOUT_MS,
+  TEMPLATE_VALID_STATUS_TIMEOUT_MS,
+  UPLOAD_COMPLETION_TIMEOUT_MS,
+  YUM_INSTALL_QUICK_TIMEOUT_MS,
+} from '../testConstants';
 import { RHSMClient, refreshSubscriptionManager } from './helpers/rhsmClient';
 import { runCmd } from './helpers/helpers';
 import { navigateToRepositories, navigateToTemplates } from '../UI/helpers/navHelpers';
@@ -22,7 +30,7 @@ const uploadRepoNamePrefix = 'Upload_Repo';
 test.describe('Install Upload Repo Content', () => {
   test('Install Upload Repo Content', async ({ page, client, cleanup }) => {
     // Increase timeout for CI environment because template validation can take up to 11 minutes
-    test.setTimeout(900000); // 15 minutes
+    test.setTimeout(LONG_TEST_TIMEOUT_MS);
 
     const uploadRepoName = `${uploadRepoNamePrefix}_${randomName()}`;
     const templateNamePrefix = 'integration_test_upload_repo';
@@ -53,7 +61,7 @@ test.describe('Install Upload Repo Content', () => {
         page.waitForResponse(
           (resp) =>
             resp.url().includes('/bulk_create/') && resp.status() >= 200 && resp.status() < 300,
-          { timeout: 600000 },
+          { timeout: BULK_TASK_TIMEOUT_MS },
         ),
       ]);
 
@@ -71,10 +79,12 @@ test.describe('Install Upload Repo Content', () => {
         const fileInput = page.locator('input[type=file]').first();
         await fileInput.setInputFiles(filePath);
       });
-      await expect(page.getByText('All uploads completed!')).toBeVisible({ timeout: 240000 });
+      await expect(page.getByText('All uploads completed!')).toBeVisible({
+        timeout: UPLOAD_COMPLETION_TIMEOUT_MS,
+      });
       await page.getByRole('button', { name: 'Confirm changes' }).click();
       await expect(page.getByRole('dialog', { name: 'Upload content' })).toBeHidden({
-        timeout: 30000,
+        timeout: MODAL_VISIBILITY_TIMEOUT_MS,
       });
       await closeNotificationPopup(page, `One rpm successfully uploaded to ${uploadRepoName}`);
       // Wait for the repository row to appear, display 1 package, and reach Valid status
@@ -110,7 +120,7 @@ test.describe('Install Upload Repo Content', () => {
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       await page.getByRole('button', { name: 'Create other options' }).click();
       await page.getByText('Create template only', { exact: true }).click();
-      await waitForValidStatus(page, templateName, 660000);
+      await waitForValidStatus(page, templateName, TEMPLATE_VALID_STATUS_TIMEOUT_MS);
     });
 
     await test.step('Register system with template using RHSM client', async () => {
@@ -136,10 +146,15 @@ test.describe('Install Upload Repo Content', () => {
         'bear package should not be installed',
         ['rpm', '-q', 'bear'],
         regClient,
-        60000,
+        YUM_INSTALL_QUICK_TIMEOUT_MS,
         1,
       );
-      await runCmd('Install bear package', ['yum', 'install', '-y', 'bear'], regClient, 60000);
+      await runCmd(
+        'Install bear package',
+        ['yum', 'install', '-y', 'bear'],
+        regClient,
+        YUM_INSTALL_QUICK_TIMEOUT_MS,
+      );
       await runCmd('bear package should be installed', ['rpm', '-q', 'bear'], regClient);
       const dnfVerifyRepo = await runCmd(
         'Verify that bear was installed from the upload repo',

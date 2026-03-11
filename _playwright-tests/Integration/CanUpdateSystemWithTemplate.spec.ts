@@ -6,6 +6,14 @@ import {
   TemplatesApi,
   ListTemplatesRequest,
 } from 'test-utils';
+import {
+  DNF_UPDATEINFO_TIMEOUT_MS,
+  ERRATA_POLL,
+  LONG_TEST_TIMEOUT_MS,
+  TEMPLATE_UPDATE_TASK_POLL,
+  TEMPLATE_VALID_STATUS_TIMEOUT_MS,
+  YUM_INSTALL_QUICK_TIMEOUT_MS,
+} from '../testConstants';
 import { RHSMClient, refreshSubscriptionManager, waitForRhcdActive } from './helpers/rhsmClient';
 import { runCmd } from './helpers/helpers';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
@@ -19,13 +27,6 @@ const templateNamePrefix = 'integration_test_template';
 const templateName = `${templateNamePrefix}-${randomName()}`;
 const regClient = new RHSMClient(`RHSMClientTest-${randomName()}`);
 
-/** Poll config for errata count checks (content propagation in CI can be slow) */
-const ERRATA_POLL = {
-  timeout: 120000,
-  intervals: [15000, 20000, 25000] as const,
-  dnfTimeout: 2 * 60 * 1000,
-};
-
 let firstCountNumber: number;
 
 test.describe('Test System With Template', () => {
@@ -38,7 +39,7 @@ test.describe('Test System With Template', () => {
 
   test('Verify system updates with template', async ({ page, client, cleanup }) => {
     // Increase timeout for CI environment because template update tasks can take longer
-    test.setTimeout(900000); // 15 minutes
+    test.setTimeout(LONG_TEST_TIMEOUT_MS);
 
     const HARepo = 'Red Hat Enterprise Linux 9 for x86_64 - High Availability';
 
@@ -79,7 +80,7 @@ test.describe('Test System With Template', () => {
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       await page.getByRole('button', { name: 'Create other options' }).click();
       await page.getByText('Create template only', { exact: true }).click();
-      await waitForValidStatus(page, templateName, 660000);
+      await waitForValidStatus(page, templateName, TEMPLATE_VALID_STATUS_TIMEOUT_MS);
     });
 
     await test.step('Create RHSM client and register the template', async () => {
@@ -108,7 +109,7 @@ test.describe('Test System With Template', () => {
         'List available packages',
         ['sh', '-c', 'dnf updateinfo --list --all | grep RH | wc -l'],
         regClient,
-        10 * 60 * 1000,
+        DNF_UPDATEINFO_TIMEOUT_MS,
       );
       const raw = count?.stdout?.toString().trim() ?? '0';
       firstCountNumber = Number.parseInt(raw, 10);
@@ -165,8 +166,8 @@ test.describe('Test System With Template', () => {
           },
           {
             message: 'Wait for template update task to complete',
-            timeout: 660000,
-            intervals: [5000, 10000, 10000, 10000, 10000],
+            timeout: TEMPLATE_UPDATE_TASK_POLL.timeout,
+            intervals: [...TEMPLATE_UPDATE_TASK_POLL.intervals],
           },
         )
         .toBe('completed');
@@ -201,7 +202,7 @@ test.describe('Test System With Template', () => {
         'vim-enhanced should not be installed',
         ['rpm', '-q', 'vim-enhanced'],
         regClient,
-        60000,
+        YUM_INSTALL_QUICK_TIMEOUT_MS,
         1,
       );
 
@@ -209,7 +210,7 @@ test.describe('Test System With Template', () => {
         'Install vim-enhanced',
         ['yum', 'install', '-y', 'vim-enhanced'],
         regClient,
-        60000,
+        YUM_INSTALL_QUICK_TIMEOUT_MS,
       );
 
       await runCmd('vim-enhanced should be installed', ['rpm', '-q', 'vim-enhanced'], regClient);
@@ -218,7 +219,7 @@ test.describe('Test System With Template', () => {
         'Install booth from the HA layered repo',
         ['yum', 'install', '-y', 'booth'],
         regClient,
-        60000,
+        YUM_INSTALL_QUICK_TIMEOUT_MS,
       );
 
       await runCmd('booth should be installed', ['rpm', '-q', 'booth'], regClient);

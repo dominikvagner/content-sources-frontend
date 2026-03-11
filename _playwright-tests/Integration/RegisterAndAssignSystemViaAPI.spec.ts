@@ -1,4 +1,9 @@
 import { test, expect, cleanupTemplates, randomName } from 'test-utils';
+import {
+  LONG_TEST_TIMEOUT_MS,
+  RHSM_RHCD_WAIT,
+  SYSTEM_ATTACHMENT_VISIBILITY_TIMEOUT_MS,
+} from '../testConstants';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
 import {
   closeGenericPopupsIfExist,
@@ -13,7 +18,7 @@ const regClient = new RHSMClient(`RHSMClientTest-${randomName()}`);
 
 test.describe('Register and assign template to systems via API', () => {
   test('Create template and assign to systems via API', async ({ page, client, cleanup }) => {
-    test.setTimeout(900000); // 15 min for CI (template creation, container boot, cleanup)
+    test.setTimeout(LONG_TEST_TIMEOUT_MS);
 
     const templateName = `${templateNamePrefix}-${randomName()}`;
 
@@ -99,7 +104,7 @@ test.describe('Register and assign template to systems via API', () => {
       }
       expect(reg?.exitCode, 'Expect registering to be successful').toBe(0);
 
-      await waitForRhcdActive(regClient, 60, 2000);
+      await waitForRhcdActive(regClient, RHSM_RHCD_WAIT.maxAttempts, RHSM_RHCD_WAIT.delayMs);
       await refreshSubscriptionManager(regClient);
     });
 
@@ -110,7 +115,9 @@ test.describe('Register and assign template to systems via API', () => {
 
       // Check if system row is visible with extended timeout
       const systemRow = page.getByRole('row').filter({ hasText: hostname });
-      await expect(systemRow).toBeVisible({ timeout: 120000 });
+      await expect(systemRow).toBeVisible({
+        timeout: SYSTEM_ATTACHMENT_VISIBILITY_TIMEOUT_MS,
+      });
     });
   });
 });

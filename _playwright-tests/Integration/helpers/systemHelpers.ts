@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { performance } from 'perf_hooks';
+import { INVENTORY_PATCH_POLL_TIMEOUT_MS } from '../../testConstants';
 
 /**
  * Count matching systems in Patch.
@@ -72,7 +73,7 @@ export const waitInPatch = async (
   await expect
     .poll(async () => await isInInventory(page, hostname), {
       message: 'System did not appear in inventory in time',
-      timeout: 600_000,
+      timeout: INVENTORY_PATCH_POLL_TIMEOUT_MS,
     })
     .toBe(1);
 
@@ -81,7 +82,7 @@ export const waitInPatch = async (
   await expect
     .poll(async () => await isInPatch(page, hostname, expectedAttachment), {
       message: 'System did not appear in patch in time',
-      timeout: 600_000,
+      timeout: INVENTORY_PATCH_POLL_TIMEOUT_MS,
     })
     .toBe(1);
 
