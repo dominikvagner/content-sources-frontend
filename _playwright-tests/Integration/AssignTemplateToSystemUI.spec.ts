@@ -55,7 +55,7 @@ test.describe('Assign Template to System via UI', () => {
     });
 
     await test.step('Create template', async () => {
-      await cleanup.runAndAdd(() => cleanupTemplates(client, templateName));
+      await cleanup.runAndAdd(() => cleanupTemplates(client, templateNamePrefix));
       cleanup.add(() => regClient.Destroy('rhc'));
 
       await closeGenericPopupsIfExist(page);
