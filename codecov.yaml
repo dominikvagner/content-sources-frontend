@@ -1,0 +1,24 @@
+ignore:
+  # Unit tests (Jest) (must not use **/*.spec.* so Playwright specs stay scannable)
+  - "**/*.test.*"
+  # Config files
+  - "config/**"
+  - "**/*.config.js"
+  - "**/*.config.ts"
+  - "**/*.config.mjs"
+  - "build-tools/**"
+  - "tsconfig*.json"
+  - ".watchmanconfig"
+
+coverage:
+  range: 60..80
+  status:
+    project: off
+    patch: off
+  parsers:
+    javascript:
+      enable_partials: yes
+
+comment:
+  layout: "diff, flags, files"
+  behavior: default

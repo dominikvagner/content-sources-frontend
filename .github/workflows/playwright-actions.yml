@@ -2,10 +2,12 @@ name: UI project tests
 on:
   pull_request:
     types: [opened, reopened, synchronize, labeled, unlabeled]
+  push:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
@@ -15,13 +17,13 @@ jobs:
       - instance-size:large
       - buildspec-override:true
     env:
-      COVERAGE: ${{ vars.COVERAGE || 'false' }}
+      COVERAGE: ${{ vars.COVERAGE || 'true' }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v5
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: recursive
 
       - name: Set up sparse checkout
@@ -202,3 +204,16 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 10
+
+      - name: Generate E2E coverage report
+        if: env.COVERAGE == 'true'
+        run: yarn coverage:report
+
+      - name: Upload Playwright E2E Coverage
+        if: env.COVERAGE == 'true'
+        uses: codecov/codecov-action@v5
+        with:
+          directory: ./coverage-e2e/
+          flags: e2e
+          name: playwright-tests
+          fail_ci_if_error: false

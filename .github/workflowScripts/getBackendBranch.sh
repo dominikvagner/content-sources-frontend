@@ -1,9 +1,12 @@
 #!/bin/bash
 
 # Check if the PR URL is provided as an argument
-if [ -z "$1" ]; then
-    echo "Usage: $0 <pr-url>"
-    exit 1
+# For push or workflow_dispatch (no PR), pass "null" or empty to use main branch
+if [ -z "$1" ] || [ "$1" = "null" ]; then
+    echo "No PR context; cloning main branch."
+    [ -d "content-sources-backend" ] && rm -rf content-sources-backend
+    git clone --branch main https://github.com/content-services/content-sources-backend.git content-sources-backend
+    exit 0
 fi
 
 # Variables
