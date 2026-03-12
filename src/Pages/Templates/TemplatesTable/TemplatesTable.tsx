@@ -40,9 +40,10 @@ import { DELETE_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
 import useDistributionDetails from '../../../Hooks/useDistributionDetails';
 import { useTemplateList } from 'services/Templates/TemplateQueries';
 import StatusIcon from './components/StatusIcon';
-import { ExclamationTriangleIcon, ExternalLinkAltIcon } from '@patternfly/react-icons';
+import { ExclamationTriangleIcon, ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { useFlag } from '@unleash/proxy-client-react';
+import { TEMPLATES_DOCS_URL } from './constants';
 
 const useStyles = createUseStyles({
   topContainer: {
@@ -68,9 +69,6 @@ const useStyles = createUseStyles({
   },
   bannerContainer: {
     padding: '24px 24px 0px',
-  },
-  templateDocLink: {
-    marginTop: '20px',
   },
 });
 
@@ -443,16 +441,15 @@ const TemplatesTable = () => {
                   </Button>
                 </ConditionalTooltip>
                 <Button
-                  className={classes.templateDocLink}
                   variant='link'
-                  ouiaId='snapshot_package_count_button'
-                  icon={<ExternalLinkAltIcon />}
+                  component='a'
+                  href={TEMPLATES_DOCS_URL}
+                  icon={<ExternalLinkSquareAltIcon />}
                   iconPosition='end'
-                  isInline
+                  target='_blank'
+                  rel='noopener noreferrer'
                 >
-                  <a href='https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/managing_system_content_and_patch_updates_on_rhel_systems/patching-using-content-templates_patch-service-overview'>
-                    Learn more about templates
-                  </a>
+                  Learn more about content templates
                 </Button>
               </>
             }

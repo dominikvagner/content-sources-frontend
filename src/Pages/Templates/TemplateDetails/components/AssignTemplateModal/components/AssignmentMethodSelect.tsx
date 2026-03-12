@@ -2,7 +2,7 @@ import React, { useRef, useMemo } from 'react';
 import { SimpleSelectOption, SimpleSelect } from '@patternfly/react-templates';
 import { Form, FormGroup, FormGroupLabelHelp, List, ListItem } from '@patternfly/react-core';
 import HelpPopover from '../../../../../../components/HelpPopover';
-import { MANAGING_TEMPLATES_DOCS_URL } from '../AssignTemplateModal';
+import { TEMPLATES_DOCS_URL } from '../../../../TemplatesTable/constants';
 
 export const AssignmentMethods = {
   SystemList: 'list',
@@ -80,7 +80,7 @@ const AssignmentMethodSelect = ({ selected, setSelected, hasCompatibleSystems }:
               </>
             }
             linkText='Learn more about content templates'
-            linkUrl={MANAGING_TEMPLATES_DOCS_URL}
+            linkUrl={TEMPLATES_DOCS_URL}
           >
             <FormGroupLabelHelp ref={labelHelpRef} aria-label='More info for name field' />
           </HelpPopover>

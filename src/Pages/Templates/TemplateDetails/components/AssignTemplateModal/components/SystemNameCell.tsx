@@ -6,6 +6,7 @@ import type { SystemItem } from '../../../../../../services/Systems/SystemsApi';
 import HelpPopover from '../../../../../../components/HelpPopover';
 import React from 'react';
 import { isVersionLockedSystem } from '../../../../TemplatesTable/helpers';
+import { TEMPLATES_DOCS_URL } from '../../../../TemplatesTable/constants';
 
 type Props = Pick<SystemItem, 'id'> &
   Pick<SystemItem['attributes'], 'display_name' | 'rhsm' | 'satellite_managed'> & {
@@ -18,9 +19,6 @@ type WarningItem = {
   title: string;
   description: string;
 };
-
-const ABOUT_TEMPLATES_DOCS_URL =
-  'https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html-single/managing_system_content_and_patch_updates_on_rhel_systems/index#about-content-templates_patching-using-content-templates';
 
 /**
  * Renders a system name with a warning icon if the system is incompatible with the template.
@@ -75,7 +73,7 @@ export default function SystemNameCell({
             triggerAction='hover'
             hasAutoWidth
             linkText='Learn more about template compatibility'
-            linkUrl={ABOUT_TEMPLATES_DOCS_URL}
+            linkUrl={TEMPLATES_DOCS_URL}
             bodyContent={<Content component={ContentVariants.small}>{warning.description}</Content>}
           >
             <Icon data-ouia-component-id='system-list-warning-icon' status='warning'>
