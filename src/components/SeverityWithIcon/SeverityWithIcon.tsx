@@ -1,41 +1,43 @@
-import { Grid } from '@patternfly/react-core';
-import { SecurityIcon } from '@patternfly/react-icons';
 import {
-  c_alert_m_warning__icon_Color,
-  c_alert_m_danger__icon_Color,
-  t_color_orange_50,
-  t_color_gray_50,
+  SeverityCriticalIcon,
+  SeverityImportantIcon,
+  SeverityModerateIcon,
+  SeverityMinorIcon,
+  SeverityNoneIcon,
+} from '@patternfly/react-icons';
+import {
+  t_global_color_severity_critical_100,
+  t_global_color_severity_important_100,
+  t_global_color_severity_moderate_100,
+  t_global_color_severity_minor_100,
+  t_global_color_severity_none_100,
+  t_global_spacer_sm,
 } from '@patternfly/react-tokens';
-
+import { useMemo } from 'react';
 import { createUseStyles } from 'react-jss';
 
-const useStyles = (color: string) => {
-  let finalColor = 'initial';
-  switch (color) {
-    case 'critical':
-      finalColor = c_alert_m_danger__icon_Color.value;
-      break;
-    case 'important':
-      finalColor = t_color_orange_50.value;
+const useStyles = (severity: string) => {
+  let color: string = t_global_color_severity_none_100.value;
+  switch (severity) {
+    case 'minor':
+    case 'low':
+      color = t_global_color_severity_minor_100.value;
       break;
     case 'moderate':
-      finalColor = c_alert_m_warning__icon_Color.value;
+      color = t_global_color_severity_moderate_100.value;
       break;
-    case 'low':
-      finalColor = t_color_gray_50.value;
+    case 'important':
+      color = t_global_color_severity_important_100.value;
       break;
-    default:
+    case 'critical':
+      color = t_global_color_severity_critical_100.value;
       break;
   }
 
   return createUseStyles({
-    iconColor: {
-      fill: finalColor,
-      marginRight: '4px',
-    },
-    wrapper: {
-      display: 'inline-flex',
-      alignItems: 'center',
+    icon: {
+      fill: color,
+      marginRight: t_global_spacer_sm.var,
     },
   });
 };
@@ -44,17 +46,30 @@ interface Props {
   severity: string;
 }
 
-const severityTypes = new Set(['critical', 'important', 'moderate', 'low']);
-
-export default function SeverityWithIcon({ severity }: Props) {
+export default function SeverityIcon({ severity }: Props) {
   const loweredSeverity = severity?.toLowerCase();
   const classes = useStyles(loweredSeverity)();
 
-  const isOther = !severityTypes.has(loweredSeverity);
+  const Icon = useMemo(() => {
+    switch (loweredSeverity) {
+      case 'minor':
+      case 'low':
+        return SeverityMinorIcon;
+      case 'moderate':
+        return SeverityModerateIcon;
+      case 'important':
+        return SeverityImportantIcon;
+      case 'critical':
+        return SeverityCriticalIcon;
+      default:
+        return SeverityNoneIcon;
+    }
+  }, [loweredSeverity]);
 
   return (
-    <Grid className={classes.wrapper}>
-      {isOther ? null : <SecurityIcon className={classes.iconColor} />} {severity}
-    </Grid>
+    <>
+      <Icon className={classes.icon} />
+      {severity}
+    </>
   );
 }

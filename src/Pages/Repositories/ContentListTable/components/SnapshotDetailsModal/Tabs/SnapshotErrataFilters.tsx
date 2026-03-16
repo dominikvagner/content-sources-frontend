@@ -17,7 +17,6 @@ import { FilterIcon, SearchIcon } from '@patternfly/react-icons';
 import { createUseStyles } from 'react-jss';
 import useDebounce from 'Hooks/useDebounce';
 import Hide from 'components/Hide/Hide';
-import SeverityWithIcon from 'components/SeverityWithIcon/SeverityWithIcon';
 import { isEmpty } from 'lodash';
 
 const useStyles = createUseStyles({
@@ -182,7 +181,7 @@ export default function SnapshotErrataFilters({ isLoading, setFilterData, filter
                   component='button'
                   data-ouia-component-id={`filter_${sev}`}
                 >
-                  <SeverityWithIcon severity={sev} />
+                  {sev}
                 </DropdownItem>
               ))}
             </DropdownList>
