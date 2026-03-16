@@ -5,6 +5,7 @@ import {
   randomName,
   TemplatesApi,
   ListTemplatesRequest,
+  ensureValidToken,
 } from 'test-utils';
 import {
   DNF_UPDATEINFO_TIMEOUT_MS,
@@ -16,6 +17,7 @@ import {
 } from '../testConstants';
 import { RHSMClient, refreshSubscriptionManager, waitForRhcdActive } from './helpers/rhsmClient';
 import { runCmd } from './helpers/helpers';
+import { createApiConfigWithDynamicToken } from './helpers/apiHelpers';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
 import {
   closeGenericPopupsIfExist,
@@ -143,13 +145,18 @@ test.describe('Test System With Template', () => {
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       await page.getByRole('button', { name: 'Confirm changes', exact: true }).click();
 
-      // Wait for the template update task to complete
+      // Wait for the template update task to complete. Check the token validity before each poll
+      // because the JWT can expire mid-test.
+      const tokenBaseName = 'LAYERED_REPO_TOKEN';
+      const apiBasePath = process.env.BASE_URL + '/api/content-sources/v1';
+      const dynamicClient = createApiConfigWithDynamicToken(tokenBaseName, apiBasePath);
       await expect
         .poll(
           async () => {
-            const templates = await new TemplatesApi(client).listTemplates(<ListTemplatesRequest>{
-              name: templateName,
-            });
+            await ensureValidToken(page, `${tokenBaseName}.json`, 5);
+            const templates = await new TemplatesApi(dynamicClient).listTemplates(<
+              ListTemplatesRequest
+            >{ name: templateName });
             const template = templates.data?.[0];
             const taskStatus = template?.lastUpdateTask?.status;
             const taskError = template?.lastUpdateTask?.error;
