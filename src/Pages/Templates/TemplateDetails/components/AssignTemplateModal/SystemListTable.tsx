@@ -22,7 +22,8 @@ import { TEMPLATES_ROUTE } from 'Routes/constants';
 import TdWithTooltip from 'components/TdWithTooltip/TdWithTooltip';
 import { useParams } from 'react-router-dom';
 import SystemNameCell from './components/SystemNameCell';
-import { canAssignSystemToTemplate } from '../../../TemplatesTable/helpers';
+import { canAssignSystemToTemplate, isVersionLockedSystem } from '../../../TemplatesTable/helpers';
+import OSCell from './components/OSCell';
 
 const useStyles = createUseStyles({
   mainContainer: {
@@ -162,7 +163,13 @@ export default function SystemListTable({
                     <TagIcon className={classes.rightMargin} />
                     {tags.length}
                   </Td>
-                  <Td>{os}</Td>
+                  <Td>
+                    {isExtendedSupportTemplate && isVersionLockedSystem(rhsm) ? (
+                      <OSCell os={os} rhsm={rhsm} />
+                    ) : (
+                      os
+                    )}
+                  </Td>
                   <Td className={template_name ? '' : classes.forceDisabled}>
                     {template_name ? (
                       <Button

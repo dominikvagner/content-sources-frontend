@@ -513,7 +513,7 @@ export const defaultSystemsListItem: SystemItem = {
   type: 'system',
 };
 
-export const minorReleaseSystemsListItem: SystemItem = {
+export const versionLockedSystemsListItem: SystemItem = {
   id: '4b2c15a7-9e7f-40c2-b36d-01f807d9c6e3',
   attributes: {
     ...defaultSystemsListItem.attributes,

@@ -6,7 +6,7 @@ import {
   defaultSystemsListItem,
   defaultTemplateItem,
   defaultUpdateTemplateTaskCompleted,
-  minorReleaseSystemsListItem,
+  versionLockedSystemsListItem,
 } from 'testingHelpers';
 import type { SystemItem } from 'services/Systems/SystemsApi';
 
@@ -97,7 +97,7 @@ it('prevents selection of systems with minor release versions and shows warning 
     isFetching: false,
     isError: false,
     data: {
-      data: [defaultSystemsListItem, minorReleaseSystemsListItem],
+      data: [defaultSystemsListItem, versionLockedSystemsListItem],
       meta: { total_items: 2, limit: 20, offset: 0 },
     },
   }));

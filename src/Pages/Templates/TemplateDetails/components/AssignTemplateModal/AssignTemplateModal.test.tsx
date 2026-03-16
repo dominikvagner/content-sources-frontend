@@ -1,21 +1,24 @@
 import { render, waitFor, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 import AssignTemplateModal from './AssignTemplateModal';
-import { useQueryClient } from 'react-query';
+import type { SystemItem } from 'services/Systems/SystemsApi';
+import { TemplateItem } from '../../../../../services/Templates/TemplateApi';
 import { useSystemsListQuery } from 'services/Systems/SystemsQueries';
+import useCompatibleSystems from 'Hooks/useCompatibleSystems';
+import { useFetchTemplate } from '../../../../../services/Templates/TemplateQueries';
 import {
   defaultSystemsListItem,
-  defaultTemplateItem,
-  defaultUpdateTemplateTaskCompleted,
-  minorReleaseSystemsListItem,
+  versionLockedSystemsListItem,
   satelliteManagedSystemsListItem,
+  defaultEUSupportTemplateItem,
+  defaultTemplateItem,
 } from 'testingHelpers';
-import type { SystemItem } from 'services/Systems/SystemsApi';
-import useCompatibleSystems from 'Hooks/useCompatibleSystems';
-import React from 'react';
 import { TEMPLATE_SYSTEMS_UPDATE_LIMIT } from 'Pages/Templates/TemplatesTable/constants';
-import userEvent from '@testing-library/user-event';
 
 const bananaUUID = 'banana-uuid';
+
+let mockSelectedSystemsCount: number;
 
 jest.mock('react-router-dom', () => ({
   useParams: () => ({ templateUUID: bananaUUID }),
@@ -29,19 +32,17 @@ jest.mock('Hooks/useCompatibleSystems');
 
 jest.mock('react-query');
 
+jest.mock('Hooks/useNotification', () => () => ({ notify: () => null }));
+
+jest.mock('services/Templates/TemplateQueries');
+
 jest.mock('services/Systems/SystemsQueries', () => ({
   useAddTemplateToSystemsQuery: () => ({ mutate: () => undefined, isLoading: false }),
   useSystemsListQuery: jest.fn(),
 }));
 
-jest.mock('Hooks/useNotification', () => () => ({ notify: () => null }));
-
-jest.mock('services/Templates/TemplateQueries', () => ({
-  useFetchTemplate: () => ({ data: defaultTemplateItem }),
-}));
-
-// Conditionally mock SystemListView with a set number of systems selected
-let mockSelectedSystemsCount = 0;
+// Mock SystemListView to simulate large selections for max-systems test
+// For tests where mockSelectedSystemsCount=0, this renders the real component
 jest.mock('./SystemListView', () => {
   const actual = jest.requireActual('./SystemListView');
   const SystemListView = actual.default;
@@ -69,98 +70,88 @@ jest.mock('./SystemListView', () => {
   };
 });
 
-beforeAll(() => {
-  (useQueryClient as jest.Mock).mockImplementation(() => ({
-    getQueryData: () => ({
-      version: 1,
-      name: 'Steve the template',
-      arch: 'x86_64',
-      last_update_task: defaultUpdateTemplateTaskCompleted,
-    }),
+const mockTemplate = (template: TemplateItem = defaultTemplateItem) =>
+  (useFetchTemplate as jest.Mock).mockImplementation(() => ({
+    data: template,
   }));
+
+const mockCompatibleSystems = (hasCompatibleSystems: boolean = true) =>
+  (useCompatibleSystems as jest.Mock).mockImplementation(() => ({
+    hasCompatibleSystems,
+    isFetchingCompatibility: false,
+    isCompatibilityError: false,
+  }));
+
+const mockSystemsList = (data: SystemItem[]) =>
+  (useSystemsListQuery as jest.Mock).mockImplementation(() => ({
+    isLoading: false,
+    isFetching: false,
+    isError: false,
+    data: {
+      data,
+      meta: { total_items: data.length, limit: 20, offset: 0 },
+    },
+  }));
+
+beforeEach(() => {
+  mockSelectedSystemsCount = 0;
+  jest.clearAllMocks();
+
+  // Set default mock implementations
+  mockTemplate();
+  mockCompatibleSystems();
 });
 
 afterEach(() => {
   mockSelectedSystemsCount = 0;
 });
 
-(useCompatibleSystems as jest.Mock).mockReturnValue({
-  hasCompatibleSystems: true,
-  isFetchingCompatibility: false,
-  isCompatibilityError: false,
-});
+const waitForRows = async (expectedCount: number) => {
+  await waitFor(() => {
+    expect(screen.getAllByRole('row')).toHaveLength(expectedCount);
+  });
+};
 
-(useSystemsListQuery as jest.Mock).mockImplementation(() => ({
-  isLoading: false,
-  isFetching: false,
-  isError: false,
-  data: undefined,
-}));
+const expectIconInRowWith = (iconId: string, systemName: string) => {
+  const icon = screen.getByTestId(iconId);
+  expect(icon).toBeInTheDocument();
+  expect(within(icon.closest('tr')!).getByText(systemName)).toBeInTheDocument();
+};
 
 it('shows registration view if no systems are present', async () => {
-  (useCompatibleSystems as jest.Mock).mockImplementation(() => ({
-    hasCompatibleSystems: false,
-    isFetchingCompatibility: false,
-    isCompatibilityError: false,
-  }));
+  mockCompatibleSystems(false);
+  mockSystemsList([]);
   render(<AssignTemplateModal />);
   expect(screen.getByText('Non-registered systems')).toBeInTheDocument();
 });
 
 it('renders systems list and pre-selects systems already assigned to template', async () => {
-  (useCompatibleSystems as jest.Mock).mockImplementation(() => ({
-    hasCompatibleSystems: true,
-    isFetchingCompatibility: false,
-    isCompatibilityError: false,
-  }));
-  (useSystemsListQuery as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    isFetching: false,
-    isError: false,
-    data: {
-      data: new Array(15).fill(defaultSystemsListItem).map((item: SystemItem, index) => ({
-        ...item,
-        id: item.id + index,
-        attributes: {
-          ...item.attributes,
-          display_name: item.attributes.display_name + index,
-          template_uuid: !index ? bananaUUID : item.attributes.template_uuid,
-        },
-      })),
-      meta: { total_items: 15, limit: 20, offset: 0 },
+  const systems = new Array(15).fill(defaultSystemsListItem).map((item: SystemItem, index) => ({
+    ...item,
+    id: item.id + index,
+    attributes: {
+      ...item.attributes,
+      display_name: item.attributes.display_name + index,
+      template_uuid: !index ? bananaUUID : item.attributes.template_uuid,
     },
   }));
+
+  mockSystemsList(systems);
+
   render(<AssignTemplateModal />);
 
   expect(screen.getByText('14867.host.example.com14')).toBeInTheDocument();
-
-  // ensure first item is pre-selected
-  expect(screen.getByRole('checkbox', { name: 'Select row 0', checked: true })).toBeInTheDocument();
-  expect(
-    screen.getByRole('checkbox', { name: 'Select row 1', checked: false }),
-  ).toBeInTheDocument();
+  // ensure the first item is pre-selected
+  expect(screen.getByRole('checkbox', { name: 'Select row 0' })).toBeChecked();
+  expect(screen.getByRole('checkbox', { name: 'Select row 1' })).not.toBeChecked();
 });
 
 it('prevents selection of systems with minor release versions and shows warning icon', async () => {
-  (useCompatibleSystems as jest.Mock).mockImplementation(() => ({
-    hasCompatibleSystems: true,
-    isFetchingCompatibility: false,
-    isCompatibilityError: false,
-  }));
-  (useSystemsListQuery as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    isFetching: false,
-    isError: false,
-    data: {
-      data: [defaultSystemsListItem, minorReleaseSystemsListItem],
-      meta: { total_items: 2, limit: 20, offset: 0 },
-    },
-  }));
+  mockSystemsList([defaultSystemsListItem, versionLockedSystemsListItem]);
+
   render(<AssignTemplateModal />);
 
-  await waitFor(() => {
-    expect(screen.getAllByRole('row')).toHaveLength(3); // 1 header + 2 data rows
-  });
+  await waitForRows(3); // 1 header + 2 data rows
 
   expect(screen.getByText('14867.host.example.com')).toBeInTheDocument();
   expect(screen.getByText('40098.host.example.com')).toBeInTheDocument();
@@ -169,35 +160,15 @@ it('prevents selection of systems with minor release versions and shows warning 
   expect(screen.getByRole('checkbox', { name: 'Select row 1' })).toBeDisabled();
 
   // Warning icon should be present for minor release system
-  const warningIcon = screen.getByTestId('system-list-warning-icon');
-  expect(warningIcon).toBeInTheDocument();
-
-  // Verify the warning icon is in the same row as the minor release system
-  expect(
-    within(warningIcon.closest('tr')!).getByText('40098.host.example.com'),
-  ).toBeInTheDocument();
+  expectIconInRowWith('system-list-warning-icon', '40098.host.example.com');
 });
 
 it('prevents selection of satellite-managed systems and shows warning icon', async () => {
-  (useCompatibleSystems as jest.Mock).mockImplementation(() => ({
-    hasCompatibleSystems: true,
-    isFetchingCompatibility: false,
-    isCompatibilityError: false,
-  }));
-  (useSystemsListQuery as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    isFetching: false,
-    isError: false,
-    data: {
-      data: [defaultSystemsListItem, satelliteManagedSystemsListItem],
-      meta: { total_items: 2, limit: 20, offset: 0 },
-    },
-  }));
+  mockSystemsList([defaultSystemsListItem, satelliteManagedSystemsListItem]);
+
   render(<AssignTemplateModal />);
 
-  await waitFor(() => {
-    expect(screen.getAllByRole('row')).toHaveLength(3); // 1 header + 2 data rows
-  });
+  await waitForRows(3); // 1 header + 2 data rows
 
   expect(screen.getByText('14867.host.example.com')).toBeInTheDocument();
   expect(screen.getByText('69204.host.example.com')).toBeInTheDocument();
@@ -206,13 +177,7 @@ it('prevents selection of satellite-managed systems and shows warning icon', asy
   expect(screen.getByRole('checkbox', { name: 'Select row 1' })).toBeDisabled();
 
   // Warning icon should be present for satellite-managed system
-  const warningIcon = screen.getByTestId('system-list-warning-icon');
-  expect(warningIcon).toBeInTheDocument();
-
-  // Verify the warning icon is in the same row as the satellite-managed system
-  expect(
-    within(warningIcon.closest('tr')!).getByText('69204.host.example.com'),
-  ).toBeInTheDocument();
+  expectIconInRowWith('system-list-warning-icon', '69204.host.example.com');
 });
 
 it('prevents assigning a template when more than 1000 systems are selected', async () => {
@@ -232,4 +197,25 @@ it('prevents assigning a template when more than 1000 systems are selected', asy
       `Cannot assign a template to more than ${TEMPLATE_SYSTEMS_UPDATE_LIMIT} systems at a time.`,
     ),
   ).toBeInTheDocument();
+});
+
+it('shows info icon and tooltip for version-locked systems with extended release template', async () => {
+  mockTemplate(defaultEUSupportTemplateItem);
+  mockSystemsList([defaultSystemsListItem, versionLockedSystemsListItem]);
+
+  const infoIconId = 'system-list-info-icon';
+  const infoMessage = `This system is locked to version ${versionLockedSystemsListItem.attributes.rhsm}`;
+
+  render(<AssignTemplateModal />);
+
+  await waitForRows(3); // 1 header + 2 data rows
+
+  expect(screen.getByText('14867.host.example.com')).toBeInTheDocument();
+  expect(screen.getByText('40098.host.example.com')).toBeInTheDocument();
+  // Expect the info icon to be present for the minor release system
+  expectIconInRowWith(infoIconId, '40098.host.example.com');
+
+  const infoIcon = screen.getByTestId(infoIconId);
+  await userEvent.hover(infoIcon);
+  expect(screen.getByText(infoMessage)).toBeInTheDocument();
 });
