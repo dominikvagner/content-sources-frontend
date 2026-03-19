@@ -1,4 +1,4 @@
-import { test, expect, cleanupTemplates, randomName } from 'test-utils';
+import { test, expect, cleanupTemplates, randomName, waitInPatch } from 'test-utils';
 import {
   LONG_TEST_TIMEOUT_MS,
   RHSM_RHCD_WAIT,
@@ -11,7 +11,6 @@ import {
   waitForValidStatus,
 } from '../UI/helpers/helpers';
 import { RHSMClient, waitForRhcdActive, refreshSubscriptionManager } from './helpers/rhsmClient';
-import { waitInPatch } from './helpers/systemHelpers';
 
 const templateNamePrefix = 'use_template_dialog_test';
 const regClient = new RHSMClient(`RHSMClientTest-${randomName()}`);

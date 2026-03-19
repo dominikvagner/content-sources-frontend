@@ -3,7 +3,13 @@ import {
   expect,
   cleanupTemplates,
   randomName,
-} from '../test-utils/_playwright-tests/test-utils/src';
+  waitInPatch,
+  isInInventory,
+  getTemplateSystemsCount,
+  getTemplateUuidByName,
+  INVENTORY_PATCH_POLL_TIMEOUT_MS,
+} from 'test-utils';
+import { CONTENT_PROPAGATION_POLL } from '../testConstants';
 import { RHSMClient } from './helpers/rhsmClient';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
 import {
@@ -11,7 +17,6 @@ import {
   getRowByNameOrUrl,
   waitForValidStatus,
 } from '../UI/helpers/helpers';
-import { waitInPatch, isInInventory } from './helpers/systemHelpers';
 
 const templateNamePrefix = 'associated_template_test';
 const templateName = `${templateNamePrefix}-${randomName()}`;
@@ -148,6 +153,19 @@ test.describe('Associated Template CRUD', () => {
         .poll(async () => await isInInventory(page, hostname), {
           message: 'System still found in inventory',
           timeout: 600_000,
+        })
+        .toBe(0);
+    });
+
+    await test.step('Wait for template to have no associated systems in Patch', async () => {
+      const templateUuid = await getTemplateUuidByName(client, templateName);
+      expect(templateUuid, 'template UUID should be resolvable').toBeTruthy();
+
+      await expect
+        .poll(async () => await getTemplateSystemsCount(page, templateUuid!), {
+          message: 'Template still has associated systems in Patch',
+          timeout: INVENTORY_PATCH_POLL_TIMEOUT_MS,
+          intervals: [...CONTENT_PROPAGATION_POLL.intervals],
         })
         .toBe(0);
     });

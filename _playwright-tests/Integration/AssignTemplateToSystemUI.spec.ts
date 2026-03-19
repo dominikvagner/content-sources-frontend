@@ -1,4 +1,4 @@
-import { test, expect, cleanupTemplates, randomName } from 'test-utils';
+import { test, expect, cleanupTemplates, randomName, waitInPatch } from 'test-utils';
 import {
   CONTENT_PROPAGATION_POLL,
   DNF_COMMAND_TIMEOUT_MS,
@@ -11,7 +11,6 @@ import { refreshSubscriptionManager, RHSMClient, waitForRhcdActive } from './hel
 import { runCmd } from './helpers/helpers';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
 import { closeGenericPopupsIfExist, getRowByNameOrUrl } from '../UI/helpers/helpers';
-import { waitInPatch } from './helpers/systemHelpers';
 
 test.describe('Assign Template to System via UI', () => {
   const templateNamePrefix = 'Template_test_for_system_assignment';
