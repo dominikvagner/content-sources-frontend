@@ -215,5 +215,7 @@ jobs:
         with:
           directory: ./coverage-e2e/
           flags: e2e
+          # This merges the "fork" name and "PR" name into one entry
+          override_branch: ${{ github.head_ref || github.ref_name }}
           name: playwright-tests
           fail_ci_if_error: false
