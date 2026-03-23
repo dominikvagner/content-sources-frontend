@@ -177,6 +177,10 @@ test.describe('Setup Authentication States', () => {
     test(`Authenticate ${user.key} user and save state`, async ({ page }) => {
       test.setTimeout(60_000);
 
+      // Block TrustArc cookie consent so it does not overlay the UI during login & logout
+      await page.route('https://consent.trustarc.com/**', (route) => route.abort());
+      await page.route('https://consent-pref.trustarc.com/**', (route) => route.abort());
+
       await closeGenericPopupsIfExist(page);
       await logInWithUsernameAndPassword(
         page,
