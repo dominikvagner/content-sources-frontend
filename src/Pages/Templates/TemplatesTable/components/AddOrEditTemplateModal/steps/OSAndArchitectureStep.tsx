@@ -26,6 +26,7 @@ import {
 } from '../../../constants';
 import {
   describeOSVersionDropdownItem,
+  describeOSVersionDropdownItemExtended,
   extractMajorVersion,
   isMinorVersionOfMajor,
   isArchManuallyDisabled,
@@ -335,6 +336,18 @@ export default function OSAndArchitectureStep() {
                         isSelected={minor === templateRequest?.extended_release_version}
                         component='button'
                         data-ouia-component-id={`filter_${minor}`}
+                        description={
+                          isLoading ? (
+                            <Skeleton width='50%' screenreaderText='loading support end date' />
+                          ) : (
+                            describeOSVersionDropdownItemExtended(
+                              data,
+                              isError,
+                              templateRequest.extended_release,
+                              minor,
+                            )
+                          )
+                        }
                       >
                         {getMinorVersionName(minor)}
                       </DropdownItem>

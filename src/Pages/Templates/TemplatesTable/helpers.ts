@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { E4S, EEUS, LAST_FULL_SUPPORT_MINOR_VERSION, STANDARD_STREAM_PATH } from './constants';
+import { EUS, E4S, EEUS, LAST_FULL_SUPPORT_MINOR_VERSION, STANDARD_STREAM_PATH } from './constants';
 import { RoadmapLifecycleResponse } from 'services/Roadmap/RoadmapApi';
 
 export const extractMajorVersion = (extendedReleaseVersion: string) =>
@@ -115,4 +115,37 @@ export const describeOSVersionDropdownItem = (
   const maintString = maint ? dateToMonthYear(maint.end_date) : 'N/A';
 
   return `Full support ends: ${fullString} | Maintenance support ends: ${maintString}`;
+};
+
+export const describeOSVersionDropdownItemExtended = (
+  metadata: RoadmapLifecycleResponse | undefined,
+  isError: boolean,
+  extendedReleaseKind: string | undefined,
+  version: string,
+): string | undefined => {
+  if (isError || !extendedReleaseKind) {
+    return undefined;
+  }
+
+  const [major, minor] = version.split('.');
+  const ver = metadata?.data.find(
+    (x) => x.major === parseInt(major) && x.minor === parseInt(minor),
+  );
+  if (!ver) {
+    return undefined;
+  }
+
+  switch (extendedReleaseKind) {
+    case EUS:
+      return `Support ends: ${dateToMonthYear(ver.end_date_eus ?? ver.end_date)}`;
+    case E4S:
+      return `Support ends: ${dateToMonthYear(ver.end_date_e4s ?? ver.end_date)}`;
+    case EEUS: {
+      const startDate = new Date(ver.start_date);
+      const offsetDate = new Date(startDate.setMonth(startDate.getMonth() + 48)); // ref: https://access.redhat.com/support/policy/updates/errata#Enhanced_Extended_Update_Support
+      return `Support ends: ${dateToMonthYear(offsetDate)}`;
+    }
+    default:
+      return undefined; // unknown extended release kind
+  }
 };

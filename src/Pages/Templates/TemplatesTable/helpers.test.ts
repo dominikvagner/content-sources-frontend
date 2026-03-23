@@ -5,6 +5,7 @@ import {
   isMinorVersionOfMajor,
   extractMinorVersion,
   isArchManuallyDisabled,
+  describeOSVersionDropdownItemExtended,
 } from './helpers';
 import { E4S, EEUS, EUS } from './constants';
 
@@ -141,5 +142,53 @@ describe('describeOSVersionDropdownItem', () => {
     expect(describeOSVersionDropdownItem(metadata9, false, 8)).toBe(
       'Full support ends: N/A | Maintenance support ends: N/A',
     );
+  });
+});
+
+describe('describeOSVersionDropdownItemExtended', () => {
+  const metadata9_4: RoadmapLifecycleResponse = {
+    data: [
+      {
+        name: 'RHEL 9.4',
+        start_date: '2026-01-01',
+        end_date: '2026-04-01',
+        major: 9,
+        minor: 4,
+        end_date_eus: '2026-05-31',
+        end_date_e4s: '2027-05-31',
+      },
+    ],
+  };
+
+  it('deos not show description when no response is returned', () => {
+    expect(describeOSVersionDropdownItemExtended(undefined, false, EUS, '9.4')).toBe(undefined);
+  });
+  it('deos not show description when there was a request error', () => {
+    expect(describeOSVersionDropdownItemExtended(metadata9_4, true, EUS, '9.4')).toBe(undefined);
+  });
+  it('deos not show description when no extended support kind was provided', () => {
+    expect(describeOSVersionDropdownItemExtended(metadata9_4, true, undefined, '9.4')).toBe(
+      undefined,
+    );
+  });
+
+  it('shows correct support end date for EUS', () => {
+    expect(describeOSVersionDropdownItemExtended(metadata9_4, false, EUS, '9.4')).toBe(
+      'Support ends: May 2026',
+    );
+  });
+  it('shows correct support end date for E4S', () => {
+    expect(describeOSVersionDropdownItemExtended(metadata9_4, false, E4S, '9.4')).toBe(
+      'Support ends: May 2027',
+    );
+  });
+  it('shows correct support end date for EEUS', () => {
+    expect(describeOSVersionDropdownItemExtended(metadata9_4, false, EEUS, '9.4')).toBe(
+      'Support ends: January 2030',
+    );
+  });
+
+  it('deos not show description when could not find data for version', () => {
+    expect(describeOSVersionDropdownItemExtended(metadata9_4, true, EUS, '9.5')).toBe(undefined);
   });
 });
