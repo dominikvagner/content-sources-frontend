@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import {
   defaultTemplateItem,
@@ -6,9 +7,11 @@ import {
   ReactQueryTestWrapper,
   defaultEUSupportTemplateItem,
   testEUSRepositoryParamsResponse,
+  testRoadmapLifecycleResponse,
 } from 'testingHelpers';
 import OSAndArchitectureStep from './OSAndArchitectureStep';
 import useDistributionDetails from '../../../../../../Hooks/useDistributionDetails';
+import { useFetchLifecycle } from 'services/Roadmap/RoadmapQueries';
 
 jest.mock('../AddOrEditTemplateContext', () => ({
   useAddOrEditTemplateContext: jest.fn(),
@@ -17,6 +20,10 @@ jest.mock('../AddOrEditTemplateContext', () => ({
 jest.mock('../../../../../../Hooks/useDistributionDetails', () => ({
   __esModule: true,
   default: jest.fn(),
+}));
+
+jest.mock('services/Roadmap/RoadmapQueries', () => ({
+  useFetchLifecycle: jest.fn(),
 }));
 
 const standardVersionName = `el${defaultTemplateItem.version}`;
@@ -61,6 +68,12 @@ beforeEach(() => {
   }));
 
   (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => defaultStandardContext);
+
+  (useFetchLifecycle as jest.Mock).mockImplementation(() => ({
+    data: testRoadmapLifecycleResponse,
+    isError: false,
+    isLoading: false,
+  }));
 });
 
 it('renders enabled arch and version selectors when creating a standard template', () => {
@@ -158,4 +171,21 @@ it('hides release stream selection when no streams are entitled', () => {
 
   // Release stream selection should be hidden
   expect(queryByText('Release stream')).not.toBeInTheDocument();
+});
+
+it('shows support end dates in OS version dropdown', async () => {
+  const user = userEvent.setup();
+  const { getByTestId, getByText } = render(
+    <ReactQueryTestWrapper>
+      <OSAndArchitectureStep />
+    </ReactQueryTestWrapper>,
+  );
+
+  // open OS version dropdown
+  const dropdown = getByTestId('restrict_to_os_version');
+  await user.click(dropdown);
+
+  expect(
+    getByText('Full support ends: April 2026 | Maintenance support ends: April 2026'),
+  ).toBeInTheDocument();
 });

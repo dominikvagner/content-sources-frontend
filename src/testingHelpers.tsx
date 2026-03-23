@@ -16,6 +16,7 @@ import {
 import { AdminTask } from 'services/Admin/AdminTaskApi';
 import { TemplateItem } from 'services/Templates/TemplateApi';
 import type { IDSystemItem, SystemItem } from 'services/Systems/SystemsApi';
+import { RoadmapLifecycleResponse } from 'services/Roadmap/RoadmapApi';
 
 // Stream labels for testing
 const EUS = 'eus';
@@ -582,4 +583,22 @@ export const defaultErrataItem: ErrataItem = {
   severity: 'Important',
   reboot_suggested: false,
   cves: ['CVE-2024-1394'],
+};
+
+export const testRoadmapLifecycleResponse: RoadmapLifecycleResponse = {
+  data: [
+    {
+      name: 'RHEL 9',
+      start_date: '2026-04-01',
+      end_date: '2026-04-01',
+      major: 9,
+    },
+    {
+      name: 'RHEL 9.9',
+      start_date: '2026-04-01',
+      end_date: '2026-04-01',
+      major: 9,
+      minor: 9,
+    },
+  ],
 };

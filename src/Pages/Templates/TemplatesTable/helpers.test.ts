@@ -1,4 +1,6 @@
+import { LifecycleItem, RoadmapLifecycleResponse } from 'services/Roadmap/RoadmapApi';
 import {
+  describeOSVersionDropdownItem,
   getRedHatCoreRepoUrls,
   isMinorVersionOfMajor,
   extractMinorVersion,
@@ -93,5 +95,50 @@ describe('isArchManuallyDisabled', () => {
 
   it('does not disable x86_64 for non-EUS version 9', () => {
     expect(isArchManuallyDisabled('x86_64', 'e4s', '9')).toBe(false);
+  });
+});
+
+describe('describeOSVersionDropdownItem', () => {
+  const data9: LifecycleItem = {
+    name: 'RHEL 9',
+    start_date: '',
+    end_date: '2027-04-01',
+    major: 9,
+  };
+  const data9_9: LifecycleItem = {
+    name: 'RHEL 9.9',
+    start_date: '',
+    end_date: '2026-04-01',
+    major: 9,
+    minor: 9,
+  };
+  const metadata9: RoadmapLifecycleResponse = { data: [data9, data9_9] };
+
+  it('deos not show description when no response is returned', () => {
+    expect(describeOSVersionDropdownItem(undefined, false, 9)).toBe(undefined);
+  });
+  it('deos not show description when there was a request error', () => {
+    expect(describeOSVersionDropdownItem(metadata9, true, 9)).toBe(undefined);
+  });
+
+  it('shows correct description when data exists', () => {
+    expect(describeOSVersionDropdownItem(metadata9, false, 9)).toBe(
+      'Full support ends: April 2026 | Maintenance support ends: April 2027',
+    );
+  });
+
+  it('shows N/A on partial failure', () => {
+    expect(describeOSVersionDropdownItem({ data: [] }, false, 9)).toBe(
+      'Full support ends: N/A | Maintenance support ends: N/A',
+    );
+    expect(describeOSVersionDropdownItem({ data: [data9] }, false, 9)).toBe(
+      'Full support ends: N/A | Maintenance support ends: April 2027',
+    );
+    expect(describeOSVersionDropdownItem({ data: [data9_9] }, false, 9)).toBe(
+      'Full support ends: April 2026 | Maintenance support ends: N/A',
+    );
+    expect(describeOSVersionDropdownItem(metadata9, false, 8)).toBe(
+      'Full support ends: N/A | Maintenance support ends: N/A',
+    );
   });
 });

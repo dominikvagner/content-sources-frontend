@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
-import { STANDARD_STREAM_PATH } from './constants';
+import { LAST_FULL_SUPPORT_MINOR_VERSION, STANDARD_STREAM_PATH } from './constants';
+import { RoadmapLifecycleResponse } from 'services/Roadmap/RoadmapApi';
 
 export const extractMajorVersion = (extendedReleaseVersion: string) =>
   extendedReleaseVersion.split('.')[0];
@@ -89,3 +90,29 @@ export const TemplateValidationSchema = Yup.object().shape({
   name: Yup.string().max(255, 'Too Long!').required('Required'),
   description: Yup.string().max(255, 'Too Long!'),
 });
+
+const dateToMonthYear = (date: string | number | Date): string =>
+  new Date(date).toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+export const describeOSVersionDropdownItem = (
+  metadata: RoadmapLifecycleResponse | undefined,
+  isError: boolean,
+  major: number,
+): string | undefined => {
+  if (isError || !metadata) {
+    return undefined;
+  }
+
+  const full = metadata?.data.find(
+    (x) => x.major === major && x.minor == LAST_FULL_SUPPORT_MINOR_VERSION,
+  );
+  const fullString = full ? dateToMonthYear(full.end_date) : 'N/A';
+
+  const maint = metadata?.data.find((x) => x.major === major && x.minor == null); // using == on purpose to cover `undefined`
+  const maintString = maint ? dateToMonthYear(maint.end_date) : 'N/A';
+
+  return `Full support ends: ${fullString} | Maintenance support ends: ${maintString}`;
+};

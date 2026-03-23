@@ -12,6 +12,7 @@ import {
   List,
   ListItem,
   FormGroupLabelHelp,
+  Skeleton,
 } from '@patternfly/react-core';
 import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
@@ -19,6 +20,7 @@ import { useState, useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
 import { SUPPORTED_MAJOR_VERSIONS, SUPPORTED_ARCHES, STANDARD_STREAM } from '../../../constants';
 import {
+  describeOSVersionDropdownItem,
   extractMajorVersion,
   isMinorVersionOfMajor,
   isArchManuallyDisabled,
@@ -27,6 +29,7 @@ import useDistributionDetails from '../../../../../../Hooks/useDistributionDetai
 import Hide from '../../../../../../components/Hide/Hide';
 import HelpPopover from '../../../../../../components/HelpPopover';
 import text from '@patternfly/react-styles/css/utilities/Text/text';
+import { useFetchLifecycle } from 'services/Roadmap/RoadmapQueries';
 
 const useStyles = createUseStyles({
   fullWidth: {
@@ -149,6 +152,8 @@ export default function OSAndArchitectureStep() {
   );
 
   const classes = useStyles();
+
+  const { data, isError, isLoading } = useFetchLifecycle();
 
   return (
     <Grid hasGutter>
@@ -298,6 +303,13 @@ export default function OSAndArchitectureStep() {
                         isSelected={major === templateRequest?.version}
                         component='button'
                         data-ouia-component-id={`filter_${major}`}
+                        description={
+                          isLoading ? (
+                            <Skeleton width='50%' screenreaderText='loading support end dates' />
+                          ) : (
+                            describeOSVersionDropdownItem(data, isError, parseInt(major))
+                          )
+                        }
                       >
                         {name}
                       </DropdownItem>
