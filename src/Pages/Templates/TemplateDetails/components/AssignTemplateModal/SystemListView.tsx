@@ -136,26 +136,16 @@ const SystemListView = ({
     [systemsList],
   );
 
-  const standardSystems = useMemo(
-    () =>
-      systemsList
-        .filter((system) => !isVersionLockedSystem(system.attributes.rhsm))
-        .map(({ id }) => id),
-    [systemsList],
-  );
-
   const satelliteSystems = useMemo(
     () => systemsList.filter((system) => system.attributes.satellite_managed).map(({ id }) => id),
     [systemsList],
   );
 
   const allVersionLocked = versionLockedSystems.length === systemsList.length;
-  const allStandard = standardSystems.length === systemsList.length;
   const allSatellite = satelliteSystems.length === systemsList.length;
 
   // True when at least some systems on the page have a compatible release version and are not satellite-managed
-  const canEnableAssignButton =
-    !allSatellite && (templateUsesExtendedSupport ? !allStandard : !allVersionLocked);
+  const canEnableAssignButton = !allSatellite && (templateUsesExtendedSupport || !allVersionLocked);
 
   // Systems that are compatible with the template, not satellite-managed, and not already assigned
   const selectableSystems = useMemo(
