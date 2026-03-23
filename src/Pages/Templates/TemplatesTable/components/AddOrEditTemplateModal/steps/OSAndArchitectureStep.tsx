@@ -18,7 +18,12 @@ import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import { useState, useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
-import { SUPPORTED_MAJOR_VERSIONS, SUPPORTED_ARCHES, STANDARD_STREAM } from '../../../constants';
+import {
+  SUPPORTED_MAJOR_VERSIONS,
+  SUPPORTED_ARCHES,
+  STANDARD_STREAM,
+  EEUS,
+} from '../../../constants';
 import {
   describeOSVersionDropdownItem,
   extractMajorVersion,
@@ -138,8 +143,8 @@ export default function OSAndArchitectureStep() {
       const majorVersion = extractMajorVersion(minorVersion);
       // For EEUS version 9, x86_64 is manually disabled
       // If aarch64 is also not entitled, disable all 9.X versions
-      if (templateRequest.extended_release === 'eeus' && majorVersion === '9') {
-        const selectedStream = extended_release_streams.find((stream) => stream.label === 'eeus');
+      if (templateRequest.extended_release === EEUS && majorVersion === '9') {
+        const selectedStream = extended_release_streams.find((stream) => stream.label === EEUS);
 
         if (selectedStream?.architectures) {
           const aarch64 = selectedStream.architectures.find((a) => a.label === 'aarch64');

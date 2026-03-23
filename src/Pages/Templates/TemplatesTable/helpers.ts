@@ -1,5 +1,5 @@
 import * as Yup from 'yup';
-import { LAST_FULL_SUPPORT_MINOR_VERSION, STANDARD_STREAM_PATH } from './constants';
+import { E4S, EEUS, LAST_FULL_SUPPORT_MINOR_VERSION, STANDARD_STREAM_PATH } from './constants';
 import { RoadmapLifecycleResponse } from 'services/Roadmap/RoadmapApi';
 
 export const extractMajorVersion = (extendedReleaseVersion: string) =>
@@ -29,8 +29,8 @@ export const getRedHatCoreRepoUrls = (
   }
 
   // 'eeus' uses 'e4s' in the url path
-  if (stream === 'eeus') {
-    stream = 'e4s';
+  if (stream === EEUS) {
+    stream = E4S;
   }
 
   return [
@@ -84,7 +84,7 @@ export const isArchManuallyDisabled = (
   arch: string,
   releaseStream: string,
   version: string,
-): boolean => releaseStream === 'eeus' && version === '9' && arch === 'x86_64';
+): boolean => releaseStream === EEUS && version === '9' && arch === 'x86_64';
 
 export const TemplateValidationSchema = Yup.object().shape({
   name: Yup.string().max(255, 'Too Long!').required('Required'),

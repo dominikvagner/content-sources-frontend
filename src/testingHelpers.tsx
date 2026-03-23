@@ -17,10 +17,7 @@ import { AdminTask } from 'services/Admin/AdminTaskApi';
 import { TemplateItem } from 'services/Templates/TemplateApi';
 import type { IDSystemItem, SystemItem } from 'services/Systems/SystemsApi';
 import { RoadmapLifecycleResponse } from 'services/Roadmap/RoadmapApi';
-
-// Stream labels for testing
-const EUS = 'eus';
-const E4S = 'e4s';
+import { EUS, E4S } from './Pages/Templates/TemplatesTable/constants';
 
 const queryClient = new QueryClient({
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
