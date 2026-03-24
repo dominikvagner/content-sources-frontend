@@ -28,9 +28,10 @@ it('renders template details for a standard template', () => {
     redHatCoreRepos: new Set('item1'),
     distribution_arches: testRepositoryParamsResponse.distribution_arches,
     distribution_versions: testRepositoryParamsResponse.distribution_versions,
-    extended_release_features: testRepositoryParamsResponse.extended_release_features,
+    extended_release_streams: testRepositoryParamsResponse.extended_release_streams,
     distribution_minor_versions: testRepositoryParamsResponse.distribution_minor_versions,
     isEdit: false,
+    isExtendedSupportAvailable: false,
   }));
 
   const versionName = `el${defaultTemplateItem.version}`;
@@ -38,7 +39,8 @@ it('renders template details for a standard template', () => {
   (useDistributionDetails as jest.Mock).mockImplementation(() => ({
     getVersionName: () => versionName,
     getArchName: () => defaultTemplateItem.arch,
-    isExtendedSupportAvailable: false,
+    getMinorVersionName: () => '',
+    getStreamName: () => '',
   }));
 
   const { getByText } = render(
@@ -62,9 +64,10 @@ it('renders release stream and minor version for an EUS template', () => {
     redHatCoreRepos: new Set('rhel-9-for-x86_64-baseos-eus-rpms'),
     distribution_arches: testEUSRepositoryParamsResponse.distribution_arches,
     distribution_versions: testEUSRepositoryParamsResponse.distribution_versions,
-    extended_release_features: testEUSRepositoryParamsResponse.extended_release_features,
+    extended_release_streams: testEUSRepositoryParamsResponse.extended_release_streams,
     distribution_minor_versions: testEUSRepositoryParamsResponse.distribution_minor_versions,
     isEdit: false,
+    isExtendedSupportAvailable: true,
   }));
 
   const versionName = `el${defaultEUSupportTemplateItem.extended_release_version}`;
@@ -74,7 +77,7 @@ it('renders release stream and minor version for an EUS template', () => {
     getMinorVersionName: () => versionName,
     getArchName: () => defaultEUSupportTemplateItem.arch,
     getStreamName: () => streamName,
-    isExtendedSupportAvailable: true,
+    getVersionName: () => '',
   }));
 
   const { getByText } = render(

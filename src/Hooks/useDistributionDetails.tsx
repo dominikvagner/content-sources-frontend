@@ -1,7 +1,5 @@
 import { useCallback, useMemo } from 'react';
 import { useRepositoryParams } from 'services/Content/ContentQueries';
-import { EXTENDED_SUPPORT_FEATURES } from '../Pages/Templates/TemplatesTable/constants';
-import { extendedReleaseToFeatureName } from '../Pages/Templates/TemplatesTable/helpers';
 
 export default function useDistributionDetails() {
   const {
@@ -12,7 +10,7 @@ export default function useDistributionDetails() {
       distribution_versions: distVersions = [],
       distribution_arches: distArches = [],
       distribution_minor_versions: distMinorVersions = [],
-      extended_release_features: extendedReleaseFeatures = [],
+      extended_release_streams: extendedReleaseStreamsRaw = [],
     } = {},
   } = useRepositoryParams();
 
@@ -58,24 +56,10 @@ export default function useDistributionDetails() {
   );
 
   const getStreamName = useCallback(
-    (extendedRelease?: string) => {
-      const featureName = extendedReleaseToFeatureName(extendedRelease);
-      return extendedReleaseFeatures.find(({ label }) => label === featureName)?.name ?? '';
-    },
-    [extendedReleaseFeatures],
+    (extendedRelease?: string) =>
+      extendedReleaseStreamsRaw.find(({ label }) => label === extendedRelease)?.name ?? '',
+    [extendedReleaseStreamsRaw],
   );
-
-  const getStreamAvailability = useCallback(
-    (majorVersion: string) => {
-      const relevantMinors = distMinorVersions.filter(({ major }) => major === majorVersion);
-      return EXTENDED_SUPPORT_FEATURES.map((feature) =>
-        relevantMinors.some(({ feature_names }) => feature_names?.includes(feature)),
-      ) as [boolean, boolean];
-    },
-    [distMinorVersions],
-  );
-
-  const isExtendedSupportAvailable = !!extendedReleaseFeatures?.length;
 
   return {
     isLoading,
@@ -83,9 +67,7 @@ export default function useDistributionDetails() {
     isError,
     getArchName,
     getVersionName,
-    getStreamName,
     getMinorVersionName,
-    getStreamAvailability,
-    isExtendedSupportAvailable,
+    getStreamName,
   };
 }

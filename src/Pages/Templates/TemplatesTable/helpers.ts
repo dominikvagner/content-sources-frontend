@@ -1,20 +1,10 @@
 import * as Yup from 'yup';
 import {
-  EUS,
-  E4S,
   SUPPORTED_ARCHES,
   SUPPORTED_MAJOR_VERSIONS,
   SUPPORTED_EUS_ARCHES,
   STANDARD_STREAM_PATH,
 } from './constants';
-
-/** Converts a feature name label (e.g., 'RHEL-EUS-x86_64') to the API format ('eus'/'e4s'/''). */
-export const featureNameToExtendedRelease = (featureName: string | undefined) =>
-  featureName === EUS ? 'eus' : featureName === E4S ? 'e4s' : (featureName ?? '');
-
-/** Converts an API format value ('eus'/'e4s') back to the feature name label used by repository_parameters. */
-export const extendedReleaseToFeatureName = (release: string | undefined) =>
-  release === 'eus' ? EUS : release === 'e4s' ? E4S : '';
 
 export const extractMajorVersion = (extendedReleaseVersion: string) =>
   extendedReleaseVersion.split('.')[0];

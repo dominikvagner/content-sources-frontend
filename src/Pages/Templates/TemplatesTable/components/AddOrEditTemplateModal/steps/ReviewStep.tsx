@@ -15,16 +15,17 @@ import { STANDARD_STREAM } from '../../../constants';
 export default function ReviewStep() {
   const [expanded, setExpanded] = useState(new Set([0]));
 
-  const { templateRequest, selectedRedHatRepos, redHatCoreRepos, selectedCustomRepos, isEdit } =
-    useAddOrEditTemplateContext();
-
   const {
-    getVersionName,
-    getStreamName,
-    getMinorVersionName,
+    templateRequest,
+    selectedRedHatRepos,
+    redHatCoreRepos,
+    selectedCustomRepos,
+    isEdit,
     isExtendedSupportAvailable,
-    getArchName,
-  } = useDistributionDetails();
+  } = useAddOrEditTemplateContext();
+
+  const { getVersionName, getStreamName, getMinorVersionName, getArchName } =
+    useDistributionDetails();
 
   const review = useMemo(() => {
     const {

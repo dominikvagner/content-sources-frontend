@@ -119,13 +119,25 @@ export type DistributionMinorVersion = {
   name: string;
   label: string;
   major: string;
-  feature_names: string[];
+  extended_release_streams: string[];
+};
+
+export type ExtendedReleaseStream = {
+  name: string;
+  label: string;
+  architectures?: Array<ExtendedReleaseArchitecture>;
+};
+
+export type ExtendedReleaseArchitecture = {
+  name: string;
+  label: string;
+  entitled: boolean;
 };
 
 export interface RepositoryParamsResponse {
   distribution_versions: Array<NameLabel>;
   distribution_arches: Array<NameLabel>;
-  extended_release_features: Array<NameLabel>;
+  extended_release_streams: Array<ExtendedReleaseStream>;
   distribution_minor_versions: Array<DistributionMinorVersion>;
 }
 
@@ -420,7 +432,7 @@ export const getRepositoryParams: () => Promise<RepositoryParamsResponse> = asyn
   return {
     ...data,
     // Backend returns [] when no subscriptions match, but guard against null just in case
-    extended_release_features: data.extended_release_features ?? [],
+    extended_release_streams: data.extended_release_streams ?? [],
     distribution_minor_versions: data.distribution_minor_versions ?? [],
   };
 };

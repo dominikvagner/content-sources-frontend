@@ -17,18 +17,8 @@ import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import { useState, useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
-import {
-  SUPPORTED_EUS_ARCHES,
-  SUPPORTED_MAJOR_VERSIONS,
-  SUPPORTED_ARCHES,
-  STANDARD_STREAM,
-} from '../../../constants';
-import {
-  extractMajorVersion,
-  featureNameToExtendedRelease,
-  extendedReleaseToFeatureName,
-  isMinorVersionOfMajor,
-} from '../../../helpers';
+import { SUPPORTED_MAJOR_VERSIONS, SUPPORTED_ARCHES, STANDARD_STREAM } from '../../../constants';
+import { extractMajorVersion, isMinorVersionOfMajor } from '../../../helpers';
 import useDistributionDetails from '../../../../../../Hooks/useDistributionDetails';
 import Hide from '../../../../../../components/Hide/Hide';
 import HelpPopover from '../../../../../../components/HelpPopover';
@@ -54,17 +44,13 @@ export default function OSAndArchitectureStep() {
     setTemplateRequest,
     distribution_versions,
     distribution_arches,
-    extended_release_features,
+    extended_release_streams,
     distribution_minor_versions,
+    isExtendedSupportAvailable,
   } = useAddOrEditTemplateContext();
 
-  const {
-    getVersionName,
-    getStreamName,
-    isExtendedSupportAvailable,
-    getMinorVersionName,
-    getArchName,
-  } = useDistributionDetails();
+  const { getVersionName, getStreamName, getMinorVersionName, getArchName } =
+    useDistributionDetails();
 
   const isStandardStream =
     !isExtendedSupportAvailable || templateRequest.extended_release === STANDARD_STREAM.label;
@@ -80,7 +66,7 @@ export default function OSAndArchitectureStep() {
   const handleStreamChange = (newStream: string) => {
     setTemplateRequest((prev) => ({
       ...prev,
-      extended_release: featureNameToExtendedRelease(newStream),
+      extended_release: newStream,
       // Each stream has different available versions and architectures
       version: '',
       extended_release_version: '',
@@ -89,11 +75,30 @@ export default function OSAndArchitectureStep() {
   };
 
   const isArchDisabledForStream = useCallback(
-    (arch: string) =>
-      isExtendedSupportAvailable &&
-      !SUPPORTED_EUS_ARCHES.includes(arch) &&
-      templateRequest.extended_release !== STANDARD_STREAM.label,
-    [isExtendedSupportAvailable, templateRequest.extended_release],
+    (arch: string) => {
+      // Standard stream allows all architectures
+      if (
+        !isExtendedSupportAvailable ||
+        templateRequest.extended_release === STANDARD_STREAM.label
+      ) {
+        return false;
+      }
+
+      // Find the selected extended release stream
+      const selectedStream = extended_release_streams.find(
+        (stream) => stream.label === templateRequest.extended_release,
+      );
+
+      // If no stream found or no architectures defined, disable nothing
+      if (!selectedStream || !selectedStream.architectures) {
+        return false;
+      }
+
+      // Disable if the architecture is not entitled for this stream
+      const streamArch = selectedStream.architectures.find((a) => a.label === arch);
+      return !streamArch || !streamArch.entitled;
+    },
+    [isExtendedSupportAvailable, templateRequest.extended_release, extended_release_streams],
   );
 
   const classes = useStyles();
@@ -177,11 +182,9 @@ export default function OSAndArchitectureStep() {
               )}
             >
               <DropdownList>
-                {[STANDARD_STREAM, ...extended_release_features].map(({ label, name }) => (
+                {[STANDARD_STREAM, ...extended_release_streams].map(({ label, name }) => (
                   <DropdownItem
-                    isSelected={
-                      featureNameToExtendedRelease(label) === templateRequest.extended_release
-                    }
+                    isSelected={label === templateRequest.extended_release}
                     data-ouia-component-id={`filter_${label}`}
                     key={label}
                     value={label}
@@ -244,10 +247,8 @@ export default function OSAndArchitectureStep() {
                       </DropdownItem>
                     ))
                 : distribution_minor_versions
-                    .filter(({ feature_names }) =>
-                      feature_names.includes(
-                        extendedReleaseToFeatureName(templateRequest.extended_release),
-                      ),
+                    .filter(({ extended_release_streams }) =>
+                      extended_release_streams?.includes(templateRequest?.extended_release || ''),
                     )
                     .map(({ label: minor }) => (
                       <DropdownItem

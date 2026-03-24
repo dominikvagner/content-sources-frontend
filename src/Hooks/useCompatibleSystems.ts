@@ -4,7 +4,6 @@ import { useSystemsListQuery } from '../services/Systems/SystemsQueries';
 import { TemplateItem } from '../services/Templates/TemplateApi';
 import { FETCH_TEMPLATE_KEY } from '../services/Templates/TemplateQueries';
 import {
-  extendedReleaseToFeatureName,
   isExtendedSupportTemplate,
   extractMinorVersion,
 } from '../Pages/Templates/TemplatesTable/helpers';
@@ -47,12 +46,11 @@ const useCompatibleSystems = (uuid: string) => {
 
   // For extended support templates, verify the template's stream is available for the minor version of at least one returned system
   if (templateUsesExtendedSupport && hasCompatibleSystems) {
-    const featureName = extendedReleaseToFeatureName(extended_release);
     hasCompatibleSystems = data.data.some((system) => {
       const minorEntry = distribution_minor_versions.find(
         (minorVersion) => minorVersion.label === system.attributes.rhsm,
       );
-      return minorEntry?.feature_names?.includes(featureName) ?? false;
+      return minorEntry?.extended_release_streams?.includes(extended_release || '') ?? false;
     });
   }
 

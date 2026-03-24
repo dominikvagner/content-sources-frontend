@@ -1,9 +1,5 @@
 import { NameLabel } from '../../../services/Content/ContentApi';
 
-export const EUS = 'RHEL-EUS-x86_64' as const;
-export const E4S = 'RHEL-E4S-x86_64' as const;
-export const EXTENDED_SUPPORT_FEATURES = [EUS, E4S] as const;
-
 export const SUPPORTED_MAJOR_VERSIONS = ['8', '9', '10'];
 export const SUPPORTED_ARCHES = ['x86_64', 'aarch64'];
 export const SUPPORTED_EUS_ARCHES = ['x86_64'];

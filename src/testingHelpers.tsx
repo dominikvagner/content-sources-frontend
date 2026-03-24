@@ -16,7 +16,10 @@ import {
 import { AdminTask } from 'services/Admin/AdminTaskApi';
 import { TemplateItem } from 'services/Templates/TemplateApi';
 import type { IDSystemItem, SystemItem } from 'services/Systems/SystemsApi';
-import { EXTENDED_SUPPORT_FEATURES, E4S, EUS } from './Pages/Templates/TemplatesTable/constants';
+
+// Stream labels for testing
+const EUS = 'eus';
+const E4S = 'e4s';
 
 const queryClient = new QueryClient({
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -81,34 +84,48 @@ export const testRepositoryParamsResponse: RepositoryParamsResponse = {
       label: 'aarch64',
     },
   ],
-  extended_release_features: [],
+  extended_release_streams: [],
   distribution_minor_versions: [],
 };
 
 export const testEUSRepositoryParamsResponse: RepositoryParamsResponse = {
   ...testRepositoryParamsResponse,
-  extended_release_features: [
-    { name: 'Extended Update Support (EUS)', label: EUS },
-    { name: 'Update Services for SAP Solutions (E4S)', label: E4S },
+  extended_release_streams: [
+    {
+      name: 'Extended Update Support (EUS)',
+      label: EUS,
+      architectures: [
+        { name: 'x86_64', label: 'x86_64', entitled: true },
+        { name: 'aarch64', label: 'aarch64', entitled: false },
+      ],
+    },
+    {
+      name: 'Update Services for SAP Solutions (E4S)',
+      label: E4S,
+      architectures: [
+        { name: 'x86_64', label: 'x86_64', entitled: false },
+        { name: 'aarch64', label: 'aarch64', entitled: false },
+      ],
+    },
   ],
   distribution_minor_versions: [
     {
       name: 'RHEL 8.6',
       label: '8.6',
       major: '8',
-      feature_names: [E4S],
+      extended_release_streams: [E4S],
     },
     {
       name: 'RHEL 9.4',
       label: '9.4',
       major: '9',
-      feature_names: [...EXTENDED_SUPPORT_FEATURES],
+      extended_release_streams: [EUS, E4S],
     },
     {
       name: 'RHEL 10.0',
       label: '10.0',
       major: '10',
-      feature_names: [...EXTENDED_SUPPORT_FEATURES],
+      extended_release_streams: [EUS, E4S],
     },
   ],
 };
@@ -385,7 +402,7 @@ export const defaultEUSupportTemplateItem: TemplateItem = {
   name: 'EUS Template',
   description: 'EUS template description',
   arch: 'x86_64',
-  extended_release: 'RHEL-EUS-x86_64',
+  extended_release: EUS,
   extended_release_version: '9.6',
   repository_uuids: [
     '71c06bb4-ef1b-42f5-8c91-0ff67e7d8a1b',

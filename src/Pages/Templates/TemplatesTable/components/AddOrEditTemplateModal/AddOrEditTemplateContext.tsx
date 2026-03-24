@@ -11,21 +11,26 @@ import React, {
 import { TemplateRequest } from 'services/Templates/TemplateApi';
 import { QueryClient, useQueryClient } from 'react-query';
 import { useContentListQuery, useRepositoryParams } from 'services/Content/ContentQueries';
-import { ContentOrigin, NameLabel, DistributionMinorVersion } from 'services/Content/ContentApi';
+import {
+  ContentOrigin,
+  NameLabel,
+  DistributionMinorVersion,
+  ExtendedReleaseStream,
+} from 'services/Content/ContentApi';
 import { useNavigate } from 'react-router-dom';
 import { useFetchTemplate } from 'services/Templates/TemplateQueries';
 import useRootPath from 'Hooks/useRootPath';
 import { isDateValid } from 'helpers';
 import useSafeUUIDParam from 'Hooks/useSafeUUIDParam';
-import useDistributionDetails from '../../../../../Hooks/useDistributionDetails';
 import { getRedHatCoreRepoUrls, isExtendedSupportTemplate } from '../../helpers';
 import { STANDARD_STREAM } from '../../constants';
+import { useAppContext } from 'middleware/AppContext';
 
 export interface AddOrEditTemplateContextInterface {
   queryClient: QueryClient;
   distribution_arches: NameLabel[];
   distribution_versions: NameLabel[];
-  extended_release_features: NameLabel[];
+  extended_release_streams: Array<ExtendedReleaseStream>;
   distribution_minor_versions: DistributionMinorVersion[];
   templateRequest: Partial<TemplateRequest>;
   setTemplateRequest: (value: React.SetStateAction<Partial<TemplateRequest>>) => void;
@@ -35,6 +40,7 @@ export interface AddOrEditTemplateContextInterface {
   setSelectedCustomRepos: (uuidSet: Set<string>) => void;
   redHatCoreRepos: Set<string>;
   hasInvalidSteps: (index: number) => boolean;
+  isExtendedSupportAvailable: boolean;
   isEdit?: boolean;
   editUUID?: string;
 }
@@ -67,14 +73,28 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
     data: {
       distribution_versions = [],
       distribution_arches = [],
-      extended_release_features = [],
       distribution_minor_versions = [],
+      extended_release_streams: extendedReleaseStreamsRaw = [],
     } = {},
   } = useRepositoryParams();
 
+  // Filter streams to only include those with at least one entitled architecture
+  const extended_release_streams = useMemo(
+    () =>
+      extendedReleaseStreamsRaw.filter((stream) =>
+        stream.architectures?.some((arch) => arch.entitled),
+      ),
+    [extendedReleaseStreamsRaw],
+  );
+
   const { arch, version, extended_release, extended_release_version } = templateRequest;
 
-  const { isExtendedSupportAvailable } = useDistributionDetails();
+  const { features } = useAppContext();
+  const isExtendedSupportAvailable = !!(
+    features?.extendedreleaserepos?.enabled &&
+    features.extendedreleaserepos?.accessible &&
+    extended_release_streams.length > 0
+  );
 
   const usesExtendedSupportStream =
     isExtendedSupportAvailable &&
@@ -217,7 +237,7 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
         queryClient,
         distribution_arches,
         distribution_versions,
-        extended_release_features,
+        extended_release_streams,
         distribution_minor_versions,
         templateRequest,
         setTemplateRequest,
@@ -227,6 +247,7 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
         setSelectedCustomRepos,
         redHatCoreRepos,
         hasInvalidSteps,
+        isExtendedSupportAvailable,
         isEdit: !!uuid,
         editUUID: uuid,
       }}
