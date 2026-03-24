@@ -9,7 +9,7 @@ type Props = {
 };
 
 const ApiView = ({ template: { uuid, name }, variant }: Props) => {
-  const rhcCommand = `rhc connect --content-template=${name}`;
+  const rhcCommand = `rhc connect --content-template="${name}"`;
   const curlCommand = `curl --cert /etc/pki/consumer/cert.pem --key /etc/pki/consumer/key.pem -X PATCH https://cert.console.redhat.com/api/patch/v3/templates/${uuid}/subscribed-systems`;
 
   return (

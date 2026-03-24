@@ -89,7 +89,7 @@ test.describe('Register and assign template to systems via API', () => {
       const orgId = process.env.ORG_ID_1 || '';
 
       // Extract template ID from the rhc connect command
-      const templateMatch = rhcConnectCmd.match(/--content-template[=\s]+(\S+)/);
+      const templateMatch = rhcConnectCmd.match(/--content-template[=\s]+"?([^"\s]+)"?/);
       const templateId = templateMatch ? templateMatch[1] : undefined;
 
       if (!templateId) {
