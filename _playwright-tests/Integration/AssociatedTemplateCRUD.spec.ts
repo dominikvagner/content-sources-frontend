@@ -2,6 +2,7 @@ import {
   test,
   expect,
   cleanupTemplates,
+  ensureValidToken,
   randomName,
   waitInPatch,
   isInInventory,
@@ -11,6 +12,7 @@ import {
 } from 'test-utils';
 import { CONTENT_PROPAGATION_POLL } from '../testConstants';
 import { RHSMClient } from './helpers/rhsmClient';
+import { createApiConfigWithDynamicToken } from './helpers/apiHelpers';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
 import {
   closeGenericPopupsIfExist,
@@ -34,7 +36,12 @@ test.describe('Associated Template CRUD', () => {
     let hostname: string;
 
     await test.step('Set up cleanup for templates and RHSM client', async () => {
-      await cleanup.runAndAdd(() => cleanupTemplates(client, templateNamePrefix));
+      await cleanup.runAndAdd(async () => {
+        await ensureValidToken(page, 'ADMIN_TOKEN.json', 5);
+        const apiBasePath = process.env.BASE_URL + '/api/content-sources/v1';
+        const cleanupClient = createApiConfigWithDynamicToken('ADMIN_TOKEN', apiBasePath);
+        await cleanupTemplates(cleanupClient, templateNamePrefix);
+      });
       cleanup.add(() => regClient.Destroy('rhc'));
     });
 

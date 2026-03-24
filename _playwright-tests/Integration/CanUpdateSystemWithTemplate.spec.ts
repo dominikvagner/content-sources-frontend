@@ -41,13 +41,19 @@ test.describe('Test System With Template', () => {
   });
 
   test('Verify system updates with template', async ({ page, client, cleanup }) => {
+    void client; // Pull in fixture so Undici fetch dispatcher is configured for dynamic API cleanup
     // Increase timeout for CI environment because template update tasks can take longer
     test.setTimeout(LONG_TEST_TIMEOUT_MS);
 
     const HARepo = 'Red Hat Enterprise Linux 9 for x86_64 - High Availability';
 
     await test.step('Add cleanup, delete any templates and template test repos that exist', async () => {
-      await cleanup.runAndAdd(() => cleanupTemplates(client, templateNamePrefix));
+      await cleanup.runAndAdd(async () => {
+        await ensureValidToken(page, 'LAYERED_REPO_TOKEN.json', 5);
+        const apiBasePath = process.env.BASE_URL + '/api/content-sources/v1';
+        const cleanupClient = createApiConfigWithDynamicToken('LAYERED_REPO_TOKEN', apiBasePath);
+        await cleanupTemplates(cleanupClient, templateNamePrefix);
+      });
       cleanup.add(() => regClient.Destroy('rhc'));
     });
 

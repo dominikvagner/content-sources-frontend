@@ -1,15 +1,17 @@
 import { closeGenericPopupsIfExist, waitForValidStatus } from '../UI/helpers/helpers';
 import { navigateToRepositories, navigateToSnapshotsOfRepository } from '../UI/helpers/navHelpers';
-import { cleanupRepositories, randomName, test, expect } from 'test-utils';
+import { cleanupRepositories, ensureValidToken, randomName, test, expect } from 'test-utils';
 import { createCustomRepo } from '../UI/helpers/createRepositories';
 import { refreshSubscriptionManager, RHSMClient, waitForRhcdActive } from './helpers/rhsmClient';
 import fs from 'fs';
 import { runCmd } from './helpers/helpers';
+import { createApiConfigWithDynamicToken } from './helpers/apiHelpers';
 
 const repoNamePrefix = 'Snapshot_Config';
 
 test.describe('Use Snapshot Config', () => {
   test('Use Snapshot Config', async ({ page, client, cleanup, unusedRepoUrl }) => {
+    void client; // Pull in fixture so Undici fetch dispatcher is configured for dynamic API cleanup
     let repoName = '';
     let fileContent = '';
 
@@ -17,7 +19,12 @@ test.describe('Use Snapshot Config', () => {
     repoName = `${repoNamePrefix}_${randomName()}`;
 
     await test.step('Set up cleanup', async () => {
-      await cleanup.runAndAdd(() => cleanupRepositories(client, repoNamePrefix));
+      await cleanup.runAndAdd(async () => {
+        await ensureValidToken(page, 'ADMIN_TOKEN.json', 5);
+        const apiBasePath = process.env.BASE_URL + '/api/content-sources/v1';
+        const cleanupClient = createApiConfigWithDynamicToken('ADMIN_TOKEN', apiBasePath);
+        await cleanupRepositories(cleanupClient, repoNamePrefix);
+      });
       await cleanup.runAndAdd(() => regClient.Destroy('rhc'));
     });
 
