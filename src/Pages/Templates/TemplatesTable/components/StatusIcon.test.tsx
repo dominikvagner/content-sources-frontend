@@ -42,6 +42,34 @@ it('Render with In progress status', () => {
   expect(SelectComponent).toBeInTheDocument();
 });
 
+it('Render In progress when last_update_task is missing and snapshot has no error (stage)', () => {
+  const { queryByText } = render(
+    <StatusIcon
+      uuid={defaultTemplateItem.uuid}
+      last_update_snapshot_error=''
+      last_update_task={undefined}
+    />,
+  );
+
+  expect(queryByText('In progress')).toBeInTheDocument();
+  expect(queryByText('Invalid')).not.toBeInTheDocument();
+});
+
+it('Render Valid when update task is completed and error field is omitted from API', () => {
+  const taskCompletedNoErrorField = { ...defaultUpdateTemplateTaskCompleted };
+  delete (taskCompletedNoErrorField as { error?: string }).error;
+
+  const { queryByText } = render(
+    <StatusIcon
+      uuid={defaultTemplateItem.uuid}
+      last_update_snapshot_error=''
+      last_update_task={taskCompletedNoErrorField as typeof defaultUpdateTemplateTaskCompleted}
+    />,
+  );
+
+  expect(queryByText('Valid')).toBeInTheDocument();
+});
+
 it('Render with Invalid status with an error from the update-latest-snapshot task', async () => {
   const { queryByText } = render(
     <StatusIcon

@@ -31,6 +31,9 @@ const StatusIcon = ({ uuid, last_update_snapshot_error, last_update_task }: Prop
   const { getEnvironment } = useChrome();
   const isInEphemeral = useMemo(() => getEnvironment() === 'qa', []);
 
+  const snapshotError = last_update_snapshot_error ?? '';
+  const taskError = last_update_task?.error ?? '';
+
   const showError = (
     snapshotError: string | undefined,
     updateTemplateError: string | undefined,
@@ -45,10 +48,8 @@ const StatusIcon = ({ uuid, last_update_snapshot_error, last_update_task }: Prop
   };
 
   if (
-    (last_update_task?.status === 'completed' &&
-      last_update_task?.error === '' &&
-      last_update_snapshot_error === '') ||
-    (last_update_snapshot_error === '' && isInEphemeral)
+    (last_update_task?.status === 'completed' && taskError === '' && snapshotError === '') ||
+    (snapshotError === '' && isInEphemeral)
   ) {
     return (
       <Flex
@@ -64,7 +65,12 @@ const StatusIcon = ({ uuid, last_update_snapshot_error, last_update_task }: Prop
         </FlexItem>
       </Flex>
     );
-  } else if (last_update_task?.status === 'pending' || last_update_task?.status === 'running') {
+  } else if (
+    snapshotError === '' &&
+    (!last_update_task ||
+      last_update_task.status === 'pending' ||
+      last_update_task.status === 'running')
+  ) {
     return (
       <Tooltip position='top-start' content='Template update in progress'>
         <Flex
@@ -97,7 +103,7 @@ const StatusIcon = ({ uuid, last_update_snapshot_error, last_update_task }: Prop
             alertSeverityVariant='danger'
             headerContent='Invalid'
             headerIcon={<ExclamationCircleIcon />}
-            bodyContent={showError(last_update_snapshot_error, last_update_task?.error)}
+            bodyContent={showError(last_update_snapshot_error, last_update_task?.error ?? '')}
             position='left'
           >
             <Button variant='link' isInline>
