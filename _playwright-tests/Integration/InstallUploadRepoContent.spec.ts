@@ -160,6 +160,7 @@ test.describe('Install Upload Repo Content', () => {
         'Verify that bear was installed from the upload repo',
         ['sh', '-c', "dnf info bear | grep '^From repo' | cut -d ':' -f2-"],
         regClient,
+        YUM_INSTALL_QUICK_TIMEOUT_MS,
       );
       expect(dnfVerifyRepo?.stdout?.toString().trim()).toBe(uploadRepoName);
     });

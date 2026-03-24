@@ -235,6 +235,7 @@ test.describe('Test System With Template', () => {
         'Verify that booth was installed from the HA repo',
         ['sh', '-c', "dnf info booth | grep '^From repo' | cut -d ':' -f2-"],
         regClient,
+        YUM_INSTALL_QUICK_TIMEOUT_MS,
       );
       expect(dnfVerifyRepo?.stdout?.toString().trim()).toBe(
         'rhel-9-for-x86_64-highavailability-rpms',
