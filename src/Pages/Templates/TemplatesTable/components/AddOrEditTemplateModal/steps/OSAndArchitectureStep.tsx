@@ -189,6 +189,13 @@ export default function OSAndArchitectureStep() {
                         Offers specialized fixes specifically for SAP solution environments on
                         select minor releases.
                       </ListItem>
+                      <ListItem>
+                        <span className={text.fontWeightBold}>
+                          Enhanced Extended Update Support (EEUS):
+                        </span>{' '}
+                        Locks your system to a specific minor release for up to an additional 48
+                        months of critical security and urgent bug fixes.
+                      </ListItem>
                     </List>
                   </>
                 }
