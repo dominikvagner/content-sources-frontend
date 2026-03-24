@@ -1,4 +1,9 @@
-import { getRedHatCoreRepoUrls, isMinorVersionOfMajor, extractMinorVersion } from './helpers';
+import {
+  getRedHatCoreRepoUrls,
+  isMinorVersionOfMajor,
+  extractMinorVersion,
+  isArchManuallyDisabled,
+} from './helpers';
 
 describe('getRedHatCoreRepoUrls', () => {
   it('returns standard stream URLs when no release stream is specified', () => {
@@ -57,5 +62,19 @@ describe('isMinorVersionOfMajor', () => {
 describe('extractMinorVersion', () => {
   it('returns only the minor number when given the full version', () => {
     expect(extractMinorVersion('9.4')).toEqual('4');
+  });
+});
+
+describe('isArchManuallyDisabled', () => {
+  it('disables x86_64 for EEUS version 9', () => {
+    expect(isArchManuallyDisabled('x86_64', 'eeus', '9')).toBe(true);
+  });
+
+  it('does not disable aarch64 for EEUS version 9', () => {
+    expect(isArchManuallyDisabled('aarch64', 'eeus', '9')).toBe(false);
+  });
+
+  it('does not disable x86_64 for non-EUS version 9', () => {
+    expect(isArchManuallyDisabled('x86_64', 'e4s', '9')).toBe(false);
   });
 });

@@ -18,7 +18,11 @@ import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip
 import { useState, useCallback } from 'react';
 import { createUseStyles } from 'react-jss';
 import { SUPPORTED_MAJOR_VERSIONS, SUPPORTED_ARCHES, STANDARD_STREAM } from '../../../constants';
-import { extractMajorVersion, isMinorVersionOfMajor } from '../../../helpers';
+import {
+  extractMajorVersion,
+  isMinorVersionOfMajor,
+  isArchManuallyDisabled,
+} from '../../../helpers';
 import useDistributionDetails from '../../../../../../Hooks/useDistributionDetails';
 import Hide from '../../../../../../components/Hide/Hide';
 import HelpPopover from '../../../../../../components/HelpPopover';
@@ -56,11 +60,21 @@ export default function OSAndArchitectureStep() {
     !isExtendedSupportAvailable || templateRequest.extended_release === STANDARD_STREAM.label;
 
   const handleVersionChange = (newVersion: string) => {
-    setTemplateRequest((prev) => ({
-      ...prev,
-      version: isStandardStream ? newVersion : extractMajorVersion(newVersion),
-      ...(isStandardStream ? {} : { extended_release_version: newVersion }),
-    }));
+    setTemplateRequest((prev) => {
+      const newMajorVersion = isStandardStream ? newVersion : extractMajorVersion(newVersion);
+
+      // Clear arch if it becomes disabled for the new version
+      const shouldClearArch =
+        prev.arch &&
+        isArchManuallyDisabled(prev.arch, prev.extended_release || '', newMajorVersion);
+
+      return {
+        ...prev,
+        version: newMajorVersion,
+        ...(isStandardStream ? {} : { extended_release_version: newVersion }),
+        ...(shouldClearArch ? { arch: '' } : {}),
+      };
+    });
   };
 
   const handleStreamChange = (newStream: string) => {
@@ -76,6 +90,16 @@ export default function OSAndArchitectureStep() {
 
   const isArchDisabledForStream = useCallback(
     (arch: string) => {
+      if (
+        isArchManuallyDisabled(
+          arch,
+          templateRequest.extended_release || '',
+          templateRequest.version || '',
+        )
+      ) {
+        return true;
+      }
+
       // Standard stream allows all architectures
       if (
         !isExtendedSupportAvailable ||
@@ -98,7 +122,30 @@ export default function OSAndArchitectureStep() {
       const streamArch = selectedStream.architectures.find((a) => a.label === arch);
       return !streamArch || !streamArch.entitled;
     },
-    [isExtendedSupportAvailable, templateRequest.extended_release, extended_release_streams],
+    [
+      isExtendedSupportAvailable,
+      templateRequest.extended_release,
+      templateRequest.version,
+      extended_release_streams,
+    ],
+  );
+
+  const isVersionDisabledForStream = useCallback(
+    (minorVersion: string) => {
+      const majorVersion = extractMajorVersion(minorVersion);
+      // For EEUS version 9, x86_64 is manually disabled
+      // If aarch64 is also not entitled, disable all 9.X versions
+      if (templateRequest.extended_release === 'eeus' && majorVersion === '9') {
+        const selectedStream = extended_release_streams.find((stream) => stream.label === 'eeus');
+
+        if (selectedStream?.architectures) {
+          const aarch64 = selectedStream.architectures.find((a) => a.label === 'aarch64');
+          return !aarch64 || !aarch64.entitled;
+        }
+      }
+      return false;
+    },
+    [templateRequest.extended_release, extended_release_streams],
   );
 
   const classes = useStyles();
@@ -250,6 +297,7 @@ export default function OSAndArchitectureStep() {
                     .filter(({ extended_release_streams }) =>
                       extended_release_streams?.includes(templateRequest?.extended_release || ''),
                     )
+                    .filter(({ label: minor }) => !isVersionDisabledForStream(minor))
                     .map(({ label: minor }) => (
                       <DropdownItem
                         key={minor}
