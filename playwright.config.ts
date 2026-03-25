@@ -11,6 +11,12 @@ import path from 'path';
 
 config({ path: path.join(__dirname, './.env'), quiet: true });
 
+// test-utils resolves storage state paths from here; package __dirname does not match this repo layout.
+// Respect PLAYWRIGHT_AUTH_DIR from the environment (CI or local) when set.
+if (!process.env.PLAYWRIGHT_AUTH_DIR) {
+  process.env.PLAYWRIGHT_AUTH_DIR = path.join(__dirname, '.auth');
+}
+
 let creds: Record<string, string> = {};
 try {
   const credsPath = path.join(__dirname, 'creds.json');
