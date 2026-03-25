@@ -1,10 +1,5 @@
 import * as Yup from 'yup';
-import {
-  SUPPORTED_ARCHES,
-  SUPPORTED_MAJOR_VERSIONS,
-  SUPPORTED_EUS_ARCHES,
-  STANDARD_STREAM_PATH,
-} from './constants';
+import { STANDARD_STREAM_PATH } from './constants';
 
 export const extractMajorVersion = (extendedReleaseVersion: string) =>
   extendedReleaseVersion.split('.')[0];
@@ -19,37 +14,23 @@ export const extractMajorVersion = (extendedReleaseVersion: string) =>
 export const extractMinorVersion = (extendedReleaseVersion: string) =>
   extendedReleaseVersion.split('.')[1];
 
-const validateRedHatRepoParams = (
-  arch?: string,
-  majorVersion?: string,
-  featureName?: string,
-  minorVersion?: string,
-): boolean => {
-  if (!arch || !majorVersion) return false;
-  if (!SUPPORTED_ARCHES.includes(arch)) return false;
-  if (!SUPPORTED_MAJOR_VERSIONS.includes(majorVersion)) return false;
-
-  // Standard stream: only arch and major version are needed
-  if (!featureName) return true;
-
-  // Extended stream (EUS/E4S): all four params are required
-  if (!minorVersion) return false;
-  if (!SUPPORTED_EUS_ARCHES.includes(arch)) return false;
-
-  return ['eus', 'e4s'].includes(featureName);
-};
-
 export const getRedHatCoreRepoUrls = (
   arch?: string,
   majorVersion?: string,
   releaseStream?: string,
   minorVersion?: string,
 ): string[] => {
-  const areParamsValid = validateRedHatRepoParams(arch, majorVersion, releaseStream, minorVersion);
-  if (!areParamsValid) return [];
-
-  const stream = releaseStream || STANDARD_STREAM_PATH;
+  let stream = releaseStream || STANDARD_STREAM_PATH;
   const versionNumber = stream === STANDARD_STREAM_PATH ? majorVersion : minorVersion;
+
+  if (!arch || !majorVersion || (stream !== STANDARD_STREAM_PATH && !minorVersion)) {
+    return [];
+  }
+
+  // 'eeus' uses 'e4s' in the url path
+  if (stream === 'eeus') {
+    stream = 'e4s';
+  }
 
   return [
     `https://cdn.redhat.com/content/${stream}/rhel${majorVersion}/${versionNumber}/${arch}/appstream/os/`,

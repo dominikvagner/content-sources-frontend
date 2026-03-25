@@ -40,8 +40,25 @@ describe('getRedHatCoreRepoUrls', () => {
     expect(result[1]).toEqual('https://cdn.redhat.com/content/e4s/rhel8/8.6/x86_64/baseos/os/');
   });
 
-  it('returns empty array for unsupported arch/version', () => {
-    expect(getRedHatCoreRepoUrls('stuff', '12')).toEqual([]);
+  it('returns EEUS stream URLs with minor version (mapped to e4s path)', () => {
+    const result = getRedHatCoreRepoUrls('x86_64', '8', 'eeus', '8.10');
+    expect(result).toHaveLength(2);
+    expect(result[0]).toEqual('https://cdn.redhat.com/content/e4s/rhel8/8.10/x86_64/appstream/os/');
+    expect(result[1]).toEqual('https://cdn.redhat.com/content/e4s/rhel8/8.10/x86_64/baseos/os/');
+  });
+
+  it('returns empty array when arch or major version are missing', () => {
+    expect(getRedHatCoreRepoUrls(undefined, undefined)).toEqual([]);
+    expect(getRedHatCoreRepoUrls('', '')).toEqual([]);
+    expect(getRedHatCoreRepoUrls('x86_64', undefined)).toEqual([]);
+    expect(getRedHatCoreRepoUrls(undefined, '9')).toEqual([]);
+  });
+
+  it('returns empty array for extended support when minor version is missing', () => {
+    expect(getRedHatCoreRepoUrls('x86_64', '9', 'eus', undefined)).toEqual([]);
+    expect(getRedHatCoreRepoUrls('x86_64', '9', 'eus', '')).toEqual([]);
+    expect(getRedHatCoreRepoUrls('x86_64', '9', 'e4s', undefined)).toEqual([]);
+    expect(getRedHatCoreRepoUrls('x86_64', '9', 'eeus', undefined)).toEqual([]);
   });
 });
 
