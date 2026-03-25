@@ -225,9 +225,9 @@ export class RHSMClient {
         RHSM.serviceStatusTimeoutMs,
       );
       if (stream) {
-        console.log(stream.stdout);
-        console.log(stream.stderr);
-        console.log(stream.exitCode);
+        if (stream.stdout) console.log(stream.stdout);
+        if (stream.stderr) console.log(stream.stderr);
+        console.log('systemctl status rhcd.service exit code:', stream.exitCode);
       }
       return runCommand(this.name, ['rhc', 'disconnect'], RHSM.disconnectTimeoutMs);
     } else {
