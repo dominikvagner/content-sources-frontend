@@ -14,6 +14,7 @@ import {
   TEMPLATE_UPDATE_TASK_POLL,
   TEMPLATE_VALID_STATUS_TIMEOUT_MS,
   YUM_INSTALL_QUICK_TIMEOUT_MS,
+  YUM_INSTALL_TIMEOUT_MS,
 } from '../testConstants';
 import { RHSMClient, refreshSubscriptionManager, waitForRhcdActive } from './helpers/rhsmClient';
 import { runCmd } from './helpers/helpers';
@@ -222,11 +223,12 @@ test.describe('Test System With Template', () => {
 
       await runCmd('vim-enhanced should be installed', ['rpm', '-q', 'vim-enhanced'], regClient);
 
+      // booth is small but the transaction pulls many HA deps (~119 packages, ~24 MiB download).
       await runCmd(
         'Install booth from the HA layered repo',
         ['yum', 'install', '-y', 'booth'],
         regClient,
-        YUM_INSTALL_QUICK_TIMEOUT_MS,
+        YUM_INSTALL_TIMEOUT_MS,
       );
 
       await runCmd('booth should be installed', ['rpm', '-q', 'booth'], regClient);
