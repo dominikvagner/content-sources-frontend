@@ -42,7 +42,7 @@ test.describe('Templates', () => {
       await page.getByRole('link', { name: 'Learn more about content templates' }).click();
       const docsPage = await pagePromise;
       await expect(docsPage).toHaveURL(
-        /^https:\/\/docs\.redhat\.com\/en\/documentation\/red_hat_lightspeed\/.*content-template.*$/,
+        /^https:\/\/docs\.redhat\.com\/en\/documentation\/red_hat_lightspeed\/.*patching-using-content-templates.*$/,
       );
       await expect(docsPage.getByText(/^.*Using content templates.*$/).first()).toBeVisible();
       await expect(

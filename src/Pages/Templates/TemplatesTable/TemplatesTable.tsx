@@ -222,8 +222,7 @@ const TemplatesTable = () => {
           bodyContent:
             'Templates provide consistent content across environments and time. They enable you to control the scope of package and advisory updates that will be installed on selected systems.',
           linkText: 'Content templates documentation',
-          linkUrl:
-            'https://docs.redhat.com/en/documentation/red_hat_insights/1-latest/html/managing_system_content_and_patch_updates_on_rhel_systems/patching-using-content-templates_patch-service-overview',
+          linkUrl: TEMPLATES_DOCS_URL,
         }}
       />
       {serviceUnavailable && <ServiceUnavailableAlert />}
