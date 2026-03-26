@@ -358,12 +358,13 @@ export default function OSAndArchitectureStep() {
             <DropdownList>
               {distribution_arches
                 .filter(({ label }) => SUPPORTED_ARCHES.includes(label))
+                .filter(({ label }) => isEdit || !isArchDisabledForStream(label))
                 .map(({ label, name }) => (
                   <DropdownItem
                     key={label}
                     value={label}
                     isSelected={label === templateRequest?.arch}
-                    isDisabled={isArchDisabledForStream(label)}
+                    isDisabled={isEdit && isArchDisabledForStream(label)}
                     component='button'
                     data-ouia-component-id={`filter_${label}`}
                   >
