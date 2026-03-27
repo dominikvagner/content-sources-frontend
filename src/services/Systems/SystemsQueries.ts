@@ -2,6 +2,7 @@ import useErrorNotification from 'Hooks/useErrorNotification';
 import {
   addTemplateToSystems,
   getSystemsList,
+  getTemplateSystemCounts,
   listSystemsByTemplateId,
   deleteTemplateFromSystems,
   type IDSystemsCollectionResponse,
@@ -16,6 +17,7 @@ import { AlertVariant } from '@patternfly/react-core';
 
 export const GET_SYSTEMS_KEY = 'GET_SYSTEMS_KEY';
 export const GET_TEMPLATE_SYSTEMS_KEY = 'GET_TEMPLATE_SYSTEMS_KEY';
+export const TEMPLATE_SYSTEM_COUNTS_KEY = 'TEMPLATE_SYSTEM_COUNTS_KEY';
 
 export const useSystemsListQuery = (
   page: number,
@@ -100,8 +102,9 @@ export const useAddTemplateToSystemsQuery = (
         title: `Template successfully added to ${systemUUIDs.length} system${systemUUIDs.length > 1 ? 's' : ''}`,
       });
 
-      queryClient.invalidateQueries(GET_TEMPLATE_SYSTEMS_KEY);
       queryClient.invalidateQueries(GET_SYSTEMS_KEY);
+      queryClient.invalidateQueries(GET_TEMPLATE_SYSTEMS_KEY);
+      queryClient.invalidateQueries(TEMPLATE_SYSTEM_COUNTS_KEY);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
@@ -121,6 +124,7 @@ export const useDeleteTemplateFromSystems = (queryClient: QueryClient) => {
     onSuccess: () => {
       queryClient.invalidateQueries(GET_SYSTEMS_KEY);
       queryClient.invalidateQueries(GET_TEMPLATE_SYSTEMS_KEY);
+      queryClient.invalidateQueries(TEMPLATE_SYSTEM_COUNTS_KEY);
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: (err: any) => {
@@ -132,4 +136,26 @@ export const useDeleteTemplateFromSystems = (queryClient: QueryClient) => {
       );
     },
   });
+};
+
+export const useTemplateSystemCounts = (templateUuids: string[]) => {
+  const errorNotifier = useErrorNotification();
+  return useQuery<Record<string, number>>(
+    [TEMPLATE_SYSTEM_COUNTS_KEY, ...templateUuids],
+    () => getTemplateSystemCounts(templateUuids),
+    {
+      onError: (err) => {
+        errorNotifier(
+          'Unable to get system counts for templates',
+          'An error occurred',
+          err,
+          'template-system-counts-error',
+        );
+      },
+      keepPreviousData: true,
+      staleTime: 25_000,
+      refetchInterval: 20_000,
+      enabled: templateUuids.length > 0,
+    },
+  );
 };
