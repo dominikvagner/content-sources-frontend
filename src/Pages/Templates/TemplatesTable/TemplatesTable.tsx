@@ -36,9 +36,10 @@ import TemplateFilters from './components/TemplateFilters';
 import { formatDateDDMMMYYYY, formatDateUTC } from 'helpers';
 import Header from 'components/Header/Header';
 import useRootPath from 'Hooks/useRootPath';
-import { DELETE_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
+import { DELETE_ROUTE, SYSTEMS_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
 import useDistributionDetails from '../../../Hooks/useDistributionDetails';
 import { useTemplateList } from 'services/Templates/TemplateQueries';
+import { useTemplateSystemCounts } from 'services/Systems/SystemsQueries';
 import StatusIcon from './components/StatusIcon';
 import { ExclamationTriangleIcon, ExternalLinkSquareAltIcon } from '@patternfly/react-icons';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
@@ -103,7 +104,7 @@ const TemplatesTable = () => {
   const notFiltered =
     filterData.arch === '' && filterData.version === '' && filterData.search === '';
 
-  const columnSortAttributes = ['name', '', 'arch', 'version', ''];
+  const columnSortAttributes = ['name', '', 'arch', 'version', '', ''];
 
   const sortString = useMemo(
     () =>
@@ -178,6 +179,7 @@ const TemplatesTable = () => {
     { title: 'Architecture', width: 10 },
     { title: 'OS version', width: 10 },
     { title: 'Snapshot date', width: 15 },
+    { title: 'Systems', width: 10 },
     { title: 'Status', width: 15 },
   ];
 
@@ -199,6 +201,11 @@ const TemplatesTable = () => {
     data: templateList = [],
     meta: { count = 0 },
   } = data;
+
+  const templateUuids = useMemo(() => templateList.map((t) => t.uuid), [templateList]);
+
+  const { data: systemCountMap = {}, isFetching: isSystemCountsFetching } =
+    useTemplateSystemCounts(templateUuids);
 
   const itemName = 'templates';
   const notFilteredBody =
@@ -351,6 +358,21 @@ const TemplatesTable = () => {
                         >
                           <p>{use_latest ? 'Use latest' : formatDateDDMMMYYYY(date)}</p>
                         </ConditionalTooltip>
+                      </Td>
+                      <Td>
+                        {isSystemCountsFetching && systemCountMap[uuid] === undefined ? (
+                          <Spinner size='sm' />
+                        ) : (
+                          <Button
+                            variant='link'
+                            isInline
+                            onClick={() =>
+                              navigate(`${rootPath}/${TEMPLATES_ROUTE}/${uuid}/${SYSTEMS_ROUTE}`)
+                            }
+                          >
+                            {systemCountMap[uuid] ?? 0}
+                          </Button>
+                        )}
                       </Td>
                       <Td>
                         <StatusIcon

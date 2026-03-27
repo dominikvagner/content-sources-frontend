@@ -119,6 +119,24 @@ export interface TagsResponse {
   meta: SystemMeta;
 }
 
+export interface PatchTemplateAttributes {
+  name: string;
+  published: string;
+  systems: number;
+}
+
+export interface PatchTemplateItem {
+  attributes: PatchTemplateAttributes;
+  id: string;
+  type: string;
+}
+
+export interface PatchTemplatesResponse {
+  data: PatchTemplateItem[];
+  links: Links;
+  meta: SystemMeta;
+}
+
 const patchApiVersionUrl = '/api/patch/v3';
 
 export const getSystemsList: (
@@ -228,4 +246,42 @@ export const listTags: (
   );
 
   return data;
+};
+
+const PATCH_TEMPLATES_CHUNK_SIZE = 50;
+
+export const getTemplateSystemCounts: (
+  templateUuids: string[],
+) => Promise<Record<string, number>> = async (templateUuids) => {
+  if (templateUuids.length === 0) return {};
+
+  // Strip hyphens from UUIDs to conserve characters, Patch API supports this
+  const strippedUuids = templateUuids.map((uuid) => uuid.replace(/-/g, ''));
+
+  // Chunk into groups of 50, to prevent hitting the URL length limit
+  const chunks: string[][] = [];
+  while (strippedUuids.length > 0) {
+    chunks.push(strippedUuids.splice(0, PATCH_TEMPLATES_CHUNK_SIZE));
+  }
+
+  const responses = await Promise.all(
+    chunks.map(async (chunk) => {
+      const { data } = await axios.get<PatchTemplatesResponse>(
+        `${patchApiVersionUrl}/templates?${objectToUrlParams({
+          [encodeURI('filter[id]')]: encodeURI(`in:${chunk.join(',')}`),
+          limit: chunk.length.toString(),
+        })}`,
+      );
+      return data;
+    }),
+  );
+
+  const systemCountMap: Record<string, number> = {};
+  for (const response of responses) {
+    for (const item of response.data) {
+      systemCountMap[item.id] = item.attributes.systems;
+    }
+  }
+
+  return systemCountMap;
 };

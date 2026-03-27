@@ -17,7 +17,11 @@ import {
 import { refreshSubscriptionManager, RHSMClient, waitForRhcdActive } from './helpers/rhsmClient';
 import { runCmd } from './helpers/helpers';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
-import { closeGenericPopupsIfExist, getRowByNameOrUrl } from '../UI/helpers/helpers';
+import {
+  closeGenericPopupsIfExist,
+  getRowByNameOrUrl,
+  getRowCellByHeader,
+} from '../UI/helpers/helpers';
 import { createApiConfigWithDynamicToken } from './helpers/apiHelpers';
 
 test.describe('Assign Template to System via UI', () => {
@@ -121,6 +125,17 @@ test.describe('Assign Template to System via UI', () => {
 
       const systemRow = await getRowByNameOrUrl(page, hostname);
       await expect(systemRow).toBeVisible({ timeout: SYSTEM_ROW_VISIBILITY_TIMEOUT_MS });
+    });
+
+    await test.step('Check template table systems column, expect a system assigned', async () => {
+      await navigateToTemplates(page);
+      const row = await getRowByNameOrUrl(page, templateName);
+      const cell = await getRowCellByHeader(page, row, 'Systems');
+      const systemsButton = cell.getByRole('button');
+      await expect(systemsButton).toHaveText('1');
+
+      await systemsButton.click();
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(templateName);
     });
 
     await test.step('Verify the host can install packages from the template', async () => {
