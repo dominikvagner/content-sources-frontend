@@ -1041,17 +1041,17 @@
     lazy-ass "1.6.0"
     ramda "0.26.1"
 
-"@currents/playwright@^1.22.1":
-  version "1.22.1"
-  resolved "https://registry.yarnpkg.com/@currents/playwright/-/playwright-1.22.1.tgz#e9682b61dd6f7993eb72195a66e8bcff496f9145"
-  integrity sha512-yjopDP+CLRBPZ3oQrzKU7Cx1v2SgGGBZI1vNeX5qKQksi30lDkqnA0Uyx2wQwGUIj1IgziHdRzNhdW58D78FxA==
+"@currents/playwright@1.22.3":
+  version "1.22.3"
+  resolved "https://registry.yarnpkg.com/@currents/playwright/-/playwright-1.22.3.tgz#f04ab68435d6e1541bc1bba9ca6019dbd77d121f"
+  integrity sha512-hV/Ojb5U/5GDT2PSW/2vePI+3n2odMg2ow2cO94kP2hGPCotXXrWFXYsvqnmoP2qbPcbZe2KvZvmc8ZpFctHRA==
   dependencies:
     "@babel/code-frame" "^7.29.0"
     "@commander-js/extra-typings" "^13.1.0"
     "@currents/commit-info" "1.0.1-beta.0"
     async-retry "^1.3.3"
-    axios "^1.13.5"
-    axios-retry "^4.5.0"
+    axios "1.13.6"
+    axios-retry "4.5.0"
     chalk "^4.1.2"
     commander "^13.1.0"
     date-fns "^4.1.0"
@@ -3925,14 +3925,14 @@ awesome-only-resolves-last-promise@^1.0.3:
   dependencies:
     awesome-imperative-promise "^1.0.1"
 
-axios-retry@^4.5.0:
+axios-retry@4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/axios-retry/-/axios-retry-4.5.0.tgz#441fdc32cedf63d6abd5de5d53db3667afd4c39b"
   integrity sha512-aR99oXhpEDGo0UuAlYcn2iGRds30k366Zfa05XWScR9QaQD4JYiP3/1Qt1u7YlefUOK+cn0CcwoL1oefavQUlQ==
   dependencies:
     is-retry-allowed "^2.2.0"
 
-axios@^1.12.2, axios@^1.13.5, axios@^1.13.6, axios@^1.6.1:
+axios@1.13.6, axios@^1.12.2, axios@^1.13.6, axios@^1.6.1:
   version "1.13.6"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.13.6.tgz#c3f92da917dc209a15dd29936d20d5089b6b6c98"
   integrity sha512-ChTCHMouEe2kn713WHbQGcuYrr6fXTBiu460OTwWrWob16g1bXn4vtz07Ope7ewMozJAnEquLk5lWQWtBig9DQ==
