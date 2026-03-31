@@ -213,6 +213,7 @@ export default function OSAndArchitectureStep() {
               }}
               isOpen={isReleaseStreamOpen}
               onOpenChange={(isOpen) => setIsReleaseStreamOpen(isOpen)}
+              popperProps={{ appendTo: 'inline' }}
               toggle={(toggleRef) => (
                 <ConditionalTooltip
                   position='top-start'
@@ -284,6 +285,7 @@ export default function OSAndArchitectureStep() {
             )}
             onOpenChange={(isOpen) => setIsVersionOpen(isOpen)}
             isOpen={isVersionOpen}
+            popperProps={{ appendTo: 'inline' }}
           >
             <DropdownList>
               {isStandardStream
@@ -354,6 +356,7 @@ export default function OSAndArchitectureStep() {
             )}
             onOpenChange={(isOpen) => setIsArchOpen(isOpen)}
             isOpen={isArchOpen}
+            popperProps={{ appendTo: 'inline' }}
           >
             <DropdownList>
               {distribution_arches
