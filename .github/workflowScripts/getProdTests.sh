@@ -48,4 +48,5 @@ fi
 # Clean up
 rm $yaml_file
 
-git checkout $commit_hash
+git fetch origin "$commit_hash"
+git checkout "$commit_hash"
