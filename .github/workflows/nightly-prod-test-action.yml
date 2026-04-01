@@ -25,6 +25,12 @@ jobs:
       - name: Set up sparse checkout
         uses: ./.github/actions/sparse-checkout-utils
 
+      - name: Get prod tests
+        run: ./.github/workflowScripts/getProdTests.sh
+
+      - name: Update submodules
+        run: git submodule update
+
       - name: Cache - node_modules
         uses: actions/cache@v4
         with:
