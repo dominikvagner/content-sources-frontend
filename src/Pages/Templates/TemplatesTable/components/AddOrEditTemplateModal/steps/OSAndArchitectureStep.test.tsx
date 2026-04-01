@@ -150,13 +150,6 @@ it('keeps the version selector enabled when editing an EUS template', () => {
 });
 
 it('hides release stream selection when no streams are entitled', () => {
-  (useDistributionDetails as jest.Mock).mockImplementation(() => ({
-    getVersionName: () => standardVersionName,
-    getArchName: () => defaultTemplateItem.arch,
-    getMinorVersionName: () => '',
-    getStreamName: () => '',
-  }));
-
   (useAddOrEditTemplateContext as jest.Mock).mockImplementation(() => ({
     ...defaultStandardContext,
     isExtendedSupportAvailable: false,
