@@ -1,11 +1,4 @@
-import {
-  test,
-  expect,
-  cleanupTemplates,
-  ensureValidToken,
-  randomName,
-  waitInPatch,
-} from 'test-utils';
+import { test, expect, cleanupTemplates, randomName, waitInPatch } from 'test-utils';
 import {
   LONG_TEST_TIMEOUT_MS,
   RHSM_RHCD_WAIT,
@@ -18,25 +11,18 @@ import {
   waitForValidStatus,
 } from '../UI/helpers/helpers';
 import { RHSMClient, waitForRhcdActive, refreshSubscriptionManager } from './helpers/rhsmClient';
-import { createApiConfigWithDynamicToken } from './helpers/apiHelpers';
 
 const templateNamePrefix = 'use_template_dialog_test';
 const regClient = new RHSMClient(`RHSMClientTest-${randomName()}`);
 
 test.describe('Register and assign template to systems via API', () => {
   test('Create template and assign to systems via API', async ({ page, client, cleanup }) => {
-    void client; // Pull in fixture so Undici fetch dispatcher is configured for dynamic API cleanup
     test.setTimeout(LONG_TEST_TIMEOUT_MS);
 
     const templateName = `${templateNamePrefix}-${randomName()}`;
 
     await test.step('Set up cleanup for repositories, templates, and RHSM client', async () => {
-      await cleanup.runAndAdd(async () => {
-        await ensureValidToken(page, 'ADMIN_TOKEN.json', 5);
-        const apiBasePath = process.env.BASE_URL + '/api/content-sources/v1';
-        const cleanupClient = createApiConfigWithDynamicToken('ADMIN_TOKEN', apiBasePath);
-        await cleanupTemplates(cleanupClient, templateNamePrefix);
-      });
+      await cleanup.runAndAdd(() => cleanupTemplates(client, templateNamePrefix));
       cleanup.add(() => regClient.Destroy('rhc'));
     });
 

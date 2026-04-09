@@ -18,7 +18,6 @@ import {
 } from '../testConstants';
 import { RHSMClient, refreshSubscriptionManager, waitForRhcdActive } from './helpers/rhsmClient';
 import { runCmd } from './helpers/helpers';
-import { createApiConfigWithDynamicToken } from './helpers/apiHelpers';
 import { navigateToTemplates } from '../UI/helpers/navHelpers';
 import {
   closeGenericPopupsIfExist,
@@ -41,19 +40,13 @@ test.describe('Test System With Template', () => {
   });
 
   test('Verify system updates with template', async ({ page, client, cleanup }) => {
-    void client; // Pull in fixture so Undici fetch dispatcher is configured for dynamic API cleanup
     // Increase timeout for CI environment because template update tasks can take longer
     test.setTimeout(LONG_TEST_TIMEOUT_MS);
 
     const HARepo = 'Red Hat Enterprise Linux 9 for x86_64 - High Availability';
 
     await test.step('Add cleanup, delete any templates and template test repos that exist', async () => {
-      await cleanup.runAndAdd(async () => {
-        await ensureValidToken(page, 'LAYERED_REPO_TOKEN.json', 5);
-        const apiBasePath = process.env.BASE_URL + '/api/content-sources/v1';
-        const cleanupClient = createApiConfigWithDynamicToken('LAYERED_REPO_TOKEN', apiBasePath);
-        await cleanupTemplates(cleanupClient, templateNamePrefix);
-      });
+      await cleanup.runAndAdd(() => cleanupTemplates(client, templateNamePrefix));
       cleanup.add(() => regClient.Destroy('rhc'));
     });
 
@@ -152,18 +145,13 @@ test.describe('Test System With Template', () => {
       await page.getByRole('button', { name: 'Next', exact: true }).click();
       await page.getByRole('button', { name: 'Confirm changes', exact: true }).click();
 
-      // Wait for the template update task to complete. Check the token validity before each poll
-      // because the JWT can expire mid-test.
-      const tokenBaseName = 'LAYERED_REPO_TOKEN';
-      const apiBasePath = process.env.BASE_URL + '/api/content-sources/v1';
-      const dynamicClient = createApiConfigWithDynamicToken(tokenBaseName, apiBasePath);
       await expect
         .poll(
           async () => {
-            await ensureValidToken(page, `${tokenBaseName}.json`, 5);
-            const templates = await new TemplatesApi(dynamicClient).listTemplates(<
-              ListTemplatesRequest
-            >{ name: templateName });
+            await ensureValidToken(page, `LAYERED_REPO_TOKEN.json`, 5);
+            const templates = await new TemplatesApi(client).listTemplates(<ListTemplatesRequest>{
+              name: templateName,
+            });
             const template = templates.data?.[0];
             const taskStatus = template?.lastUpdateTask?.status;
             const taskError = template?.lastUpdateTask?.error;

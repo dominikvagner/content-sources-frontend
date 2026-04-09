@@ -1,11 +1,4 @@
-import {
-  test,
-  expect,
-  cleanupTemplates,
-  ensureValidToken,
-  randomName,
-  waitInPatch,
-} from 'test-utils';
+import { test, expect, cleanupTemplates, randomName, waitInPatch } from 'test-utils';
 import {
   CONTENT_PROPAGATION_POLL,
   DNF_COMMAND_TIMEOUT_MS,
@@ -22,7 +15,6 @@ import {
   getRowByNameOrUrl,
   getRowCellByHeader,
 } from '../UI/helpers/helpers';
-import { createApiConfigWithDynamicToken } from './helpers/apiHelpers';
 
 test.describe('Assign Template to System via UI', () => {
   const templateNamePrefix = 'Template_test_for_system_assignment';
@@ -32,7 +24,6 @@ test.describe('Assign Template to System via UI', () => {
     client,
     cleanup,
   }) => {
-    void client; // Pull in fixture so Undici fetch dispatcher is configured for dynamic API cleanup
     const templateName = `${templateNamePrefix}-${randomName()}`;
     const containerName = `RHSMClientTest-${randomName()}`;
     const regClient = new RHSMClient(containerName);
@@ -68,12 +59,7 @@ test.describe('Assign Template to System via UI', () => {
     });
 
     await test.step('Create template', async () => {
-      await cleanup.runAndAdd(async () => {
-        await ensureValidToken(page, 'ADMIN_TOKEN.json', 5);
-        const apiBasePath = process.env.BASE_URL + '/api/content-sources/v1';
-        const cleanupClient = createApiConfigWithDynamicToken('ADMIN_TOKEN', apiBasePath);
-        await cleanupTemplates(cleanupClient, templateNamePrefix);
-      });
+      await cleanup.runAndAdd(() => cleanupTemplates(client, templateNamePrefix));
       cleanup.add(() => regClient.Destroy('rhc'));
 
       await closeGenericPopupsIfExist(page);

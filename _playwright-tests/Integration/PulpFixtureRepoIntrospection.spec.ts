@@ -82,7 +82,7 @@ test.describe('Pulp Fixture Repository Introspection', () => {
 
     await test.step('Validate existing pulp repositories count', async () => {
       expect(pulpReposResponse.data).toBeDefined();
-      expect(existingPulpRepos.length).toBe(36);
+      expect(existingPulpRepos).toHaveLength(36);
     });
 
     await test.step('Check that repositories are introspected and have valid status', async () => {

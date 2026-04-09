@@ -4,7 +4,6 @@ import {
   expect,
   cleanupRepositories,
   cleanupTemplates,
-  ensureValidToken,
   randomName,
   waitWhileRepositoryIsPending,
 } from 'test-utils';
@@ -18,7 +17,6 @@ import {
 } from '../testConstants';
 import { RHSMClient, refreshSubscriptionManager } from './helpers/rhsmClient';
 import { runCmd } from './helpers/helpers';
-import { createApiConfigWithDynamicToken } from './helpers/apiHelpers';
 import { navigateToRepositories, navigateToTemplates } from '../UI/helpers/navHelpers';
 import {
   closeGenericPopupsIfExist,
@@ -41,13 +39,8 @@ test.describe('Install Upload Repo Content', () => {
     const regClient = new RHSMClient(hostname);
 
     await test.step('Set up cleanup for repositories, templates, and RHSM client', async () => {
-      await cleanup.runAndAdd(async () => {
-        await ensureValidToken(page, 'ADMIN_TOKEN.json', 5);
-        const apiBasePath = process.env.BASE_URL + '/api/content-sources/v1';
-        const cleanupClient = createApiConfigWithDynamicToken('ADMIN_TOKEN', apiBasePath);
-        await cleanupRepositories(cleanupClient, uploadRepoNamePrefix);
-        await cleanupTemplates(cleanupClient, templateNamePrefix);
-      });
+      await cleanup.runAndAdd(() => cleanupRepositories(client, uploadRepoNamePrefix));
+      await cleanup.runAndAdd(() => cleanupTemplates(client, templateNamePrefix));
       cleanup.add(() => regClient.Destroy('rhc'));
     });
 
