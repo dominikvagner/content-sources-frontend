@@ -62,6 +62,10 @@ export const testRepositoryParamsResponse: RepositoryParamsResponse = {
       name: 'RHEL 9',
       label: '9',
     },
+    {
+      name: 'RHEL 10',
+      label: '10',
+    },
   ],
   distribution_arches: [
     { name: 'Any architecture', label: 'any' },
@@ -118,6 +122,12 @@ export const testEUSRepositoryParamsResponse: RepositoryParamsResponse = {
       label: '9.4',
       major: '9',
       extended_release_streams: [EUS, E4S],
+    },
+    {
+      name: 'RHEL 9.6',
+      label: '9.6',
+      major: '9',
+      extended_release_streams: [EUS],
     },
     {
       name: 'RHEL 10.0',
@@ -195,6 +205,17 @@ export const defaultEPELRepository: Partial<ContentItem> = {
   distribution_arch: 'x86_64',
   distribution_versions: ['9'],
   origin: ContentOrigin.COMMUNITY,
+};
+
+export const defaultEUSRepository: Partial<ContentItem> = {
+  uuid: '7e2a90b4-c3d1-4f1b-9a84-e67d2c1a8f92',
+  name: 'Red Hat Enterprise Linux 9.6 for x86_64 - AppStream - Extended Update Support (RPMs)',
+  url: 'https://cdn.redhat.com/content/eus/rhel9/9.6/x86_64/appstream/os/',
+  distribution_arch: 'x86_64',
+  distribution_versions: ['9'],
+  origin: ContentOrigin.REDHAT,
+  extended_release: EUS,
+  extended_release_version: '9.6',
 };
 
 export const defaultIntrospectTask: AdminTask = {

@@ -1,7 +1,6 @@
 import {
   DataViewToolbar,
   DataViewTable,
-  DataViewTh,
   DataView,
   DataViewState,
   useDataViewSort,
@@ -9,6 +8,7 @@ import {
   DataViewTextFilter,
   DataViewCheckboxFilter,
   DataViewTrObject,
+  DataViewTreeFilter,
 } from '@patternfly/react-data-view';
 import { ThProps, ActionsColumn, IAction } from '@patternfly/react-table';
 import {
@@ -59,10 +59,11 @@ import { DataViewFilters } from '@patternfly/react-data-view/dist/dynamic/DataVi
 import { useContentListFilters, FilterLabelsMap } from './hooks/useContentListFilters';
 import ContentOriginFilter from './components/ContentOriginFilter';
 import CommunityRepositoryLabel from '../../../components/RepositoryLabels/CommunityRepositoryLabel';
-import { DataViewTr } from '@patternfly/react-data-view/src/DataViewTable';
+import { DataViewTr, DataViewTh } from '@patternfly/react-data-view/src/DataViewTable';
 import EmptyTableDataView from 'components/EmptyTableDataView/EmptyTableDataView';
 import CustomEpelWarning from 'components/RepositoryLabels/CustomEpelWarning';
 import { isEPELUrl } from 'helpers';
+import { hasOrigin, versionNameToApiValue } from '../helpers';
 
 type ActionRowData = Pick<
   ContentItem,
@@ -83,9 +84,6 @@ const useStyles = createUseStyles({
 });
 
 export const perPageKey = 'contentListPerPage';
-
-const hasOrigin = (value: unknown): value is { origin?: ContentOrigin } =>
-  typeof value === 'object' && value !== null && 'origin' in value;
 
 interface ContentInformationCellProps {
   rowData: Pick<ContentItem, 'name' | 'url' | 'last_snapshot' | 'origin'>;
@@ -188,6 +186,7 @@ const ContentListTable = () => {
   const {
     getArchName,
     getVersionName,
+    getMinorVersionName,
     isError: repositoryParamsIsError,
     error: repositoryParamsError,
   } = useDistributionDetails();
@@ -197,7 +196,7 @@ const ContentListTable = () => {
   const columns = [
     { name: 'Name', sortAttribute: 'name' },
     { name: 'Architecture', sortAttribute: 'distribution_arch' },
-    { name: 'OS versions', sortAttribute: 'distribution_versions' },
+    { name: 'OS', sortAttribute: 'distribution_versions' },
     { name: 'Packages', sortAttribute: 'package_count' },
     { name: 'Last Introspection', sortAttribute: 'last_introspection_time' },
     { name: 'Status', sortAttribute: null }, // Non-sortable column
@@ -212,7 +211,7 @@ const ContentListTable = () => {
     if (!sortBy || !direction) return '';
     const column = columns.find((col) => col.name === sortBy);
     if (!column || !column.sortAttribute) return '';
-    return `${column.sortAttribute}:${direction}`;
+    return `${column.sortAttribute}:${direction}`; // E.g., distribution_versions:desc
   }, [sortBy, direction]);
 
   const getSortParams = (columnIndex: number): ThProps['sort'] => {
@@ -252,7 +251,7 @@ const ContentListTable = () => {
     archFilterOptions,
     statusFilterOptions,
     isFiltered,
-  } = useContentListFilters(queryClient);
+  } = useContentListFilters();
 
   const resetFiltersAndPagination = useCallback(() => {
     clearAllFilters();
@@ -619,6 +618,7 @@ const ContentListTable = () => {
       last_snapshot_uuid,
       distribution_arch,
       distribution_versions,
+      extended_release_version,
       last_introspection_time,
       failed_introspections_count,
       last_introspection_error,
@@ -652,7 +652,11 @@ const ContentListTable = () => {
             ),
           },
           { cell: getArchName(distribution_arch) },
-          { cell: getVersionName(distribution_versions) },
+          {
+            cell: extended_release_version
+              ? getMinorVersionName(extended_release_version)
+              : getVersionName(distribution_versions),
+          },
           { cell: <PackageCount rowData={{ uuid, status, package_count }} /> },
           {
             cell:
@@ -781,13 +785,22 @@ const ContentListTable = () => {
                   placeholder='Filter by name/url'
                   isDisabled={isLoading}
                 />
-                <DataViewCheckboxFilter
+                <DataViewTreeFilter
                   filterId='versions'
                   ouiaId='filter_version'
-                  aria-label='filter OS version'
+                  aria-label='filter by operating system'
                   title={FilterLabelsMap.Versions}
-                  placeholder='Filter by OS version'
-                  options={osFilterOptions}
+                  defaultExpanded={true}
+                  items={osFilterOptions}
+                  value={filters.versions.map((version) =>
+                    version.includes('.') ? getMinorVersionName(version) : getVersionName(version),
+                  )}
+                  onChange={(_event, selectedNames) => {
+                    onSetFilters({
+                      versions: selectedNames?.map((name) => versionNameToApiValue(name)),
+                    });
+                    setPage(1);
+                  }}
                 />
                 <DataViewCheckboxFilter
                   filterId='arches'

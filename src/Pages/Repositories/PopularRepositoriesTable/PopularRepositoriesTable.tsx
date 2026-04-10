@@ -281,7 +281,7 @@ const PopularRepositoriesTable = () => {
     setSelectedData(newData);
   };
 
-  const columnHeaders = ['Name', 'Architecture', 'OS versions'];
+  const columnHeaders = ['Name', 'Architecture', 'OS'];
 
   // Error is caught in the wrapper component
   if (isError) throw error;

@@ -28,7 +28,7 @@ export default function useDistributionDetails() {
   /** Converts an arch label (e.g., "x86_64") to its display name. */
   const getArchName = useCallback((arch: string = '') => labelToName[arch] || arch, [labelToName]);
 
-  /** Converts an OS version label (e.g., "9") or array of labels to a display string (e.g., "el9" or "el8, el9"). */
+  /** Converts an OS version label (e.g., "9") or array of labels to a display string (e.g., "RHEL 9" or "RHEL 8, RHEL 9"). */
   const getVersionName = useCallback(
     (version?: string | string[]): string => {
       if (!version) return '';
@@ -44,7 +44,7 @@ export default function useDistributionDetails() {
     [labelToName],
   );
 
-  /** Converts a minor version label (e.g., "9.4") to its display name (e.g., "el9.4"). */
+  /** Converts a minor version label (e.g., "9.4") to its display name (e.g., "RHEL 9.4"). */
   const getMinorVersionName = useCallback(
     (minorVersion?: string) => {
       const name = distMinorVersions?.find(

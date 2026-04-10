@@ -4,6 +4,8 @@ import {
   testRepositoryParamsResponse,
   defaultRedHatRepository,
   defaultEPELRepository,
+  testEUSRepositoryParamsResponse,
+  defaultEUSRepository,
 } from 'testingHelpers';
 import { render, waitFor, screen, within } from '@testing-library/react';
 import ContentListTable from './ContentListTable';
@@ -42,6 +44,11 @@ beforeEach(() => {
     contentOrigin: [ContentOrigin.COMMUNITY, ContentOrigin.CUSTOM],
     setContentOrigin: () => {},
   });
+
+  (useRepositoryParams as jest.Mock).mockImplementation(() => ({
+    isLoading: false,
+    data: testRepositoryParamsResponse,
+  }));
 });
 
 afterEach(() => {
@@ -56,7 +63,7 @@ const renderContentListTable = () =>
   );
 
 it('shows empty state when there are no repositories', () => {
-  (useRepositoryParams as jest.Mock).mockImplementation(() => ({ isLoading: false }));
+  (useRepositoryParams as jest.Mock).mockImplementation(() => ({ isLoading: false, data: {} }));
   (useContentListQuery as jest.Mock).mockImplementation(() => ({ isLoading: false }));
 
   const { queryByText } = renderContentListTable();
@@ -66,10 +73,6 @@ it('shows empty state when there are no repositories', () => {
 });
 
 it('Render a loading state', () => {
-  (useRepositoryParams as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    data: testRepositoryParamsResponse,
-  }));
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: true,
   }));
@@ -81,10 +84,6 @@ it('Render a loading state', () => {
 });
 
 it('Render with a single row', async () => {
-  (useRepositoryParams as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    data: testRepositoryParamsResponse,
-  }));
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
     data: {
@@ -118,10 +117,6 @@ it('Render with a single row', async () => {
 });
 
 it('disables EPEL checkboxes when Custom and EPEL tabs are active', async () => {
-  (useRepositoryParams as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    data: testRepositoryParamsResponse,
-  }));
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
     data: {
@@ -151,10 +146,6 @@ it('disables EPEL checkboxes when Custom and EPEL tabs are active', async () => 
 });
 
 it('disables checkboxes for Community repos when no origin tab is active', async () => {
-  (useRepositoryParams as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    data: testRepositoryParamsResponse,
-  }));
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
     data: {
@@ -201,10 +192,6 @@ it('disables checkboxes for Community repos when no origin tab is active', async
 });
 
 it('disables delete kebab when Red Hat and/or EPEL tabs are active and shows read-only tooltip', async () => {
-  (useRepositoryParams as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    data: testRepositoryParamsResponse,
-  }));
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
     data: {
@@ -234,10 +221,6 @@ it('disables delete kebab when Red Hat and/or EPEL tabs are active and shows rea
 });
 
 it('hides bulk select when Red Hat and/or EPEL tabs are active', async () => {
-  (useRepositoryParams as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    data: testRepositoryParamsResponse,
-  }));
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
     data: {
@@ -261,10 +244,6 @@ it('hides bulk select when Red Hat and/or EPEL tabs are active', async () => {
 });
 
 it('disables bulk select and shows tooltip when no custom repositories are on the page', async () => {
-  (useRepositoryParams as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    data: testRepositoryParamsResponse,
-  }));
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
     data: {
@@ -285,4 +264,65 @@ it('disables bulk select and shows tooltip when no custom repositories are on th
   expect(
     await screen.findByRole('tooltip', { name: 'No custom repositories on this page to select.' }),
   ).toBeInTheDocument();
+});
+
+it('filters the table by major and minor OS versions', async () => {
+  (useAppContext as jest.Mock).mockReturnValue({
+    features: {
+      extendedreleaserepos: { enabled: true, accessible: true },
+    },
+    rbac: { repoWrite: true, repoRead: true },
+    contentOrigin: [ContentOrigin.REDHAT],
+    setContentOrigin: () => {},
+  });
+
+  (useRepositoryParams as jest.Mock).mockImplementation(() => ({
+    isLoading: false,
+    data: testEUSRepositoryParamsResponse,
+  }));
+
+  (useContentListQuery as jest.Mock).mockImplementation((_page, _limit, filterData) => {
+    const onlyEUS = filterData?.versions?.length === 1 && filterData.versions[0] === '9.6';
+    const data = onlyEUS ? [defaultEUSRepository] : [defaultEUSRepository, defaultRedHatRepository];
+    return { isLoading: false, data: { data, meta: { count: data.length, limit: 20, offset: 0 } } };
+  });
+
+  const osMenuItem = 'Operating system';
+
+  renderContentListTable();
+
+  // Initially, there should be two rows (one for each repository)
+  let rows = document.querySelectorAll('tbody tr');
+  expect(rows.length).toBe(2);
+
+  const user = userEvent.setup();
+
+  await user.click(screen.getByRole('button', { name: 'Name/URL' }));
+  await user.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: osMenuItem }));
+  await user.click(within(screen.getByTestId('filter_version')).getByRole('button'));
+  await user.click(screen.getByLabelText('RHEL 9.6'));
+
+  // After filtering by a minor version, there should be one row (for the filtered repository)
+  await waitFor(() => {
+    rows = document.querySelectorAll('tbody tr');
+    expect(rows.length).toBe(1);
+  });
+  expect(await screen.findByText(defaultEUSRepository.name!)).toBeInTheDocument();
+
+  // Re-select the OS filter type and add a major version filter
+  await user.click(screen.getByRole('button', { name: 'Name/URL' }));
+  await user.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: osMenuItem }));
+
+  // PatternFly leaves stale filter_version elements in the DOM on re-render, so grab the last (active) one
+  const versionFilters = screen.getAllByTestId('filter_version');
+  const activeFilter = versionFilters[versionFilters.length - 1];
+  await user.click(within(activeFilter).getAllByRole('button')[0]);
+  await user.click(screen.getByLabelText('RHEL 10'));
+
+  await waitFor(() => {
+    rows = document.querySelectorAll('tbody tr');
+    expect(rows.length).toBe(2);
+  });
+  expect(await screen.findByText(defaultEUSRepository.name!)).toBeInTheDocument();
+  expect(await screen.findByText(defaultRedHatRepository.name!)).toBeInTheDocument();
 });
