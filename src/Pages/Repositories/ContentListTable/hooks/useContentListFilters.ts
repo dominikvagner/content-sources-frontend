@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { FilterData, NameLabel } from '../../../../services/Content/ContentApi';
-import type { DataViewFilterOption } from '@patternfly/react-data-view/dist/cjs/DataViewFilters';
+import type { DataViewFilterOption } from '@patternfly/react-data-view/dist/dynamic/DataViewFilters';
 import { useRepositoryParams } from '../../../../services/Content/ContentQueries';
 import useDebounce from '../../../../Hooks/useDebounce';
-import { useDataViewFilters } from '@patternfly/react-data-view';
+import { useDataViewFilters } from '@patternfly/react-data-view/dist/dynamic/Hooks';
 import { TreeViewDataItem } from '@patternfly/react-core';
 import { SUPPORTED_MAJOR_VERSIONS } from '../../../Templates/TemplatesTable/constants';
 

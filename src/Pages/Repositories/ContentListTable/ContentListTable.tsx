@@ -1,15 +1,18 @@
+import { DataViewToolbar } from '@patternfly/react-data-view/dist/dynamic/DataViewToolbar';
 import {
-  DataViewToolbar,
   DataViewTable,
-  DataView,
-  DataViewState,
+  DataViewTr,
+  DataViewTh,
+  DataViewTrObject,
+} from '@patternfly/react-data-view/dist/dynamic/DataViewTable';
+import { DataView, DataViewState } from '@patternfly/react-data-view/dist/dynamic/DataView';
+import { DataViewTextFilter } from '@patternfly/react-data-view/dist/dynamic/DataViewTextFilter';
+import { DataViewCheckboxFilter } from '@patternfly/react-data-view/dist/dynamic/DataViewCheckboxFilter';
+import { DataViewTreeFilter } from '@patternfly/react-data-view/dist/dynamic/DataViewTreeFilter';
+import {
   useDataViewSort,
   useDataViewSelection,
-  DataViewTextFilter,
-  DataViewCheckboxFilter,
-  DataViewTrObject,
-  DataViewTreeFilter,
-} from '@patternfly/react-data-view';
+} from '@patternfly/react-data-view/dist/dynamic/Hooks';
 import { ThProps, ActionsColumn, IAction } from '@patternfly/react-table';
 import {
   useContentListQuery,
@@ -59,7 +62,6 @@ import { DataViewFilters } from '@patternfly/react-data-view/dist/dynamic/DataVi
 import { useContentListFilters, FilterLabelsMap } from './hooks/useContentListFilters';
 import ContentOriginFilter from './components/ContentOriginFilter';
 import CommunityRepositoryLabel from '../../../components/RepositoryLabels/CommunityRepositoryLabel';
-import { DataViewTr, DataViewTh } from '@patternfly/react-data-view/src/DataViewTable';
 import EmptyTableDataView from 'components/EmptyTableDataView/EmptyTableDataView';
 import CustomEpelWarning from 'components/RepositoryLabels/CustomEpelWarning';
 import { isEPELUrl } from 'helpers';
@@ -788,16 +790,20 @@ const ContentListTable = () => {
                 <DataViewTreeFilter
                   filterId='versions'
                   ouiaId='filter_version'
-                  aria-label='filter by operating system'
                   title={FilterLabelsMap.Versions}
+                  // TODO: Create an issue in the data-view repository to support a custom aria-label and a placeholder
+                  // aria-label='filter by operating system'
+                  // placeholder='Filter by operating system'
                   defaultExpanded={true}
                   items={osFilterOptions}
                   value={filters.versions.map((version) =>
                     version.includes('.') ? getMinorVersionName(version) : getVersionName(version),
                   )}
-                  onChange={(_event, selectedNames) => {
+                  onChange={(_event, selectedVersionNames) => {
                     onSetFilters({
-                      versions: selectedNames?.map((name) => versionNameToApiValue(name)),
+                      versions: selectedVersionNames?.map((versionName) =>
+                        versionNameToApiValue(versionName),
+                      ),
                     });
                     setPage(1);
                   }}
