@@ -9,7 +9,7 @@ export const STANDARD_STREAM_PATH = 'dist';
 export const TEMPLATE_SYSTEMS_UPDATE_LIMIT = 1000;
 
 export const TEMPLATES_DOCS_URL =
-  'https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/managing_system_content_and_patch_updates_on_rhel_systems/patching-using-content-templates';
+  'https://docs.redhat.com/en/documentation/red_hat_lightspeed/1-latest/html/managing_system_content_and_patch_updates_on_rhel_systems/using-content-templates-to-apply-system-patches';
 
 export const LAST_FULL_SUPPORT_MINOR_VERSION = 9;
 export const EUS = 'eus';
