@@ -68,11 +68,11 @@ it('Select a filter of each type and ensure chips are present', async () => {
   await userEvent.click(optionMenu);
 
   // Select major and minor version items
-  const versionOption = getByRole('menuitem', { name: 'OS version' });
+  const versionOption = getByRole('menuitem', { name: 'Operating system' });
   expect(versionOption).toBeInTheDocument();
   await userEvent.click(versionOption);
 
-  const versionSelector = getByRole('button', { name: 'filter OS version' }) as Element;
+  const versionSelector = getByRole('button', { name: 'filter operating system' }) as Element;
   await userEvent.click(versionSelector);
 
   const majorVersionItem = queryByText('RHEL 8') as Element;

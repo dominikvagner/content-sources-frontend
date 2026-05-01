@@ -50,7 +50,7 @@ const useStyles = createUseStyles({
   },
 });
 
-export type Filters = 'Name' | 'OS version' | 'Architecture' | 'Release stream';
+export type Filters = 'Name' | 'Operating system' | 'Architecture' | 'Release stream';
 
 const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
   const classes = useStyles();
@@ -59,7 +59,7 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
   const navigate = useNavigate();
   const [isActionOpen, setActionOpen] = useState(false);
   const [typeFilterOpen, setTypeFilterOpen] = useState(false);
-  const filters = ['Name', 'OS version', 'Architecture', 'Release stream'];
+  const filters = ['Name', 'Operating system', 'Architecture', 'Release stream'];
   const [filterType, setFilterType] = useState<Filters>('Name');
   const [versionNamesLabels, setVersionNamesLabels] = useState({});
   const [archNamesLabels, setArchNamesLabels] = useState({});
@@ -297,20 +297,20 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
             />
           </InputGroupItem>
         );
-      case 'OS version':
+      case 'Operating system':
         return (
           <Dropdown
             toggle={(toggleRef) => (
               <MenuToggle
                 ref={toggleRef}
-                aria-label='filter OS version'
+                aria-label='filter operating system'
                 id='versionSelect'
                 ouiaId='filter_by_version'
                 onClick={() => setActionOpen((prev) => !prev)}
                 isDisabled={isLoading}
                 isExpanded={isActionOpen}
               >
-                Filter by OS version
+                Filter by operating system
               </MenuToggle>
             )}
             onOpenChange={(isOpen) => setActionOpen(isOpen)}
@@ -514,7 +514,7 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
         <FlexItem className={classes.chipsContainer}>
           <Flex gap={{ default: 'gapSm' }} flexWrap={{ default: 'wrap' }}>
             {selectedVersions.length > 0 && (
-              <LabelGroup categoryName='OS version'>
+              <LabelGroup categoryName='Operating system'>
                 {selectedVersions.map((version) => (
                   <Label
                     variant='filled'
