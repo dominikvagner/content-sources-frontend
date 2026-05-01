@@ -38,6 +38,9 @@ test.describe('Assign EUS Template to System', () => {
     client,
     cleanup,
   }) => {
+    // Increase timeout for CI environment because template validation can take up to 11 minutes
+    test.setTimeout(900000); // 15 minutes
+
     void client; // Pull in fixture so Undici fetch dispatcher is configured for dynamic API cleanup
 
     await test.step('Set up cleanup for templates and RHSM client', async () => {
