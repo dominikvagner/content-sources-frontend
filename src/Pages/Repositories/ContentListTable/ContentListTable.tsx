@@ -13,14 +13,14 @@ import {
   useDataViewSort,
   useDataViewSelection,
 } from '@patternfly/react-data-view/dist/dynamic/Hooks';
-import { ThProps, ActionsColumn, IAction } from '@patternfly/react-table';
+import { ThProps } from '@patternfly/react-table';
 import {
   useContentListQuery,
   useIntrospectRepositoryMutate,
   useTriggerSnapshot,
   useBulkDeleteContentItemMutate,
 } from '../../../services/Content/ContentQueries';
-import { memo, useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ContentItem,
   ContentOrigin,
@@ -28,20 +28,12 @@ import {
   IntrospectRepositoryRequestItem,
 } from '../../../services/Content/ContentApi';
 import { useAppContext } from '../../../middleware/AppContext';
-import {
-  Pagination,
-  Button,
-  EmptyStateActions,
-  Flex,
-  FlexItem,
-  Tooltip,
-  TooltipPosition,
-} from '@patternfly/react-core';
+import { Pagination, Button, EmptyStateActions, Flex, FlexItem } from '@patternfly/react-core';
 import useDistributionDetails from '../../../Hooks/useDistributionDetails';
 import dayjs from 'dayjs';
 import { useSearchParams, useNavigate, Outlet, useOutletContext } from 'react-router-dom';
 import Hide from 'components/Hide/Hide';
-import { ADD_ROUTE, EDIT_ROUTE, UPLOAD_ROUTE, DELETE_ROUTE } from 'Routes/constants';
+import { ADD_ROUTE } from 'Routes/constants';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import {
   BulkSelect,
@@ -50,128 +42,20 @@ import {
 import flex from '@patternfly/react-styles/css/utilities/Flex/flex';
 import { useQueryClient } from '@tanstack/react-query';
 import StatusIcon from './components/StatusIcon';
+import RepositoryCell from './components/RepositoryCell';
+import RepositoryActionCell, { type ActionRowData } from './components/RepositoryActionCell';
+import useRowActions, { showPendingTooltip } from './hooks/useRowActions';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { SkeletonTableBody } from '@patternfly/react-component-groups';
-import UploadRepositoryLabel from 'components/RepositoryLabels/UploadRepositoryLabel';
-import UrlWithExternalIcon from '../../../components/UrlWithLinkIcon/UrlWithLinkIcon';
-import ChangedArrows from './components/SnapshotListModal/components/ChangedArrows';
-import { createUseStyles } from 'react-jss';
 import PackageCount from './components/PackageCount';
 import DeleteKebab from '../../../components/DeleteKebab/DeleteKebab';
 import { DataViewFilters } from '@patternfly/react-data-view/dist/dynamic/DataViewFilters';
 import { useContentListFilters, FilterLabelsMap } from './hooks/useContentListFilters';
 import ContentOriginFilter from './components/ContentOriginFilter';
-import CommunityRepositoryLabel from '../../../components/RepositoryLabels/CommunityRepositoryLabel';
 import EmptyTableDataView from 'components/EmptyTableDataView/EmptyTableDataView';
-import CustomEpelWarning from 'components/RepositoryLabels/CustomEpelWarning';
-import { isEPELUrl } from 'helpers';
 import { hasOrigin, versionNameToApiValue } from '../helpers';
 
-type ActionRowData = Pick<
-  ContentItem,
-  'uuid' | 'origin' | 'status' | 'snapshot' | 'last_snapshot_uuid' | 'last_snapshot_task'
->;
-
-const useStyles = createUseStyles({
-  snapshotInfoText: {
-    marginRight: '16px',
-  },
-  inline: {
-    display: 'flex',
-  },
-  disabledButton: {
-    pointerEvents: 'auto',
-    cursor: 'default',
-  },
-});
-
 export const perPageKey = 'contentListPerPage';
-
-interface ContentInformationCellProps {
-  rowData: Pick<ContentItem, 'name' | 'url' | 'last_snapshot' | 'origin'>;
-  snapshotsAccessible: boolean;
-  communityReposEnabled: boolean;
-}
-
-const ContentInformationCell = memo(
-  ({ rowData, snapshotsAccessible, communityReposEnabled }: ContentInformationCellProps) => {
-    const classes = useStyles();
-    const { name, url, last_snapshot, origin } = rowData;
-
-    return (
-      <>
-        {name}
-        <Hide hide={origin !== ContentOrigin.UPLOAD}>
-          <UploadRepositoryLabel />
-        </Hide>
-        <Hide hide={origin !== ContentOrigin.COMMUNITY}>
-          <CommunityRepositoryLabel />
-        </Hide>
-        <Hide
-          hide={!(origin === ContentOrigin.EXTERNAL && isEPELUrl(url)) || !communityReposEnabled}
-        >
-          <CustomEpelWarning />
-        </Hide>
-        <Hide hide={origin === ContentOrigin.UPLOAD}>
-          <UrlWithExternalIcon href={url} />
-        </Hide>
-        <Hide hide={!snapshotsAccessible}>
-          <Flex>
-            <FlexItem className={classes.snapshotInfoText}>
-              {last_snapshot
-                ? `Last snapshot ${dayjs(last_snapshot?.created_at).fromNow()}`
-                : 'No snapshot yet'}
-            </FlexItem>
-            <Hide hide={!last_snapshot}>
-              <FlexItem className={classes.inline}>
-                <FlexItem className={classes.snapshotInfoText}>Changes:</FlexItem>
-                <ChangedArrows
-                  addedCount={last_snapshot?.added_counts?.['rpm.package'] || 0}
-                  removedCount={last_snapshot?.removed_counts?.['rpm.package'] || 0}
-                />
-              </FlexItem>
-            </Hide>
-          </Flex>
-        </Hide>
-      </>
-    );
-  },
-);
-
-ContentInformationCell.displayName = 'ContentInformationCell';
-
-interface ContentListActionRowProps {
-  rowData: ActionRowData;
-  actions: IAction[];
-  showPendingTooltipContent: string | undefined;
-  isRedHatRepository: boolean;
-}
-
-const ContentListActionRow = memo(
-  ({
-    rowData,
-    actions,
-    showPendingTooltipContent,
-    isRedHatRepository,
-  }: ContentListActionRowProps) => {
-    const triggerRef = useRef<HTMLDivElement>(null);
-    const shouldShowTooltip =
-      !isRedHatRepository && rowData?.status === 'Pending' && !!showPendingTooltipContent;
-
-    return (
-      <Hide hide={!actions?.length}>
-        <div ref={triggerRef}>
-          <ActionsColumn items={actions} />
-        </div>
-        {shouldShowTooltip && (
-          <Tooltip content={showPendingTooltipContent} triggerRef={triggerRef} />
-        )}
-      </Hide>
-    );
-  },
-);
-
-ContentListActionRow.displayName = 'ContentListActionRow';
 
 const readOnlyReposTooltipCopy =
   'Red Hat and EPEL repositories are read-only and cannot be manipulated.';
@@ -183,7 +67,6 @@ const ContentListTable = () => {
   const [urlSearchParams, setUrlSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const classes = useStyles();
 
   const {
     getArchName,
@@ -460,19 +343,6 @@ const ContentListTable = () => {
     sortString,
   );
 
-  const showPendingTooltip = (
-    snapshotStatus: string | undefined,
-    introspectStatus: string | undefined,
-  ) => {
-    if (!snapshotStatus && !introspectStatus) {
-      return 'Introspection or snapshotting is in progress';
-    } else if (snapshotStatus === 'running' || snapshotStatus === 'pending') {
-      return 'Snapshotting is in progress';
-    } else if (introspectStatus === 'Pending') {
-      return 'Introspection is in progress';
-    }
-  };
-
   // Feature flags for memoized components
   const snapshotsAccessible = features?.snapshots?.accessible ?? false;
   const communityReposEnabled = features?.communityrepos?.enabled ?? false;
@@ -489,123 +359,12 @@ const ContentListTable = () => {
     await triggerSnapshot(repoUuid);
   };
 
-  const rowActions = useCallback(
-    (rowData: ActionRowData): IAction[] =>
-      isRedHatRepository ||
-      rowData.origin === ContentOrigin.REDHAT ||
-      rowData.origin === ContentOrigin.COMMUNITY
-        ? features?.snapshots?.accessible
-          ? [
-              {
-                isDisabled: !rowData.snapshot || !(rowData.snapshot && rowData.last_snapshot_uuid),
-
-                ouiaId: 'kebab_view_snapshots',
-                title:
-                  rowData.snapshot && rowData.last_snapshot_uuid
-                    ? 'View all snapshots'
-                    : 'No snapshots yet',
-                onClick: () => {
-                  navigate(`${rowData.uuid}/snapshots`);
-                },
-              },
-            ]
-          : []
-        : [
-            ...(rbac?.repoWrite
-              ? [
-                  {
-                    isDisabled: rowData?.status === 'Pending',
-                    title: 'Edit',
-                    ouiaId: 'kebab_edit',
-                    onClick: () => {
-                      navigate(`${rowData.uuid}/${EDIT_ROUTE}`);
-                    },
-                  },
-                  ...(rowData.origin === ContentOrigin.UPLOAD
-                    ? [
-                        {
-                          isDisabled: rowData?.status === 'Pending',
-                          title: 'Upload content',
-                          ouiaId: 'kebab_upload_content',
-                          onClick: () => {
-                            navigate(`${rowData.uuid}/${UPLOAD_ROUTE}`);
-                          },
-                        },
-                      ]
-                    : []),
-                ]
-              : []),
-            ...(features?.snapshots?.accessible
-              ? [
-                  {
-                    isDisabled: !rowData.last_snapshot_uuid,
-                    title: rowData.last_snapshot_uuid ? 'View all snapshots' : 'No snapshots yet',
-                    ouiaId: 'kebab_view_snapshots',
-                    onClick: () => {
-                      navigate(`${rowData.uuid}/snapshots`);
-                    },
-                  },
-                  ...(rbac?.repoWrite && rowData.origin !== ContentOrigin.UPLOAD
-                    ? [
-                        {
-                          id: 'actions-column-snapshot',
-                          className:
-                            rowData?.status === 'Pending' || !rowData.snapshot
-                              ? classes.disabledButton
-                              : '',
-                          isDisabled: rowData?.status === 'Pending' || !rowData.snapshot,
-                          title: 'Trigger snapshot',
-                          ouiaId: 'kebab_trigger_snapshots',
-                          onClick: () => {
-                            triggerIntrospectionAndSnapshot(rowData?.uuid);
-                          },
-                          tooltipProps: !rowData.snapshot
-                            ? {
-                                content: 'Snapshots disabled for this repository.',
-                                position: TooltipPosition.left,
-                                triggerRef: () =>
-                                  document.getElementById('actions-column-snapshot') ||
-                                  document.body,
-                              }
-                            : undefined,
-                        },
-                      ]
-                    : []),
-                ]
-              : []),
-            ...(rbac?.repoWrite && !rowData?.snapshot
-              ? [
-                  {
-                    isDisabled: rowData?.status == 'Pending',
-                    title: 'Introspect now',
-                    ouiaId: 'kebab_introspect_now',
-                    onClick: () =>
-                      introspectRepoForUuid(rowData?.uuid).then(clearSelectedRepositories),
-                  },
-                ]
-              : []),
-            ...(rbac?.repoWrite
-              ? [
-                  { isSeparator: true },
-                  {
-                    title: 'Delete',
-                    ouiaId: 'kebab_delete',
-                    onClick: () => navigate(`${DELETE_ROUTE}?repoUUID=${rowData.uuid}`),
-                  },
-                ]
-              : []),
-          ],
-    [
-      isRedHatRepository,
-      features?.snapshots?.accessible,
-      rbac?.repoWrite,
-      navigate,
-      triggerIntrospectionAndSnapshot,
-      introspectRepoForUuid,
-      clearSelectedRepositories,
-      classes.disabledButton,
-    ],
-  );
+  const { rowActions } = useRowActions({
+    isRedHatRepository,
+    introspectRepoForUuid,
+    triggerIntrospectionAndSnapshot,
+    clearSelectedRepositories,
+  });
 
   // Format rows for DataView using DataViewTr objects
   // Selection is handled by DataView selection system using id and isSelected
@@ -646,7 +405,7 @@ const ContentListTable = () => {
         row: [
           {
             cell: (
-              <ContentInformationCell
+              <RepositoryCell
                 rowData={{ name, url, last_snapshot, origin }}
                 snapshotsAccessible={snapshotsAccessible}
                 communityReposEnabled={communityReposEnabled}
@@ -684,7 +443,7 @@ const ContentListTable = () => {
           },
           {
             cell: (
-              <ContentListActionRow
+              <RepositoryActionCell
                 rowData={actionRowData}
                 actions={actions}
                 showPendingTooltipContent={pendingTooltipContent}
@@ -784,7 +543,7 @@ const ContentListTable = () => {
                   filterId='search'
                   ouiaId='filter_search'
                   title={FilterLabelsMap.Search}
-                  placeholder='Filter by name/url'
+                  placeholder='Filter by name or URL'
                   isDisabled={isLoading}
                 />
                 <DataViewTreeFilter

@@ -1,46 +1,39 @@
 import { LongArrowAltDownIcon, LongArrowAltUpIcon } from '@patternfly/react-icons';
 import { Flex, FlexItem } from '@patternfly/react-core';
 import {
-  t_global_color_status_danger_100 as global_danger_color_100,
-  t_global_color_status_success_100 as global_success_color_100,
+  t_global_color_status_danger_100,
+  t_global_color_status_success_100,
 } from '@patternfly/react-tokens';
-import { createUseStyles } from 'react-jss';
-
-const red = global_danger_color_100.value;
-const green = global_success_color_100.value;
-
-const useStyles = createUseStyles({
-  base: {
-    fontWeight: 'bold',
-    alignItems: 'center',
-    display: 'flex',
-    '& svg': {
-      marginRight: '5px',
-    },
-  },
-  red: { extend: 'base', color: red },
-  green: { extend: 'base', color: green },
-});
+import text from '@patternfly/react-styles/css/utilities/Text/text';
 
 interface Props {
   addedCount: number;
   removedCount: number;
 }
 
-const ChangedArrows = ({ addedCount, removedCount }: Props) => {
-  const classes = useStyles();
-  return (
-    <Flex>
-      <FlexItem className={classes.green}>
+const ChangedArrows = ({ addedCount, removedCount }: Props) => (
+  <Flex gap={{ default: 'gapSm' }} className={text.fontWeightBold}>
+    <Flex
+      gap={{ default: 'gapXs' }}
+      alignItems={{ default: 'alignItemsCenter' }}
+      style={{ color: t_global_color_status_success_100.value }}
+    >
+      <FlexItem>
         <LongArrowAltUpIcon />
-        {addedCount}
       </FlexItem>
-      <FlexItem className={classes.red}>
-        <LongArrowAltDownIcon />
-        {removedCount}
-      </FlexItem>
+      <FlexItem>{addedCount}</FlexItem>
     </Flex>
-  );
-};
+    <Flex
+      gap={{ default: 'gapXs' }}
+      alignItems={{ default: 'alignItemsCenter' }}
+      style={{ color: t_global_color_status_danger_100.value }}
+    >
+      <FlexItem>
+        <LongArrowAltDownIcon />
+      </FlexItem>
+      <FlexItem>{removedCount}</FlexItem>
+    </Flex>
+  </Flex>
+);
 
 export default ChangedArrows;

@@ -77,9 +77,9 @@ it('Render a loading state', () => {
     isLoading: true,
   }));
 
-  const { queryByText, queryByTestId } = renderContentListTable();
+  const { queryByTestId } = renderContentListTable();
 
-  expect(queryByText('Name/URL')).toBeInTheDocument();
+  expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
   expect(queryByTestId('SkeletonTableBody-tbody')).toBeInTheDocument();
 });
 
@@ -297,7 +297,9 @@ it('filters the table by major and minor OS versions', async () => {
 
   const user = userEvent.setup();
 
-  await user.click(screen.getByRole('button', { name: 'Name/URL' }));
+  const toolbar = document.querySelector('[data-ouia-component-id="DataViewToolbar"]')!;
+
+  await user.click(within(toolbar).getByRole('button', { name: 'Name' }));
   await user.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: osMenuItem }));
   await user.click(within(screen.getByTestId('filter_version')).getByRole('button'));
   await user.click(screen.getByLabelText('RHEL 9.6'));
@@ -309,7 +311,7 @@ it('filters the table by major and minor OS versions', async () => {
   });
   expect(await screen.findByText(defaultEUSRepository.name!)).toBeInTheDocument();
   // Re-select the OS filter type and add a major version filter
-  await user.click(screen.getByRole('button', { name: 'Name/URL' }));
+  await user.click(within(toolbar).getByRole('button', { name: 'Name' }));
   await user.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: osMenuItem }));
 
   // PatternFly leaves stale filter_version elements in the DOM on re-render, so grab the last (active) one

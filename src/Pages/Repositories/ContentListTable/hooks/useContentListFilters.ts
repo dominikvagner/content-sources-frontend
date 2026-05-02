@@ -16,7 +16,7 @@ const StatusDisplayMap = {
 } as const;
 
 export const FilterLabelsMap = {
-  Search: 'Name/URL',
+  Search: 'Name',
   Versions: 'Operating system',
   Arches: 'Architecture',
   Statuses: 'Status',
@@ -32,12 +32,10 @@ export const initialFilters: RepositoryFilters = {
 };
 
 const statusFilterOptions: DataViewFilterOption[] = Object.keys(StatusDisplayMap).map(
-  (statusDisplay) =>
-    ({
-      label: statusDisplay,
-      value: StatusDisplayMap[statusDisplay],
-      ['data-ouia-component-id']: `filter_${statusDisplay}`,
-    }) as unknown as DataViewFilterOption,
+  (statusDisplay) => ({
+    label: statusDisplay,
+    value: StatusDisplayMap[statusDisplay],
+  }),
 );
 
 export const useContentListFilters = () => {
@@ -96,14 +94,10 @@ export const useContentListFilters = () => {
 
   const archFilterOptions: DataViewFilterOption[] = useMemo(
     () =>
-      distribution_arches.map(
-        (nameLabel: NameLabel) =>
-          ({
-            label: nameLabel.name,
-            value: nameLabel.label,
-            ['data-ouia-component-id']: `filter_${nameLabel.name}`,
-          }) as unknown as DataViewFilterOption,
-      ),
+      distribution_arches.map((nameLabel: NameLabel) => ({
+        label: nameLabel.name,
+        value: nameLabel.label,
+      })),
     [distribution_arches],
   );
 
