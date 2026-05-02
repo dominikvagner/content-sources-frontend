@@ -317,7 +317,7 @@ const PopularRepositoriesTable = () => {
                   id='search'
                   customIcon={<SearchIcon />}
                   ouiaId='popular_filter_search'
-                  placeholder='Filter by name/url'
+                  placeholder='Filter by name or URL'
                   value={searchValue}
                   onChange={(_event, val) => setSearchValue(val)}
                 />
@@ -410,7 +410,7 @@ const PopularRepositoriesTable = () => {
             {searchValue !== '' && (
               <Flex>
                 <FlexItem fullWidth={{ default: 'fullWidth' }} className={classes.chipsContainer}>
-                  <LabelGroup categoryName='Name/URL'>
+                  <LabelGroup categoryName='Name'>
                     <Label variant='outline' key='search_chip' onClose={() => setSearchValue('')}>
                       {searchValue}
                     </Label>

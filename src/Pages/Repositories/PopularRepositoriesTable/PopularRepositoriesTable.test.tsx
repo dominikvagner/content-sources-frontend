@@ -90,7 +90,7 @@ it('Render a loading state checking search disabled', () => {
     </ReactQueryTestWrapper>,
   );
 
-  expect(queryByPlaceholderText('Filter by name/url')).toHaveAttribute('disabled');
+  expect(queryByPlaceholderText('Filter by name or URL')).toHaveAttribute('disabled');
 });
 
 it('finds search box, enters text, and checks text occurrence', () => {
@@ -106,7 +106,7 @@ it('finds search box, enters text, and checks text occurrence', () => {
     </ReactQueryTestWrapper>,
   );
 
-  const searchBox = getByPlaceholderText('Filter by name/url');
+  const searchBox = getByPlaceholderText('Filter by name or URL');
   fireEvent.change(searchBox, { target: { value: 'yourSearchText' } });
 
   const occurrences = queryAllByText('yourSearchText', { exact: false });

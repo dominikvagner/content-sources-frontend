@@ -186,7 +186,7 @@ export default function CustomRepositoriesStep() {
                     isDisabled={isLoading}
                     id='name-url'
                     ouiaId='filter_name_url'
-                    placeholder='Filter by name/url'
+                    placeholder='Filter by name or URL'
                     value={searchQuery}
                     onChange={(_event, value) => setSearchQuery(value)}
                     type='search'

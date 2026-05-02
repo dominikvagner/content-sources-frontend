@@ -125,7 +125,7 @@ const ContentListTable = () => {
   const storedPerPage = Number(localStorage.getItem(perPageKey)) || 20;
   const [perPage, setPerPage] = useState(storedPerPage);
 
-  // Used to force-reset the active attribute of DataViewFilters back to the first item (Name/URL)
+  // Used to force-reset the active attribute of DataViewFilters back to the first item (Name)
   const [filtersActiveAttributeResetKey, setFiltersActiveAttributeResetKey] = useState(0);
 
   const {

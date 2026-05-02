@@ -91,8 +91,8 @@ test.describe('Templates CRUD', () => {
       await expect(page.getByText('Snapshot not yet available for this repository')).toBeVisible();
 
       // Verify x86 repo cannot be added due to architecture mismatch (should not appear)
-      await modalPage.getByRole('searchbox', { name: 'Filter by name/url' }).clear();
-      await modalPage.getByRole('searchbox', { name: 'Filter by name/url' }).fill(repoNameX86);
+      await modalPage.getByRole('searchbox', { name: 'Filter by name or URL' }).clear();
+      await modalPage.getByRole('searchbox', { name: 'Filter by name or URL' }).fill(repoNameX86);
       await expect(
         modalPage.getByText('No custom repositories match the filter criteria', { exact: false }),
       ).toBeVisible();
