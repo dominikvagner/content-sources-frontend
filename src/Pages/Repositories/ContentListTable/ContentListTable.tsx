@@ -487,7 +487,7 @@ const ContentListTable = () => {
 
   const isPagePartiallySelected = pageSelectionCount > 0 && !isPageSelected;
 
-  const ouiaId = 'custom_repositories_table';
+  const ouiaId = 'repositories-table';
 
   const [activeState, setActiveState] = useState<DataViewState | undefined>(DataViewState.loading);
 
@@ -521,12 +521,13 @@ const ContentListTable = () => {
   return (
     <>
       <DataView
-        data-ouia-component-id='content_list_page'
+        ouiaId='content-list-page'
         activeState={activeState}
         {...(shouldEnableSelection && { selection: selectionWithDisabledRows })}
         className={`${spacing.pxLg} ${spacing.ptMd} ${flex.flexDirectionColumn}`}
       >
         <DataViewToolbar
+          ouiaId='content-list-toolbar'
           clearAllFilters={resetFiltersAndPagination}
           filters={
             <>
@@ -541,17 +542,18 @@ const ContentListTable = () => {
                 <DataViewTextFilter
                   key={`search-${filtersActiveAttributeResetKey}`}
                   filterId='search'
-                  ouiaId='filter_search'
+                  ouiaId='filter-search'
+                  aria-label='filter search'
                   title={FilterLabelsMap.Search}
                   placeholder='Filter by name or URL'
                   isDisabled={isLoading}
                 />
                 <DataViewTreeFilter
                   filterId='versions'
-                  ouiaId='filter_version'
+                  ouiaId='filter-version'
                   title={FilterLabelsMap.Versions}
                   // TODO: Create an issue in the data-view repository to support a custom aria-label and a placeholder
-                  // aria-label='filter by operating system'
+                  // aria-label='filter operating system'
                   // placeholder='Filter by operating system'
                   defaultExpanded={true}
                   items={osFilterOptions}
@@ -569,7 +571,7 @@ const ContentListTable = () => {
                 />
                 <DataViewCheckboxFilter
                   filterId='arches'
-                  ouiaId='filter_arch'
+                  ouiaId='filter-arch'
                   aria-label='filter architecture'
                   title={FilterLabelsMap.Arches}
                   placeholder='Filter by architecture'
@@ -577,7 +579,7 @@ const ContentListTable = () => {
                 />
                 <DataViewCheckboxFilter
                   filterId='statuses'
-                  ouiaId='filter_status'
+                  ouiaId='filter-status'
                   aria-label='filter status'
                   title={FilterLabelsMap.Statuses}
                   placeholder='Filter by status'
@@ -635,7 +637,7 @@ const ContentListTable = () => {
                 >
                   <Button
                     id='createContentSourceButton'
-                    ouiaId='create_content_source'
+                    ouiaId='create-content'
                     variant='primary'
                     isDisabled={
                       isLoading ||
@@ -676,7 +678,7 @@ const ContentListTable = () => {
                     }
                     atLeastOneRepoChecked={pageSelectionCount > 0}
                     numberOfReposChecked={pageSelectionCount}
-                    toggleOuiaId='custom_repositories_kebab_toggle'
+                    toggleOuiaId='repositories-kebab-toggle'
                   />
                 </ConditionalTooltip>
               </FlexItem>
@@ -692,7 +694,7 @@ const ContentListTable = () => {
           }
         />
         <DataViewTable
-          aria-label='Custom repositories table'
+          aria-label='Repositories table'
           ouiaId={ouiaId}
           variant='compact'
           columns={dataViewColumns}

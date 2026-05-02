@@ -72,18 +72,18 @@ it('shows empty state when there are no repositories', () => {
   expect(queryByText('To get started, create a custom repository.')).toBeInTheDocument();
 });
 
-it('Render a loading state', () => {
+it('renders a loading state', () => {
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: true,
   }));
 
   const { queryByTestId } = renderContentListTable();
 
-  expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
+  expect(queryByTestId('content-list-toolbar')).toBeInTheDocument();
   expect(queryByTestId('SkeletonTableBody-tbody')).toBeInTheDocument();
 });
 
-it('Render with a single row', async () => {
+it('renders with a single row', async () => {
   (useContentListQuery as jest.Mock).mockImplementation(() => ({
     isLoading: false,
     data: {
@@ -297,11 +297,10 @@ it('filters the table by major and minor OS versions', async () => {
 
   const user = userEvent.setup();
 
-  const toolbar = document.querySelector('[data-ouia-component-id="DataViewToolbar"]')!;
-
+  const toolbar = screen.getByTestId('content-list-toolbar');
   await user.click(within(toolbar).getByRole('button', { name: 'Name' }));
   await user.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: osMenuItem }));
-  await user.click(within(screen.getByTestId('filter_version')).getByRole('button'));
+  await user.click(within(screen.getByTestId('filter-version')).getByRole('button'));
   await user.click(screen.getByLabelText('RHEL 9.6'));
 
   // After filtering by a minor version, there should be one row (for the filtered repository)
@@ -314,8 +313,8 @@ it('filters the table by major and minor OS versions', async () => {
   await user.click(within(toolbar).getByRole('button', { name: 'Name' }));
   await user.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: osMenuItem }));
 
-  // PatternFly leaves stale filter_version elements in the DOM on re-render, so grab the last (active) one
-  const versionFilters = screen.getAllByTestId('filter_version');
+  // PatternFly leaves stale filter-version elements in the DOM on re-render, so grab the last (active) one
+  const versionFilters = screen.getAllByTestId('filter-version');
   const activeFilter = versionFilters[versionFilters.length - 1];
   await user.click(within(activeFilter).getAllByRole('button')[0]);
   await user.click(screen.getByLabelText('RHEL 10'));
