@@ -95,6 +95,7 @@ const TemplatesTable = () => {
     arch: '',
     version: [],
     extended_release_version: [],
+    restrict_to_major: false,
     search: '',
     repository_uuids: '',
     snapshot_uuids: '',
@@ -108,7 +109,6 @@ const TemplatesTable = () => {
   const notFiltered =
     filterData.arch === '' &&
     filterData.version.length === 0 &&
-    filterData.extended_release_version.length === 0 &&
     filterData.search === '' &&
     filterData.extended_release.length === 0;
 

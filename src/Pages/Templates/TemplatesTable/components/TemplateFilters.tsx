@@ -90,6 +90,7 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
       search: '',
       version: [],
       extended_release_version: [],
+      restrict_to_major: false,
       arch: '',
       repository_uuids: '',
       snapshot_uuids: '',
@@ -148,11 +149,15 @@ const Filters = ({ isLoading, setFilterData, filterData }: Props) => {
   };
 
   useEffect(() => {
+    const majorVersionNames = new Set(distribution_versions.map((v) => v.name));
+    const hasMajorSelected = debouncedSelectedVersions.some((v) => majorVersionNames.has(v));
+
     setFilterData({
       search: debouncedSearchQuery,
       version: debouncedSelectedVersions.map((version) => getLabels('version', version)),
       arch: getLabels('arch', debouncedSelectedArch),
       extended_release_version: [],
+      restrict_to_major: hasMajorSelected,
       repository_uuids: '',
       snapshot_uuids: '',
       extended_release: debouncedSelectedStreams.map((stream) =>

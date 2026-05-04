@@ -130,6 +130,7 @@ export default function DeleteContentModal() {
     version: [],
     search: '',
     extended_release_version: [],
+    restrict_to_major: false,
     repository_uuids: uuids.join(','),
     snapshot_uuids: '',
     extended_release: [],

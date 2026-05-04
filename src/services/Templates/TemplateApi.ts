@@ -66,6 +66,7 @@ export type TemplateFilterData = {
   arch: string;
   version: string[];
   extended_release_version: string[];
+  restrict_to_major: boolean;
   search: string;
   repository_uuids: string;
   snapshot_uuids: string;
@@ -86,6 +87,7 @@ export const getTemplates: (
     arch,
     version,
     extended_release_version,
+    restrict_to_major,
     repository_uuids,
     snapshot_uuids,
     extended_release,
@@ -102,6 +104,7 @@ export const getTemplates: (
       arch,
       version: majorVersionParam,
       extended_release_version: minorVersionParam,
+      restrict_to_major: restrict_to_major ? 'true' : '',
       sort_by: sortBy,
       repository_uuids: repository_uuids,
       snapshot_uuids: snapshot_uuids,
