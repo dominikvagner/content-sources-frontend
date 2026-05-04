@@ -30,7 +30,6 @@ import {
 import { useAppContext } from '../../../middleware/AppContext';
 import { Pagination, Button, EmptyStateActions, Flex, FlexItem } from '@patternfly/react-core';
 import useDistributionDetails from '../../../Hooks/useDistributionDetails';
-import dayjs from 'dayjs';
 import { useSearchParams, useNavigate, Outlet, useOutletContext } from 'react-router-dom';
 import Hide from 'components/Hide/Hide';
 import { ADD_ROUTE } from 'Routes/constants';
@@ -53,7 +52,7 @@ import { DataViewFilters } from '@patternfly/react-data-view/dist/dynamic/DataVi
 import { useContentListFilters, FilterLabelsMap } from './hooks/useContentListFilters';
 import ContentOriginFilter from './components/ContentOriginFilter';
 import EmptyTableDataView from 'components/EmptyTableDataView/EmptyTableDataView';
-import { hasOrigin, versionNameToApiValue } from '../helpers';
+import { hasOrigin, versionNameToApiValue, lastIntrospectionDisplay } from '../helpers';
 
 export const perPageKey = 'contentListPerPage';
 
@@ -268,9 +267,6 @@ const ContentListTable = () => {
     onPerPageSelect,
   };
 
-  const lastIntrospectionDisplay = (time?: string): string =>
-    time === '' || time === undefined ? 'Never' : dayjs(time).fromNow();
-
   // Repository introspection status
   const { mutateAsync: introspectRepository } = useIntrospectRepositoryMutate(
     queryClient,
@@ -282,8 +278,11 @@ const ContentListTable = () => {
   );
 
   // Ensure that repository statuses are properly displayed
-  const introspectRepoForUuid = (uuid: string): Promise<void> =>
-    introspectRepository({ uuid: uuid, reset_count: true } as IntrospectRepositoryRequestItem);
+  const introspectRepoForUuid = useCallback(
+    (uuid: string): Promise<void> =>
+      introspectRepository({ uuid: uuid, reset_count: true } as IntrospectRepositoryRequestItem),
+    [introspectRepository],
+  );
 
   const selection = useDataViewSelection({ matchOption: (a, b) => a.id === b.id });
   const { selected, onSelect, isSelected } = selection;
@@ -349,15 +348,21 @@ const ContentListTable = () => {
 
   const { mutateAsync: triggerSnapshotMutation } = useTriggerSnapshot(queryClient);
 
-  const triggerSnapshot = async (uuid: string): Promise<void> => {
-    await triggerSnapshotMutation(uuid);
-  };
+  const triggerSnapshot = useCallback(
+    async (uuid: string): Promise<void> => {
+      await triggerSnapshotMutation(uuid);
+    },
+    [triggerSnapshotMutation],
+  );
 
-  const triggerIntrospectionAndSnapshot = async (repoUuid: string): Promise<void> => {
-    clearSelectedRepositories();
-    await introspectRepoForUuid(repoUuid);
-    await triggerSnapshot(repoUuid);
-  };
+  const triggerIntrospectionAndSnapshot = useCallback(
+    async (repoUuid: string): Promise<void> => {
+      clearSelectedRepositories();
+      await introspectRepoForUuid(repoUuid);
+      await triggerSnapshot(repoUuid);
+    },
+    [clearSelectedRepositories, introspectRepoForUuid, triggerSnapshot],
+  );
 
   const { rowActions } = useRowActions({
     isRedHatRepository,
@@ -368,93 +373,107 @@ const ContentListTable = () => {
 
   // Format rows for DataView using DataViewTr objects
   // Selection is handled by DataView selection system using id and isSelected
-  const rows: SelectableRow[] = contentList.map(
-    ({
-      uuid,
-      name,
-      url,
-      origin,
-      last_snapshot,
-      snapshot,
-      last_snapshot_uuid,
-      distribution_arch,
-      distribution_versions,
-      extended_release_version,
-      last_introspection_time,
-      failed_introspections_count,
-      last_introspection_error,
-      last_snapshot_task,
-      package_count,
-      status,
-    }: ContentItem) => {
-      // Pre-compute values for memoized components
-      const actionRowData: ActionRowData = {
-        uuid,
-        origin,
-        status,
-        snapshot,
-        last_snapshot_uuid,
-        last_snapshot_task,
-      };
-      const actions = rowActions(actionRowData);
-      const pendingTooltipContent = showPendingTooltip(last_snapshot_task?.status, status);
+  const rows: SelectableRow[] = useMemo(
+    () =>
+      contentList.map(
+        ({
+          uuid,
+          name,
+          url,
+          origin,
+          last_snapshot,
+          snapshot,
+          last_snapshot_uuid,
+          distribution_arch,
+          distribution_versions,
+          extended_release_version,
+          last_introspection_time,
+          failed_introspections_count,
+          last_introspection_error,
+          last_snapshot_task,
+          package_count,
+          status,
+        }: ContentItem) => {
+          // Pre-compute values for memoized components
+          const actionRowData: ActionRowData = {
+            uuid,
+            origin,
+            status,
+            snapshot,
+            last_snapshot_uuid,
+            last_snapshot_task,
+          };
+          const actions = rowActions(actionRowData);
+          const pendingTooltipContent = showPendingTooltip(last_snapshot_task?.status, status);
 
-      return {
-        id: uuid, // Used by useDataViewSelection for matching
-        origin: origin, // Used to determine if a repo is deletable
-        row: [
-          {
-            cell: (
-              <RepositoryCell
-                rowData={{ name, url, last_snapshot, origin }}
-                snapshotsAccessible={snapshotsAccessible}
-                communityReposEnabled={communityReposEnabled}
-              />
-            ),
-          },
-          { cell: getArchName(distribution_arch) },
-          {
-            cell: extended_release_version
-              ? getMinorVersionName(extended_release_version)
-              : getVersionName(distribution_versions),
-          },
-          { cell: <PackageCount rowData={{ uuid, status, package_count }} /> },
-          {
-            cell:
-              origin !== ContentOrigin.UPLOAD
-                ? lastIntrospectionDisplay(last_introspection_time)
-                : 'N/A',
-          },
-          {
-            cell: (
-              <StatusIcon
-                rowData={{
-                  uuid,
-                  status,
-                  failed_introspections_count,
-                  last_introspection_time,
-                  last_introspection_error,
-                  last_snapshot_task,
-                  origin,
-                }}
-                retryHandler={introspectRepoForUuid}
-              />
-            ),
-          },
-          {
-            cell: (
-              <RepositoryActionCell
-                rowData={actionRowData}
-                actions={actions}
-                showPendingTooltipContent={pendingTooltipContent}
-                isRedHatRepository={isRedHatRepository}
-              />
-            ),
-            props: { isActionCell: true },
-          },
-        ],
-      };
-    },
+          return {
+            id: uuid, // Used by useDataViewSelection for matching
+            origin: origin, // Used to determine if a repo is deletable
+            row: [
+              {
+                cell: (
+                  <RepositoryCell
+                    rowData={{ name, url, last_snapshot, origin }}
+                    snapshotsAccessible={snapshotsAccessible}
+                    communityReposEnabled={communityReposEnabled}
+                  />
+                ),
+              },
+              { cell: getArchName(distribution_arch) },
+              {
+                cell: extended_release_version
+                  ? getMinorVersionName(extended_release_version)
+                  : getVersionName(distribution_versions),
+              },
+              { cell: <PackageCount rowData={{ uuid, status, package_count }} /> },
+              {
+                cell:
+                  origin !== ContentOrigin.UPLOAD
+                    ? lastIntrospectionDisplay(last_introspection_time)
+                    : 'N/A',
+              },
+              {
+                cell: (
+                  <StatusIcon
+                    rowData={{
+                      uuid,
+                      status,
+                      failed_introspections_count,
+                      last_introspection_time,
+                      last_introspection_error,
+                      last_snapshot_task,
+                      origin,
+                    }}
+                    retryHandler={introspectRepoForUuid}
+                  />
+                ),
+              },
+              {
+                cell: (
+                  <RepositoryActionCell
+                    rowData={actionRowData}
+                    actions={actions}
+                    showPendingTooltipContent={pendingTooltipContent}
+                    isRedHatRepository={isRedHatRepository}
+                  />
+                ),
+                props: { isActionCell: true },
+              },
+            ],
+          };
+        },
+      ),
+    [
+      contentList,
+      rowActions,
+      snapshotsAccessible,
+      communityReposEnabled,
+      getArchName,
+      getVersionName,
+      getMinorVersionName,
+      introspectRepoForUuid,
+      isRedHatRepository,
+    ],
   );
 
   const handleBulkSelect = (value: BulkSelectValue) => {
