@@ -77,7 +77,7 @@ jobs:
         id: compare-nvmrc
         run: |
           # Get both .nvmrc files
-          curl https://raw.githubusercontent.com/content-services/content-sources-backend/refs/heads/main/_playwright-tests/.nvmrc -o backend-nvmrc
+          curl https://raw.githubusercontent.com/content-services/content-sources-backend/refs/heads/main/.nvmrc -o backend-nvmrc
           backendNvmrc="backend-nvmrc"
           frontendNvmrc=".nvmrc"
 
