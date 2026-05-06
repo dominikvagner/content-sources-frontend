@@ -7,12 +7,11 @@ import { EllipsisVIcon } from '@patternfly/react-icons';
 
 interface Props {
   atLeastOneRepoChecked: boolean;
-  numberOfReposChecked: number;
-  toggleOuiaId?: string;
   isDisabled?: boolean;
+  text: string;
 }
 
-const DeleteKebab = ({ atLeastOneRepoChecked, numberOfReposChecked, isDisabled }: Props) => {
+const DeleteKebab = ({ atLeastOneRepoChecked, isDisabled, text }: Props) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -53,11 +52,7 @@ const DeleteKebab = ({ atLeastOneRepoChecked, numberOfReposChecked, isDisabled }
           show={!atLeastOneRepoChecked}
           setDisabled
         >
-          <DropdownItem onClick={() => navigate(DELETE_ROUTE)}>
-            {numberOfReposChecked <= 1
-              ? 'Delete repository'
-              : `Delete ${numberOfReposChecked} repositories`}
-          </DropdownItem>
+          <DropdownItem onClick={() => navigate(DELETE_ROUTE)}>{text}</DropdownItem>
         </ConditionalTooltip>
       </DropdownList>
     </Dropdown>

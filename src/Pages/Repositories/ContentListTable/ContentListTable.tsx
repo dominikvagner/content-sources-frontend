@@ -502,12 +502,12 @@ const ContentListTable = () => {
   const pageSelectableRows = rows.filter((row) => !shouldDisableSelect(row));
 
   // How many of those selectable rows are currently selected
-  const pageSelectionCount = pageSelectableRows.filter(isSelected).length;
+  const numberOfRowsSelected = pageSelectableRows.filter(isSelected).length;
 
   const isPageSelected =
-    pageSelectableRows.length > 0 && pageSelectionCount === pageSelectableRows.length;
+    pageSelectableRows.length > 0 && numberOfRowsSelected === pageSelectableRows.length;
 
-  const isPagePartiallySelected = pageSelectionCount > 0 && !isPageSelected;
+  const isPagePartiallySelected = numberOfRowsSelected > 0 && !isPageSelected;
 
   const ouiaId = 'repositories-table';
 
@@ -539,6 +539,14 @@ const ContentListTable = () => {
     activeState === DataViewState.empty ||
     activeState === DataViewState.loading ||
     areNoSelectableRows;
+
+  const deleteRepoText = useMemo(
+    () =>
+      numberOfRowsSelected <= 1
+        ? 'Delete repository'
+        : `Delete ${numberOfRowsSelected} repositories`,
+    [numberOfRowsSelected],
+  );
 
   return (
     <>
@@ -698,9 +706,8 @@ const ContentListTable = () => {
                       contentOrigin.length === 0 ||
                       (isCommunityAndCustom && areNoSelectableRows)
                     }
-                    atLeastOneRepoChecked={pageSelectionCount > 0}
-                    numberOfReposChecked={pageSelectionCount}
-                    toggleOuiaId='repositories-kebab-toggle'
+                    atLeastOneRepoChecked={numberOfRowsSelected > 0}
+                    text={deleteRepoText}
                   />
                 </ConditionalTooltip>
               </FlexItem>

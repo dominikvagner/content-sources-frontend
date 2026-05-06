@@ -12,7 +12,7 @@ jest.mock('react-router-dom', () => ({
 
 it('Render no checked repos', async () => {
   const { getByRole } = render(
-    <DeleteKebab atLeastOneRepoChecked={false} numberOfReposChecked={0} />,
+    <DeleteKebab atLeastOneRepoChecked={false} text='Delete repository' />,
   );
 
   const kebab = getByRole('button', { name: 'plain kebab' });
@@ -26,7 +26,7 @@ it('Render no checked repos', async () => {
 it('Render with checked repos', async () => {
   const repos = 100;
   const { queryByText } = render(
-    <DeleteKebab atLeastOneRepoChecked={true} numberOfReposChecked={repos} />,
+    <DeleteKebab atLeastOneRepoChecked={true} text={`Delete ${repos} repositories`} />,
   );
 
   const kebab = document.getElementById('delete-kebab');
