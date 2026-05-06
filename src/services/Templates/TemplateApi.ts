@@ -3,7 +3,7 @@ import {
   Links,
   Meta,
   type ErrataResponse,
-  type PackageItem,
+  type Package,
   SnapshotListResponse,
   SnapshotItem,
 } from '../Content/ContentApi';
@@ -57,7 +57,7 @@ export interface TemplateCollectionResponse {
 }
 
 export interface SnapshotRpmCollectionResponse {
-  data: Array<PackageItem>;
+  data: Array<Package>;
   links: Links;
   meta: Meta;
 }

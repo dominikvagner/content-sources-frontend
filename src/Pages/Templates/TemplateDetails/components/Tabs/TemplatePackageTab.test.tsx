@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { defaultPackageItem } from 'testingHelpers';
 import TemplatePackageTab from './TemplatePackageTab';
 import { useFetchTemplatePackages } from 'services/Templates/TemplateQueries';
-import type { PackageItem } from 'services/Content/ContentApi';
+import type { Package } from 'services/Content/ContentApi';
 
 const bananaUUID = 'banana-uuid';
 
@@ -27,7 +27,7 @@ jest.mock('services/Templates/TemplateQueries', () => ({
   isLoading: false,
   isFetching: false,
   data: {
-    data: new Array(15).fill(defaultPackageItem).map((item: PackageItem, index) => ({
+    data: new Array(15).fill(defaultPackageItem).map((item: Package, index) => ({
       ...item,
       name: item.name + index,
     })),

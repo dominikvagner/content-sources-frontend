@@ -1,5 +1,5 @@
 import { Table, TableVariant, Tbody, Td, Th, Thead, Tr } from '@patternfly/react-table';
-import { PackageItem } from 'services/Content/ContentApi';
+import { Package } from 'services/Content/ContentApi';
 import Hide from '../../Hide/Hide';
 import { Grid } from '@patternfly/react-core';
 import { SkeletonTable } from '@patternfly/react-component-groups';
@@ -18,7 +18,7 @@ const useStyles = createUseStyles({
 interface Props {
   isFetchingOrLoading: boolean;
   isLoadingOrZeroCount: boolean;
-  packagesList: PackageItem[];
+  packagesList: Package[];
   clearSearch: () => void;
   perPage: number;
   search: string;
@@ -63,7 +63,7 @@ export default function PackagesTable({
               </Tr>
             </Thead>
           </Hide>
-          {packagesList.map(({ name, version, release, arch }: PackageItem, index: number) => (
+          {packagesList.map(({ name, version, release, arch }: Package, index: number) => (
             <Tbody key={name + index}>
               <Tr>
                 <Td>{name}</Td>

@@ -178,7 +178,7 @@ export type ValidationResponse = {
   gpg_key?: ValidateItem;
 };
 
-export interface PackageItem {
+interface PackageBase {
   arch: string;
   epoch: string;
   name: string;
@@ -187,6 +187,15 @@ export interface PackageItem {
   summary: string;
   version: string;
 }
+
+type PackageWithoutUUID = PackageBase & {
+  uuid?: never;
+};
+export type PackageWithUUID = PackageBase & {
+  uuid: string;
+};
+
+export type Package = PackageWithoutUUID | PackageWithUUID;
 
 export interface ErrataItem {
   id: string;
@@ -203,7 +212,13 @@ export interface ErrataItem {
 }
 
 export type PackagesResponse = {
-  data: PackageItem[];
+  data: PackageWithoutUUID[];
+  links: Links;
+  meta: Meta;
+};
+
+export type PackagesWithUUIDResponse = {
+  data: PackageWithUUID[];
   links: Links;
   meta: Meta;
 };
@@ -460,7 +475,7 @@ export const getPackages: (
   limit: number,
   search: string,
   sortBy?: string,
-) => Promise<PackagesResponse> = async (
+) => Promise<PackagesWithUUIDResponse> = async (
   uuid: string,
   page: number,
   limit: number,

@@ -10,7 +10,7 @@ import {
   SnapshotItem,
   ValidationResponse,
   type ErrataItem,
-  type PackageItem,
+  type Package,
   ContentOrigin,
 } from 'services/Content/ContentApi';
 import { AdminTask } from 'services/Admin/AdminTaskApi';
@@ -578,7 +578,7 @@ export const defaultTemplateSystemsListItem: IDSystemItem = {
   type: 'system',
 };
 
-export const defaultPackageItem: PackageItem = {
+export const defaultPackageItem: Package = {
   name: 'banana-base-libs',
   arch: 'x86_64',
   version: '1.2.3',
