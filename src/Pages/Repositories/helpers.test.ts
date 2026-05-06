@@ -1,6 +1,11 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { hasOrigin, lastIntrospectionDisplay, versionNameToApiValue } from './helpers';
+import {
+  hasOrigin,
+  lastIntrospectionDisplay,
+  showPendingTooltip,
+  versionNameToApiValue,
+} from './helpers';
 
 dayjs.extend(relativeTime);
 
@@ -32,6 +37,30 @@ describe('lastIntrospectionDisplay', () => {
   it('should return a relative time string for a valid timestamp', () => {
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
     expect(lastIntrospectionDisplay(fiveMinutesAgo)).toBe('5 minutes ago');
+  });
+});
+
+describe('showPendingTooltip', () => {
+  it('should indicate snapshotting when snapshot status is running', () => {
+    expect(showPendingTooltip('running', undefined)).toBe('Snapshotting is in progress');
+  });
+
+  it('should indicate snapshotting when snapshot status is pending', () => {
+    expect(showPendingTooltip('pending', undefined)).toBe('Snapshotting is in progress');
+  });
+
+  it('should indicate introspection when introspect status is Pending', () => {
+    expect(showPendingTooltip(undefined, 'Pending')).toBe('Introspection is in progress');
+  });
+
+  it('should indicate both when neither status is provided', () => {
+    expect(showPendingTooltip(undefined, undefined)).toBe(
+      'Introspection or snapshotting is in progress',
+    );
+  });
+
+  it('should return undefined when statuses do not match any condition', () => {
+    expect(showPendingTooltip('completed', 'Valid')).toBeUndefined();
   });
 });
 

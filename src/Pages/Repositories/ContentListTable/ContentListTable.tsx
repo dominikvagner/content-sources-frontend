@@ -43,7 +43,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import StatusIcon from './components/StatusIcon';
 import RepositoryCell from './components/RepositoryCell';
 import RepositoryActionCell, { type ActionRowData } from './components/RepositoryActionCell';
-import useRowActions, { showPendingTooltip } from './hooks/useRowActions';
+import useRowActions from './hooks/useRowActions';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 import { SkeletonTableBody } from '@patternfly/react-component-groups';
 import PackageCount from './components/PackageCount';
@@ -52,7 +52,12 @@ import { DataViewFilters } from '@patternfly/react-data-view/dist/dynamic/DataVi
 import { useContentListFilters, FilterLabelsMap } from './hooks/useContentListFilters';
 import ContentOriginFilter from './components/ContentOriginFilter';
 import EmptyTableDataView from 'components/EmptyTableDataView/EmptyTableDataView';
-import { hasOrigin, versionNameToApiValue, lastIntrospectionDisplay } from '../helpers';
+import {
+  hasOrigin,
+  versionNameToApiValue,
+  lastIntrospectionDisplay,
+  showPendingTooltip,
+} from '../helpers';
 
 export const perPageKey = 'contentListPerPage';
 

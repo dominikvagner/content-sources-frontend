@@ -15,19 +15,6 @@ const useStyles = createUseStyles({
   },
 });
 
-export const showPendingTooltip = (
-  snapshotStatus: string | undefined,
-  introspectStatus: string | undefined,
-) => {
-  if (!snapshotStatus && !introspectStatus) {
-    return 'Introspection or snapshotting is in progress';
-  } else if (snapshotStatus === 'running' || snapshotStatus === 'pending') {
-    return 'Snapshotting is in progress';
-  } else if (introspectStatus === 'Pending') {
-    return 'Introspection is in progress';
-  }
-};
-
 interface UseRowActionsProps {
   isRedHatRepository: boolean;
   introspectRepoForUuid: (uuid: string) => Promise<void>;
@@ -55,7 +42,7 @@ export default function useRowActions({
               {
                 isDisabled: !rowData.snapshot || !(rowData.snapshot && rowData.last_snapshot_uuid),
 
-                ouiaId: 'kebab_view_snapshots',
+                ouiaId: 'kebab-view-snapshots',
                 title:
                   rowData.snapshot && rowData.last_snapshot_uuid
                     ? 'View all snapshots'
@@ -72,7 +59,7 @@ export default function useRowActions({
                   {
                     isDisabled: rowData?.status === 'Pending',
                     title: 'Edit',
-                    ouiaId: 'kebab_edit',
+                    ouiaId: 'kebab-edit',
                     onClick: () => {
                       navigate(`${rowData.uuid}/${EDIT_ROUTE}`);
                     },
@@ -82,7 +69,7 @@ export default function useRowActions({
                         {
                           isDisabled: rowData?.status === 'Pending',
                           title: 'Upload content',
-                          ouiaId: 'kebab_upload_content',
+                          ouiaId: 'kebab-upload-content',
                           onClick: () => {
                             navigate(`${rowData.uuid}/${UPLOAD_ROUTE}`);
                           },
@@ -96,7 +83,7 @@ export default function useRowActions({
                   {
                     isDisabled: !rowData.last_snapshot_uuid,
                     title: rowData.last_snapshot_uuid ? 'View all snapshots' : 'No snapshots yet',
-                    ouiaId: 'kebab_view_snapshots',
+                    ouiaId: 'kebab-view-snapshots',
                     onClick: () => {
                       navigate(`${rowData.uuid}/snapshots`);
                     },
@@ -104,14 +91,14 @@ export default function useRowActions({
                   ...(rbac?.repoWrite && rowData.origin !== ContentOrigin.UPLOAD
                     ? [
                         {
-                          id: 'actions-column-snapshot',
+                          id: `actions-column-snapshot-${rowData.uuid}`,
                           className:
                             rowData?.status === 'Pending' || !rowData.snapshot
                               ? classes.disabledButton
                               : '',
                           isDisabled: rowData?.status === 'Pending' || !rowData.snapshot,
                           title: 'Trigger snapshot',
-                          ouiaId: 'kebab_trigger_snapshots',
+                          ouiaId: 'kebab-trigger-snapshots',
                           onClick: () => {
                             triggerIntrospectionAndSnapshot(rowData?.uuid);
                           },
@@ -120,8 +107,9 @@ export default function useRowActions({
                                 content: 'Snapshots disabled for this repository.',
                                 position: TooltipPosition.left,
                                 triggerRef: () =>
-                                  document.getElementById('actions-column-snapshot') ||
-                                  document.body,
+                                  document.getElementById(
+                                    `actions-column-snapshot-${rowData.uuid}`,
+                                  ) || document.body,
                               }
                             : undefined,
                         },
@@ -134,7 +122,7 @@ export default function useRowActions({
                   {
                     isDisabled: rowData?.status == 'Pending',
                     title: 'Introspect now',
-                    ouiaId: 'kebab_introspect_now',
+                    ouiaId: 'kebab-introspect-now',
                     onClick: () =>
                       introspectRepoForUuid(rowData?.uuid).then(clearSelectedRepositories),
                   },
@@ -145,7 +133,7 @@ export default function useRowActions({
                   { isSeparator: true },
                   {
                     title: 'Delete',
-                    ouiaId: 'kebab_delete',
+                    ouiaId: 'kebab-delete',
                     onClick: () => navigate(`${DELETE_ROUTE}?repoUUID=${rowData.uuid}`),
                   },
                 ]
@@ -163,5 +151,5 @@ export default function useRowActions({
     ],
   );
 
-  return { rowActions, showPendingTooltip };
+  return { rowActions };
 }
