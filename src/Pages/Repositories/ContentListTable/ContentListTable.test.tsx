@@ -308,7 +308,6 @@ it('filters the table by major and minor OS versions', async () => {
     expect(rows.length).toBe(1);
   });
   expect(await screen.findByText(defaultEUSRepository.name!)).toBeInTheDocument();
-
   // Re-select the OS filter type and add a major version filter
   await user.click(screen.getByRole('button', { name: 'Name/URL' }));
   await user.click(within(screen.getByRole('menu')).getByRole('menuitem', { name: osMenuItem }));
