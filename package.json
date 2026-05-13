@@ -119,13 +119,16 @@
     "prop-types": "15.8.1",
     "source-map": "^0.8.0-beta.0",
     "ts-jest": "^29.4.9",
-    "ts-patch": "^4.0.1",
+    "ts-patch": ">=3.3.0 <4.0.0",
     "typescript": "^5.9.2",
     "webpack-bundle-analyzer": "^5.2.0"
   },
   "insights": {
     "appname": "content-sources",
     "buildrepo": "git@github.com:RedHatInsights/content-sources-frontend-build.git"
+  },
+  "resolutions": {
+    "ts-patch": ">=3.3.0 <4.0.0"
   },
   "jest-junit": {
     "outputDirectory": "test-results",
