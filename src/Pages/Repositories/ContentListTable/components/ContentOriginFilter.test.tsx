@@ -10,7 +10,6 @@ jest.mock('middleware/AppContext', () => ({
 
 const defaultFeatures = {
   snapshots: { accessible: true },
-  communityrepos: { enabled: false },
 };
 
 describe('ContentOriginFilter', () => {
@@ -99,13 +98,9 @@ describe('ContentOriginFilter', () => {
     expect(updater([ContentOrigin.REDHAT])).toEqual([]);
   });
 
-  it('toggles EPEL when community repositories are enabled', async () => {
+  it('toggles EPEL origin', async () => {
     const user = userEvent.setup();
     const setContentOrigin = jest.fn();
-
-    (useAppContext as jest.Mock).mockReturnValue({
-      features: { ...defaultFeatures, communityrepos: { enabled: true } },
-    });
 
     render(<ContentOriginFilter contentOrigin={[]} setContentOrigin={setContentOrigin} />);
 
@@ -115,5 +110,26 @@ describe('ContentOriginFilter', () => {
       prev: ContentOrigin[],
     ) => ContentOrigin[];
     expect(addCommunity([])).toEqual([ContentOrigin.COMMUNITY]);
+  });
+
+  it('removes community origin when EPEL is turned off', async () => {
+    const user = userEvent.setup();
+    const setContentOrigin = jest.fn();
+
+    render(
+      <ContentOriginFilter
+        contentOrigin={[ContentOrigin.COMMUNITY, ContentOrigin.REDHAT]}
+        setContentOrigin={setContentOrigin}
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: 'EPEL' }));
+
+    const removeCommunity = setContentOrigin.mock.calls[0][0] as (
+      prev: ContentOrigin[],
+    ) => ContentOrigin[];
+    expect(removeCommunity([ContentOrigin.COMMUNITY, ContentOrigin.REDHAT])).toEqual([
+      ContentOrigin.REDHAT,
+    ]);
   });
 });

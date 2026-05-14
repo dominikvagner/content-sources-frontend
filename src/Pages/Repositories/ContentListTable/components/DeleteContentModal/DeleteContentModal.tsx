@@ -35,7 +35,6 @@ import { REPOSITORIES_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
 import { ContentItem, ContentOrigin, FilterData } from 'services/Content/ContentApi';
 import { isEmpty } from 'lodash';
 import useDeepCompareEffect from 'Hooks/useDeepCompareEffect';
-import { usePopularListOutletContext } from 'Pages/Repositories/PopularRepositoriesTable/PopularRepositoriesTable';
 import { ActionButtons } from 'components/ActionButtons/ActionButtons';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
 
@@ -75,18 +74,15 @@ export default function DeleteContentModal() {
     deletionContext: { page, perPage, filterData, contentOrigin, sortString, checkedRepositories },
   } = useContentListOutletContext();
 
-  const {
-    deletionContext: { checkedRepositoriesToDelete },
-  } = usePopularListOutletContext();
-
   const repoUUIDFromPath = new URLSearchParams(search).get('repoUUID')?.split(',');
+
+  const selectedRepoUuids =
+    checkedRepositories instanceof Map ? checkedRepositories : new Map<string, ContentItem>();
 
   const uuids =
     repoUUIDFromPath && repoUUIDFromPath.length > 0
       ? repoUUIDFromPath
-      : checkedRepositories
-        ? Array.from(checkedRepositories.keys())
-        : Array.from(checkedRepositoriesToDelete.keys());
+      : Array.from(selectedRepoUuids.keys());
 
   const repoFilterData: FilterData = { uuids: uuids };
 
@@ -114,7 +110,7 @@ export default function DeleteContentModal() {
     sortString,
   );
 
-  const onClose = () => navigate(`${rootPath}/${REPOSITORIES_ROUTE}}`);
+  const onClose = () => navigate(`${rootPath}/${REPOSITORIES_ROUTE}`);
 
   const onSave = async () => {
     deleteItems(reposToDelete).then(() => {

@@ -38,6 +38,7 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
   const [contentOrigin, setContentOrigin] = useState<ContentOrigin[]>([
     ContentOrigin.EXTERNAL,
     ContentOrigin.UPLOAD,
+    ContentOrigin.COMMUNITY,
   ]);
 
   const chrome = useChrome();
@@ -57,19 +58,9 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
   const rbac = useKessel ? kesselPermissions.rbac : traditionalPermissions.rbac;
   const rbacLoading = useKessel ? kesselPermissions.loading : traditionalPermissions.loading;
 
-  // Fetch features on mount and update content origin
   useEffect(() => {
     (async () => {
-      const fetchedFeatures = await fetchFeatures();
-      setFeatures(fetchedFeatures);
-
-      if (fetchedFeatures?.communityrepos?.enabled) {
-        setContentOrigin((prev) =>
-          prev.includes(ContentOrigin.COMMUNITY) ? prev : [...prev, ContentOrigin.COMMUNITY],
-        );
-      } else {
-        setContentOrigin((prev) => prev.filter((origin) => origin !== ContentOrigin.COMMUNITY));
-      }
+      setFeatures(await fetchFeatures());
     })();
   }, []);
 

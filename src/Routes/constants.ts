@@ -1,5 +1,4 @@
 export const REPOSITORIES_ROUTE = 'repositories';
-export const POPULAR_REPOSITORIES_ROUTE = 'popular';
 export const ADMIN_TASKS_ROUTE = 'admin-tasks';
 export const TEMPLATES_ROUTE = 'templates';
 export const CONTENT_ROUTE = 'content';

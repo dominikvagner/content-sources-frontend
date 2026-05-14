@@ -8,7 +8,6 @@ export interface Feature {
 export interface Features {
   snapshots?: Feature;
   admintasks?: Feature;
-  communityrepos?: Feature;
   kessel?: Feature;
   extendedreleaserepos?: Feature;
 }

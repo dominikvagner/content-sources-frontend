@@ -19,7 +19,7 @@ import { createUseStyles } from 'react-jss';
 
 import { useAppContext } from 'middleware/AppContext';
 import { useHref, useNavigate } from 'react-router-dom';
-import { POPULAR_REPOSITORIES_ROUTE, REPOSITORIES_ROUTE } from 'Routes/constants';
+import { REPOSITORIES_ROUTE } from 'Routes/constants';
 
 const useStyles = createUseStyles({
   contentZerostate: {
@@ -38,7 +38,7 @@ const useStyles = createUseStyles({
 export const ZeroState = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const { setZeroState, features, isLightspeedEnabled } = useAppContext();
+  const { setZeroState, isLightspeedEnabled } = useAppContext();
   const path = useHref('content');
   const pathname = path.split('content')[0] + 'content';
 
@@ -55,18 +55,6 @@ export const ZeroState = () => {
         navigate(`${pathname}/${REPOSITORIES_ROUTE}?origin=red_hat`);
       },
     },
-    ...(!features?.communityrepos?.enabled
-      ? [
-          {
-            title: 'Popular repositories',
-            description: 'Add popular repositories with a single click.',
-            onClick: () => {
-              setZeroState(false);
-              navigate(`${pathname}/${REPOSITORIES_ROUTE}/${POPULAR_REPOSITORIES_ROUTE}`);
-            },
-          },
-        ]
-      : []),
   ];
 
   return (

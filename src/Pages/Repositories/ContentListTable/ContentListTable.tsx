@@ -54,9 +54,9 @@ import ContentOriginFilter from './components/ContentOriginFilter';
 import EmptyTableDataView from 'components/EmptyTableDataView/EmptyTableDataView';
 import {
   hasOrigin,
-  versionNameToApiValue,
   lastIntrospectionDisplay,
   showPendingTooltip,
+  versionNameToApiValue,
 } from '../helpers';
 
 export const perPageKey = 'contentListPerPage';
@@ -349,8 +349,6 @@ const ContentListTable = () => {
 
   // Feature flags for memoized components
   const snapshotsAccessible = features?.snapshots?.accessible ?? false;
-  const communityReposEnabled = features?.communityrepos?.enabled ?? false;
-
   const { mutateAsync: triggerSnapshotMutation } = useTriggerSnapshot(queryClient);
 
   const triggerSnapshot = useCallback(
@@ -420,7 +418,6 @@ const ContentListTable = () => {
                   <RepositoryCell
                     rowData={{ name, url, last_snapshot, origin }}
                     snapshotsAccessible={snapshotsAccessible}
-                    communityReposEnabled={communityReposEnabled}
                   />
                 ),
               },
@@ -472,10 +469,11 @@ const ContentListTable = () => {
       contentList,
       rowActions,
       snapshotsAccessible,
-      communityReposEnabled,
       getArchName,
       getVersionName,
       getMinorVersionName,
+      lastIntrospectionDisplay,
+      showPendingTooltip,
       introspectRepoForUuid,
       isRedHatRepository,
     ],

@@ -1,12 +1,5 @@
-import { useMemo, useState } from 'react';
-import {
-  Alert,
-  AlertActionCloseButton,
-  Grid,
-  Tab,
-  Tabs,
-  TabTitleText,
-} from '@patternfly/react-core';
+import { useMemo } from 'react';
+import { Grid, Tab, Tabs, TabTitleText } from '@patternfly/react-core';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 
 import { createUseStyles } from 'react-jss';
@@ -16,14 +9,12 @@ import RepositoryQuickStart from 'components/QuickStart/RepositoryQuickStart';
 import ServiceUnavailableAlert from 'components/ServiceUnavailableAlert/ServiceUnavailableAlert';
 import {
   ADMIN_TASKS_ROUTE,
-  POPULAR_REPOSITORIES_ROUTE,
   REDHAT_REPO_GEN_ROUTE,
   REPOSITORIES_ROUTE,
 } from '../../Routes/constants';
 import { useAppContext } from 'middleware/AppContext';
 import { useFlag } from '@unleash/proxy-client-react';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
-import Hide from 'components/Hide/Hide';
 
 const useStyles = createUseStyles({
   link: {
@@ -38,26 +29,9 @@ export default function RepositoryLayout() {
   const classes = useStyles();
   const currentRoute = useMemo(() => last(pathname.split('/')), [pathname]);
 
-  const storedCustomEPELBannerDismissal = !!sessionStorage.getItem('customEPELBannerDismissal');
-  const [dismissed, setDismissed] = useState(storedCustomEPELBannerDismissal);
-
-  const onDismissBanner = () => {
-    sessionStorage.setItem('customEPELBannerDismissal', 'true');
-    setDismissed(true);
-  };
-
   const tabs = useMemo(
     () => [
       { title: 'Your repositories', route: '', key: REPOSITORIES_ROUTE },
-      ...(!features?.communityrepos?.enabled
-        ? [
-            {
-              title: 'Popular repositories',
-              route: POPULAR_REPOSITORIES_ROUTE,
-              key: POPULAR_REPOSITORIES_ROUTE,
-            },
-          ]
-        : []),
       ...(features?.admintasks?.enabled && features.admintasks?.accessible
         ? [
             {
@@ -84,19 +58,7 @@ export default function RepositoryLayout() {
         paragraph='View all repositories within your organization.'
       />
       {serviceUnavailable && <ServiceUnavailableAlert />}
-      <Hide hide={dismissed || !features?.communityrepos?.enabled}>
-        <Grid className={spacing.pLgOnSm}>
-          <Alert
-            variant='warning'
-            title='Popular repositories have been removed'
-            actionClose={<AlertActionCloseButton onClose={onDismissBanner} />}
-          >
-            Please use the community EPEL repositories instead.
-          </Alert>
-        </Grid>
-      </Hide>
-      {(features?.admintasks?.enabled && features.admintasks?.accessible) ||
-      !features?.communityrepos?.enabled ? (
+      {tabs.length > 1 ? (
         <div className={spacing.pxLg}>
           <Tabs ouiaId='routed-tabs' activeKey={currentRoute}>
             {tabs.map(({ title, route, key }) => (

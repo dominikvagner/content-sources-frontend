@@ -36,8 +36,6 @@ import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip
 import { isEPELUrl, reduceStringToCharsWithEllipsis } from 'helpers';
 import UploadRepositoryLabel from 'components/RepositoryLabels/UploadRepositoryLabel';
 import CommunityRepositoryLabel from 'components/RepositoryLabels/CommunityRepositoryLabel';
-import CustomEpelWarning from 'components/RepositoryLabels/CustomEpelWarning';
-import { useAppContext } from 'middleware/AppContext';
 
 const useStyles = createUseStyles({
   topBottomContainers: {
@@ -59,7 +57,6 @@ export default function CustomRepositoriesStep() {
 
   const { queryClient, templateRequest, selectedCustomRepos, setSelectedCustomRepos } =
     useAddOrEditTemplateContext();
-  const { features } = useAppContext();
 
   const [toggled, setToggled] = useState(false);
 
@@ -295,7 +292,6 @@ export default function CustomRepositoriesStep() {
                     isEPELRepository(rowData) &&
                     isAnyEPELRepoSelected() &&
                     !selectedCustomRepos.has(uuid);
-                  const isCustomEPEL = origin === ContentOrigin.EXTERNAL && isEPELUrl(url);
 
                   return (
                     <Tr key={uuid}>
@@ -310,8 +306,7 @@ export default function CustomRepositoriesStep() {
                           isSelected: selectedCustomRepos.has(uuid),
                           isDisabled:
                             !(rowData.snapshot && rowData.last_snapshot_uuid) ||
-                            shouldDisableOtherEPEL ||
-                            (!selectedCustomRepos.has(uuid) && isCustomEPEL),
+                            shouldDisableOtherEPEL,
                         }}
                       />
                       <Td>
@@ -323,14 +318,6 @@ export default function CustomRepositoriesStep() {
                             </Hide>
                             <Hide hide={origin !== ContentOrigin.COMMUNITY}>
                               <CommunityRepositoryLabel />
-                            </Hide>
-                            <Hide
-                              hide={
-                                !(origin == ContentOrigin.EXTERNAL && isEPELUrl(url)) ||
-                                !features?.communityrepos?.enabled
-                              }
-                            >
-                              <CustomEpelWarning />
                             </Hide>
                           </>
                         </ConditionalTooltip>

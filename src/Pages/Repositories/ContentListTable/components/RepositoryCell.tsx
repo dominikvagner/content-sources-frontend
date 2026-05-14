@@ -5,18 +5,15 @@ import { ContentItem, ContentOrigin } from 'services/Content/ContentApi';
 import Hide from 'components/Hide/Hide';
 import UploadRepositoryLabel from 'components/RepositoryLabels/UploadRepositoryLabel';
 import CommunityRepositoryLabel from 'components/RepositoryLabels/CommunityRepositoryLabel';
-import CustomEpelWarning from 'components/RepositoryLabels/CustomEpelWarning';
 import UrlWithExternalIcon from 'components/UrlWithLinkIcon/UrlWithLinkIcon';
 import ChangedArrows from './SnapshotListModal/components/ChangedArrows';
-import { isEPELUrl } from 'helpers';
 
 interface Props {
   rowData: Pick<ContentItem, 'name' | 'url' | 'last_snapshot' | 'origin'>;
   snapshotsAccessible: boolean;
-  communityReposEnabled: boolean;
 }
 
-const RepositoryCell = memo(({ rowData, snapshotsAccessible, communityReposEnabled }: Props) => {
+const RepositoryCell = memo(({ rowData, snapshotsAccessible }: Props) => {
   const { name, url, last_snapshot, origin } = rowData;
 
   return (
@@ -28,11 +25,6 @@ const RepositoryCell = memo(({ rowData, snapshotsAccessible, communityReposEnabl
         </Hide>
         <Hide hide={origin !== ContentOrigin.COMMUNITY}>
           <CommunityRepositoryLabel />
-        </Hide>
-        <Hide
-          hide={!(origin === ContentOrigin.EXTERNAL && isEPELUrl(url)) || !communityReposEnabled}
-        >
-          <CustomEpelWarning />
         </Hide>
       </Flex>
 

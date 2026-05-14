@@ -11,7 +11,6 @@ test.describe('Community EPEL repositories', () => {
     await expect(page).toHaveTitle('Repositories - Content | RHEL');
 
     await test.step('Custom and EPEL tabs are selected by default', async () => {
-      await expect(page.getByRole('link', { name: 'Popular repositories' })).toBeHidden();
       await expect(page.getByRole('button', { name: 'Custom', exact: true })).toHaveAttribute(
         'aria-pressed',
         'true',

@@ -12,7 +12,6 @@ import {
   DELETE_ROUTE,
   EDIT_ROUTE,
   PACKAGES_ROUTE,
-  POPULAR_REPOSITORIES_ROUTE,
   REDHAT_REPO_GEN_ROUTE,
   REPOSITORIES_ROUTE,
   SNAPSHOTS_ROUTE,
@@ -41,7 +40,6 @@ import TemplateRepositoriesTab from 'Pages/Templates/TemplateDetails/components/
 import UploadContent from 'Pages/Repositories/ContentListTable/components/UploadContent/UploadContent';
 import DeleteSnapshotsModal from 'Pages/Repositories/ContentListTable/components/SnapshotListModal/DeleteSnapshotsModal/DeleteSnapshotsModal';
 import AdminFeaturesTable from 'Pages/Repositories/AdminFeaturesTable/AdminFeaturesTable';
-import PopularRepositoriesTable from 'Pages/Repositories/PopularRepositoriesTable/PopularRepositoriesTable';
 import AssignTemplateModal from '../Pages/Templates/TemplateDetails/components/AssignTemplateModal/AssignTemplateModal';
 
 export default function RepositoriesRoutes() {
@@ -104,25 +102,6 @@ export default function RepositoriesRoutes() {
               element={<PackageModal />}
             />
           </Route>
-          {...!features?.communityrepos?.enabled
-            ? [
-                <Route
-                  key={POPULAR_REPOSITORIES_ROUTE}
-                  path={POPULAR_REPOSITORIES_ROUTE}
-                  element={<PopularRepositoriesTable />}
-                >
-                  {rbac?.repoWrite ? (
-                    <Route
-                      key={DELETE_ROUTE}
-                      path={DELETE_ROUTE}
-                      element={<DeleteContentModal />}
-                    />
-                  ) : (
-                    ''
-                  )}
-                </Route>,
-              ]
-            : []}
           {...features?.admintasks?.enabled && features.admintasks?.accessible
             ? [
                 <Route
