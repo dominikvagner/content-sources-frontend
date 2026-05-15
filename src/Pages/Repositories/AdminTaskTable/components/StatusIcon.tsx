@@ -7,16 +7,16 @@ import {
 import { Flex, FlexItem, Spinner } from '@patternfly/react-core';
 import StatusText from 'components/StatusText/StatusText';
 import {
-  t_global_color_status_danger_100 as global_danger_color_100,
-  t_global_color_status_success_100 as global_success_color_100,
-  t_global_color_status_warning_100 as global_warning_color_100,
+  t_global_color_status_danger_default,
+  t_global_color_status_success_default,
+  t_global_color_status_warning_default,
 } from '@patternfly/react-tokens';
 import { createUseStyles } from 'react-jss';
 import { AdminTask } from 'services/Admin/AdminTaskApi';
 
-const red = global_danger_color_100.value;
-const green = global_success_color_100.value;
-const gold = global_warning_color_100.value;
+const red = t_global_color_status_danger_default.var;
+const green = t_global_color_status_success_default.var;
+const gold = t_global_color_status_warning_default.var;
 
 const useStyles = createUseStyles({
   spinner: {
@@ -54,7 +54,7 @@ const StatusIcon = ({ status, removeText = false }: Props) => {
           </FlexItem>
           {!removeText && (
             <FlexItem>
-              <StatusText color='blue'>Running</StatusText>
+              <StatusText>Running</StatusText>
             </FlexItem>
           )}
         </Flex>
@@ -67,7 +67,7 @@ const StatusIcon = ({ status, removeText = false }: Props) => {
           </FlexItem>
           {!removeText && (
             <FlexItem>
-              <StatusText color='red'>Failed</StatusText>
+              <StatusText>Failed</StatusText>
             </FlexItem>
           )}
         </Flex>
@@ -80,7 +80,7 @@ const StatusIcon = ({ status, removeText = false }: Props) => {
           </FlexItem>
           {!removeText && (
             <FlexItem>
-              <StatusText color='green'>Completed</StatusText>
+              <StatusText>Completed</StatusText>
             </FlexItem>
           )}
         </Flex>
@@ -93,7 +93,7 @@ const StatusIcon = ({ status, removeText = false }: Props) => {
           </FlexItem>
           {!removeText && (
             <FlexItem>
-              <StatusText color='red'>Canceled</StatusText>
+              <StatusText>Canceled</StatusText>
             </FlexItem>
           )}
         </Flex>
@@ -106,7 +106,7 @@ const StatusIcon = ({ status, removeText = false }: Props) => {
           </FlexItem>
           {!removeText && (
             <FlexItem>
-              <StatusText color='gold'>Pending</StatusText>
+              <StatusText>Pending</StatusText>
             </FlexItem>
           )}
         </Flex>

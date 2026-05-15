@@ -15,9 +15,9 @@ import {
 } from '@patternfly/react-core';
 import StatusText from 'components/StatusText/StatusText';
 import {
-  t_global_color_status_danger_100 as global_danger_color_100,
-  t_global_color_status_success_100 as global_success_color_100,
-  t_global_color_status_warning_100 as global_warning_color_100,
+  t_global_color_status_danger_default,
+  t_global_color_status_success_default,
+  t_global_color_status_warning_default,
 } from '@patternfly/react-tokens';
 import { createUseStyles } from 'react-jss';
 import dayjs from 'dayjs';
@@ -29,9 +29,9 @@ import Hide from 'components/Hide/Hide';
 
 dayjs.extend(relativeTime);
 
-const red = global_danger_color_100.value;
-const green = global_success_color_100.value;
-const gold = global_warning_color_100.value;
+const red = t_global_color_status_danger_default.var;
+const green = t_global_color_status_success_default.var;
+const gold = t_global_color_status_warning_default.var;
 
 const useStyles = createUseStyles({
   spinner: {
@@ -147,7 +147,7 @@ const StatusIcon = ({
             <CheckCircleIcon color={green} />
           </FlexItem>
           <FlexItem>
-            <StatusText color='green'>Valid</StatusText>
+            <StatusText>Valid</StatusText>
           </FlexItem>
         </Flex>
       );
@@ -181,9 +181,7 @@ const StatusIcon = ({
               }
             >
               <Button variant='link' isInline>
-                <StatusText color='red' isLink>
-                  Invalid
-                </StatusText>
+                <StatusText isLink>Invalid</StatusText>
               </Button>
             </Popover>
           </FlexItem>
@@ -218,9 +216,7 @@ const StatusIcon = ({
                 <PopoverFooter retryHandler={retryHandler} uuid={uuid} origin={origin} />
               }
             >
-              <StatusText color='gold' isLink>
-                Unavailable
-              </StatusText>
+              <StatusText isLink>Unavailable</StatusText>
             </Popover>
           </FlexItem>
         </Flex>
@@ -244,7 +240,7 @@ const StatusIcon = ({
               <Spinner size='md' className={classes.spinner} />
             </FlexItem>
             <FlexItem>
-              <StatusText color='blue'>In progress</StatusText>
+              <StatusText>In progress</StatusText>
             </FlexItem>
           </Flex>
         </Tooltip>

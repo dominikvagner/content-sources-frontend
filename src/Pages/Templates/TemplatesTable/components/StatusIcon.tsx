@@ -2,16 +2,16 @@ import { CheckCircleIcon, ExclamationCircleIcon } from '@patternfly/react-icons'
 import { Button, Flex, FlexItem, Popover, Spinner, Tooltip } from '@patternfly/react-core';
 import StatusText from 'components/StatusText/StatusText';
 import {
-  t_global_color_status_danger_100 as global_danger_color_100,
-  t_global_color_status_success_100 as global_success_color_100,
+  t_global_color_status_danger_default,
+  t_global_color_status_success_default,
 } from '@patternfly/react-tokens';
 import { createUseStyles } from 'react-jss';
 import { AdminTask } from 'services/Admin/AdminTaskApi';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
 import { useMemo } from 'react';
 
-const red = global_danger_color_100.value;
-const green = global_success_color_100.value;
+const red = t_global_color_status_danger_default.var;
+const green = t_global_color_status_success_default.var;
 
 const useStyles = createUseStyles({
   spinner: {
@@ -61,7 +61,7 @@ const StatusIcon = ({ uuid, last_update_snapshot_error, last_update_task }: Prop
           <CheckCircleIcon color={green} />
         </FlexItem>
         <FlexItem>
-          <StatusText color='green'>Valid</StatusText>
+          <StatusText>Valid</StatusText>
         </FlexItem>
       </Flex>
     );
@@ -82,7 +82,7 @@ const StatusIcon = ({ uuid, last_update_snapshot_error, last_update_task }: Prop
             <Spinner size='md' className={classes.spinner} />
           </FlexItem>
           <FlexItem>
-            <StatusText color='blue'>In progress</StatusText>
+            <StatusText>In progress</StatusText>
           </FlexItem>
         </Flex>
       </Tooltip>
@@ -107,9 +107,7 @@ const StatusIcon = ({ uuid, last_update_snapshot_error, last_update_task }: Prop
             position='left'
           >
             <Button variant='link' isInline>
-              <StatusText color='red' isLink>
-                Invalid
-              </StatusText>
+              <StatusText isLink>Invalid</StatusText>
             </Button>
           </Popover>
         </FlexItem>
