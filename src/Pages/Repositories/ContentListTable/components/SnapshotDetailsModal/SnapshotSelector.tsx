@@ -60,6 +60,7 @@ export function SnapshotSelector() {
         fieldId='snapshot'
       >
         <Dropdown
+          isScrollable={true}
           onSelect={(_, val) => {
             setSelected(val as string);
             setSelectorOpen(false);
