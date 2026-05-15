@@ -36,11 +36,12 @@ import { useAppContext } from 'middleware/AppContext';
 import RepoConfig from './components/RepoConfig';
 import { DELETE_ROUTE, REPOSITORIES_ROUTE } from 'Routes/constants';
 import { SnapshotDetailTab } from '../SnapshotDetailsModal/SnapshotDetailsModal';
-import { formatDateDDMMMYYYY } from 'helpers';
+import { formatDateDDMMMYYYY, modalTableSurfaceStyles } from 'helpers';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import LatestRepoConfig from './components/LatestRepoConfig';
 
 const useStyles = createUseStyles({
+  modalTableScope: modalTableSurfaceStyles,
   mainContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -233,7 +234,7 @@ const SnapshotListModal = () => {
           descriptorId='snapshot-list-modal-description'
         />
         <InnerScrollContainer>
-          <Grid className={classes.mainContainer}>
+          <Grid className={`${classes.modalTableScope} ${classes.mainContainer}`}>
             <Hide hide={loadingOrZeroCount}>
               <Flex className={classes.topContainer}>
                 <Hide hide={isRedHatRepository || isEPELRepository}>

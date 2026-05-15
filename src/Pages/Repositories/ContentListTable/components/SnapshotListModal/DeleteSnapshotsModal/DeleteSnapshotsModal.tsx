@@ -30,11 +30,12 @@ import { SnapshotItem } from 'services/Content/ContentApi';
 import { useBulkDeleteSnapshotsMutate, useGetSnapshotList } from 'services/Content/ContentQueries';
 import { TemplateItem } from 'services/Templates/TemplateApi';
 import { useFetchTemplatesForSnapshots } from 'services/Templates/TemplateQueries';
-import { formatDateDDMMMYYYY } from 'helpers';
+import { formatDateDDMMMYYYY, modalTableSurfaceStyles } from 'helpers';
 import ChangedArrows from '../components/ChangedArrows';
 import { SnapshotDetailTab } from '../../SnapshotDetailsModal/SnapshotDetailsModal';
 
 const useStyles = createUseStyles({
+  modalTableScope: modalTableSurfaceStyles,
   description: {
     paddingTop: '12px', // 4px on the title bottom padding makes this the "standard" 16 total padding
   },
@@ -143,7 +144,7 @@ export default function DeleteSnapshotsModal() {
           </>
         }
       />
-      <ModalBody>
+      <ModalBody className={classes.modalTableScope}>
         <Hide hide={!isLoading}>
           <Bullseye>
             <Spinner />

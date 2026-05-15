@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { t_global_background_color_floating_default as floatingBackground } from '@patternfly/react-tokens';
 
 // Removes null values and builds url params from a given object.
 export const objectToUrlParams = (obj: {
@@ -75,4 +76,19 @@ export const isEPELUrl = (repoUrl) => {
     'https://dl.fedoraproject.org/pub/epel/8/Everything/x86_64/',
   ];
   return epelUrls.includes(repoUrl);
+};
+
+const floatingBackgroundColor = floatingBackground.var;
+
+// Scope modal-only table surfaces without affecting shared tables on full pages.
+export const modalTableSurfaceStyles = {
+  '& .pf-v6-c-table': {
+    '--pf-v6-c-table--BackgroundColor': floatingBackgroundColor,
+    '--pf-v6-c-table__control-row--BackgroundColor': floatingBackgroundColor,
+    '--pf-v6-c-table__expandable-row-content--BackgroundColor': floatingBackgroundColor,
+    '--pf-v6-c-table__tr--m-ghost-row--BackgroundColor': floatingBackgroundColor,
+  },
+  '& .pf-v6-c-pagination.pf-m-bottom': {
+    '--pf-v6-c-pagination--m-bottom--BackgroundColor': floatingBackgroundColor,
+  },
 };

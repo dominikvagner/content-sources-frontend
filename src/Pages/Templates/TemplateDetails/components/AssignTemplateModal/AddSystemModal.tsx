@@ -46,8 +46,10 @@ import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip
 import useNotification from 'Hooks/useNotification';
 import TagsFilter from 'components/TagsFilter/TagsFilter';
 import { isVersionLockedSystem } from '../../../TemplatesTable/helpers';
+import { modalTableSurfaceStyles } from 'helpers';
 
 const useStyles = createUseStyles({
+  modalTableScope: modalTableSurfaceStyles,
   mainContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -327,7 +329,7 @@ export default function AddSystemModal() {
         }
       />
       <InnerScrollContainer>
-        <Grid className={classes.mainContainer}>
+        <Grid className={`${classes.modalTableScope} ${classes.mainContainer}`}>
           <InputGroup className={classes.topContainer}>
             <InputGroupItem>
               <InputGroup>

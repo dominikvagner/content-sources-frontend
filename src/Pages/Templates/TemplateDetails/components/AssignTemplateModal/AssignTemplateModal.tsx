@@ -34,8 +34,15 @@ import {
   TEMPLATE_SYSTEMS_UPDATE_LIMIT,
   TEMPLATES_DOCS_URL,
 } from 'Pages/Templates/TemplatesTable/constants';
+import { modalTableSurfaceStyles } from 'helpers';
+import { createUseStyles } from 'react-jss';
+
+const useStyles = createUseStyles({
+  modalTableScope: modalTableSurfaceStyles,
+});
 
 const AssignTemplateModal = () => {
+  const classes = useStyles();
   const queryClient = useQueryClient();
   const { notify } = useNotification();
 
@@ -211,7 +218,7 @@ const AssignTemplateModal = () => {
         }
       />
 
-      <ModalBody>
+      <ModalBody className={classes.modalTableScope}>
         {template ? (
           (() => {
             switch (assignmentMethod) {

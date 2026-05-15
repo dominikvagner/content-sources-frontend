@@ -37,8 +37,10 @@ import { isEmpty } from 'lodash';
 import useDeepCompareEffect from 'Hooks/useDeepCompareEffect';
 import { ActionButtons } from 'components/ActionButtons/ActionButtons';
 import spacing from '@patternfly/react-styles/css/utilities/Spacing/spacing';
+import { modalTableSurfaceStyles } from 'helpers';
 
 const useStyles = createUseStyles({
+  modalTableScope: modalTableSurfaceStyles,
   removeButton: {
     marginRight: '36px',
     transition: 'unset!important',
@@ -184,7 +186,7 @@ export default function DeleteContentModal() {
           </Stack>
         }
       />
-      <ModalBody>
+      <ModalBody className={classes.modalTableScope}>
         <Hide hide={!isLoading}>
           <Bullseye>
             <Spinner />
