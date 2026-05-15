@@ -28,7 +28,7 @@ const useStyles = createUseStyles({
   },
   topContainer: {
     justifyContent: 'space-between',
-    padding: '16px 24px',
+    padding: '1rem',
     height: 'fit-content',
   },
   topContainerWithFilterHeight: { extend: 'topContainer', minHeight: '128px' },

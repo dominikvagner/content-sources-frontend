@@ -26,7 +26,7 @@ const useStyles = createUseStyles({
   },
   topContainer: {
     justifyContent: 'space-between',
-    padding: '16px 24px 16px 0',
+    padding: '0.5rem',
     height: 'fit-content',
     display: 'flex',
     flexDirection: 'row',
