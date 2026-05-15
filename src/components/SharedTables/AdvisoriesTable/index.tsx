@@ -15,8 +15,8 @@ import Hide from '../../Hide/Hide';
 import { Flex, FlexItem, Grid, Stack, Content } from '@patternfly/react-core';
 import { SkeletonTable } from '@patternfly/react-component-groups';
 import {
-  t_global_color_status_danger_100,
-  t_global_color_status_success_100,
+  t_global_color_status_danger_default,
+  t_global_color_status_success_default,
 } from '@patternfly/react-tokens';
 import { createUseStyles } from 'react-jss';
 import useDeepCompareEffect from 'Hooks/useDeepCompareEffect';
@@ -29,8 +29,8 @@ import SeverityWithIcon from '../../SeverityWithIcon/SeverityWithIcon';
 import UrlWithExternalIcon from '../../UrlWithLinkIcon/UrlWithLinkIcon';
 import EmptyTableState from 'components/EmptyTableState/EmptyTableState';
 
-const red = t_global_color_status_danger_100.value;
-const green = t_global_color_status_success_100.value;
+const red = t_global_color_status_danger_default.var;
+const green = t_global_color_status_success_default.var;
 
 const useStyles = createUseStyles({
   mainContainer: {
