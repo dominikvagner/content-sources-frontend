@@ -26,8 +26,10 @@ import useRootPath from 'Hooks/useRootPath';
 import { useAppContext } from 'middleware/AppContext';
 import PackagesTable from 'components/SharedTables/PackagesTable';
 import { REPOSITORIES_ROUTE } from 'Routes/constants';
+import { modalTableSurfaceStyles } from 'helpers';
 
 const useStyles = createUseStyles({
+  modalTableScope: modalTableSurfaceStyles,
   mainContainer: {
     display: 'flex',
     flexDirection: 'column',
@@ -119,7 +121,7 @@ export default function PackageModal() {
         descriptorId='rpm-package-modal-description'
       />
       <InnerScrollContainer>
-        <Grid className={classes.mainContainer}>
+        <Grid className={`${classes.modalTableScope} ${classes.mainContainer}`}>
           <InputGroup className={classes.topContainer}>
             <InputGroupItem>
               <TextInput

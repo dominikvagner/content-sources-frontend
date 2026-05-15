@@ -21,8 +21,10 @@ import { createUseStyles } from 'react-jss';
 import { SnapshotSelector } from './SnapshotSelector';
 import { REPOSITORIES_ROUTE } from 'Routes/constants';
 import { SnapshotErrataTab } from './Tabs/SnapshotErrataTab';
+import { modalTableSurfaceStyles } from 'helpers';
 
 const useStyles = createUseStyles({
+  modalTableScope: modalTableSurfaceStyles,
   modalBody: {
     padding: '24px 24px 0 24px',
   },
@@ -84,7 +86,7 @@ export default function SnapshotDetailsModal() {
     >
       <ModalHeader title='Snapshot detail' labelId='snapshot-details-modal-title' />
       <InnerScrollContainer>
-        <Stack className={classes.modalBody}>
+        <Stack className={`${classes.modalTableScope} ${classes.modalBody}`}>
           <StackItem className={classes.topContainer}>
             <SnapshotSelector />
             <Button variant='secondary' onClick={onBackClick}>
