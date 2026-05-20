@@ -24,7 +24,7 @@ import useDebounce from 'Hooks/useDebounce';
 import { useNavigate, useParams } from 'react-router-dom';
 import useRootPath from 'Hooks/useRootPath';
 import { useAppContext } from 'middleware/AppContext';
-import PackagesTable from 'components/SharedTables/PackagesTable';
+import PackagesTableWithToolbars from 'components/Tables/Packages/PackagesTableWithToolbars';
 import { REPOSITORIES_ROUTE } from 'Routes/constants';
 import { modalTableSurfaceStyles } from 'helpers';
 
@@ -147,7 +147,7 @@ export default function PackageModal() {
               />
             </Hide>
           </InputGroup>
-          <PackagesTable
+          <PackagesTableWithToolbars
             packagesList={packagesList}
             isFetchingOrLoading={fetchingOrLoading}
             isLoadingOrZeroCount={loadingOrZeroCount}

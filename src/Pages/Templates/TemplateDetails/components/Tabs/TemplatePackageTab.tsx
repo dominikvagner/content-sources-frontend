@@ -14,7 +14,7 @@ import { createUseStyles } from 'react-jss';
 import { SearchIcon } from '@patternfly/react-icons';
 import useDebounce from 'Hooks/useDebounce';
 import { useParams } from 'react-router-dom';
-import PackagesTable from 'components/SharedTables/PackagesTable';
+import PackagesTableWithToolbars from 'components/Tables/Packages/PackagesTableWithToolbars';
 import { useFetchTemplatePackages } from 'services/Templates/TemplateQueries';
 import Loader from 'components/Loader';
 
@@ -107,7 +107,7 @@ export default function TemplatePackageTab() {
           onPerPageSelect={onPerPageSelect}
         />
       </InputGroup>
-      <PackagesTable
+      <PackagesTableWithToolbars
         packagesList={packagesList}
         isFetchingOrLoading={fetchingOrLoading}
         isLoadingOrZeroCount={loadingOrZeroCount}

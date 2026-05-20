@@ -24,14 +24,14 @@ interface Props {
   search: string;
 }
 
-export default function PackagesTable({
+const PackagesTableWithToolbars = ({
   isFetchingOrLoading,
   isLoadingOrZeroCount,
   packagesList,
   clearSearch,
   perPage,
   search,
-}: Props) {
+}: Props) => {
   const classes = useStyles();
   const [prevLength, setPrev] = useState(perPage || 10);
 
@@ -85,4 +85,6 @@ export default function PackagesTable({
       </Hide>
     </>
   );
-}
+};
+
+export default PackagesTableWithToolbars;

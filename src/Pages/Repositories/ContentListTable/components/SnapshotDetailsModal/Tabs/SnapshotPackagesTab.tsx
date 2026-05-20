@@ -18,7 +18,7 @@ import useDebounce from 'Hooks/useDebounce';
 import useRootPath from 'Hooks/useRootPath';
 import { useAppContext } from 'middleware/AppContext';
 import { useGetSnapshotPackagesQuery } from 'services/Content/ContentQueries';
-import PackagesTable from 'components/SharedTables/PackagesTable';
+import PackagesTableWithToolbars from 'components/Tables/Packages/PackagesTableWithToolbars';
 
 const useStyles = createUseStyles({
   mainContainer: {
@@ -120,7 +120,7 @@ export function SnapshotPackagesTab() {
           />
         </Hide>
       </InputGroup>
-      <PackagesTable
+      <PackagesTableWithToolbars
         packagesList={packagesList}
         isFetchingOrLoading={fetchingOrLoading}
         isLoadingOrZeroCount={loadingOrZeroCount}
