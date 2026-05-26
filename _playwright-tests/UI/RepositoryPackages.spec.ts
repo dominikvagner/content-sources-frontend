@@ -73,11 +73,13 @@ test.describe('Snapshot Package Count and List', () => {
       const editedRow = await getRowByNameOrUrl(page, editedRepo);
       await editedRow.getByTestId('package_count_button').click();
       await expect(page.getByRole('dialog', { name: 'Packages' })).toBeVisible();
-      await page.getByRole('searchbox', { name: 'Filter by name' }).fill('bear');
-      await expect(page.getByText('bear')).toBeVisible();
+      await page.getByRole('textbox', { name: 'Name filter' }).fill('bear');
+      await expect(
+        page.getByTestId('packages_table_noselect-td-0-0').getByText('bear'),
+      ).toBeVisible();
       // check that non exixiting package is not visible in the list
-      await page.getByRole('searchbox', { name: 'Filter by name' }).fill('non-existing-package');
-      await expect(page.getByText('non-existing-package')).toBeHidden();
+      await page.getByRole('textbox', { name: 'Name filter' }).fill('non-existing-package');
+      await expect(page.getByRole('grid').getByText('non-existing-package')).toBeHidden();
       await expect(
         page.getByRole('heading', { name: 'No packages match the filter criteria' }),
       ).toBeVisible();

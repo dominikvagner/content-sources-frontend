@@ -640,3 +640,14 @@ export const addUploads: (chunkRequest: AddUploadRequest) => Promise<AddUploadRe
   );
   return data;
 };
+
+export const bulkRemoveRepositoryRpms: (
+  repoUuid: string,
+  uuids: string[],
+) => Promise<void> = async (repoUuid: string, rpm_uuids: string[]) => {
+  const { data } = await axios.post(
+    `/api/content-sources/v1.0/repositories/${repoUuid}/rpms/bulk_remove/`,
+    { rpm_uuids },
+  );
+  return data;
+};

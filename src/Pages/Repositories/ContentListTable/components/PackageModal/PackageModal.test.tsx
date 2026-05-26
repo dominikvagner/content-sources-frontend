@@ -1,12 +1,14 @@
 import { render } from '@testing-library/react';
 import PackageModal from './PackageModal';
 import { defaultPackageItem, ReactQueryTestWrapper } from 'testingHelpers';
-import { useGetPackagesQuery } from 'services/Content/ContentQueries';
+import { useFetchContent, useGetPackagesQuery } from 'services/Content/ContentQueries';
+import { ContentOrigin } from 'services/Content/ContentApi';
 
 jest.mock('Hooks/useRootPath', () => () => 'someUrl');
 
 jest.mock('services/Content/ContentQueries', () => ({
   useGetPackagesQuery: jest.fn(),
+  useFetchContent: jest.fn(),
 }));
 
 jest.mock('react-router-dom', () => ({
@@ -14,15 +16,31 @@ jest.mock('react-router-dom', () => ({
   useParams: () => ({
     repoUUID: 'some-uuid',
   }),
+  Outlet: () => null,
 }));
 
 jest.mock('middleware/AppContext', () => ({
   useAppContext: () => ({ rbac: { read: true, write: true } }),
+  contentOrigin: [],
 }));
+
+const basePackagesQueryResult = {
+  isLoading: false,
+  isFetching: false,
+  isError: false,
+};
+
+beforeEach(() => {
+  jest.clearAllMocks();
+  (useFetchContent as jest.Mock).mockReturnValue({
+    data: { origin: ContentOrigin.EXTERNAL },
+    isError: false,
+  });
+});
 
 it('Render 1 item', () => {
   (useGetPackagesQuery as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
+    ...basePackagesQueryResult,
     data: {
       data: [defaultPackageItem],
       meta: { count: 1, limit: 20, offset: 0 },
@@ -45,7 +63,7 @@ it('Render 1 item', () => {
 
 it('Render with no packages (after an unsuccessful search)', () => {
   (useGetPackagesQuery as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
+    ...basePackagesQueryResult,
     data: {
       data: [],
       meta: { count: 0, limit: 20, offset: 0 },

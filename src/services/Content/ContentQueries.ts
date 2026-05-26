@@ -47,6 +47,7 @@ import {
   deleteSnapshots,
   getLatestRepoConfigFile,
   PopularRepository,
+  bulkRemoveRepositoryRpms,
 } from './ContentApi';
 import { ADMIN_TASK_LIST_KEY } from '../Admin/AdminTaskQueries';
 import useErrorNotification from 'Hooks/useErrorNotification';
@@ -656,6 +657,7 @@ export const useGetPackagesQuery = (
     queryKey: [PACKAGES_KEY, uuid, page, limit, searchQuery, sortBy],
     queryFn: () => getPackages(uuid, page, limit, searchQuery, sortBy),
     placeholderData: keepPreviousData,
+    refetchOnMount: 'always',
     staleTime: 60000,
     meta: {
       title: 'Unable to find packages with the given UUID.',
@@ -907,6 +909,35 @@ export const useBulkDeleteSnapshotsMutate = (
         'An error occured',
         err,
         'bulk-delete-error',
+      );
+    },
+  });
+};
+
+export const useBulkRemoveRepositoryRpmsMutate = (queryClient: QueryClient, repoUuid: string) => {
+  const errorNotifier = useErrorNotification();
+  const { notify } = useNotification();
+
+  return useMutation({
+    mutationFn: (uuids: string[]) => bulkRemoveRepositoryRpms(repoUuid, uuids),
+    onSuccess: (_data, uuids) => {
+      notify({
+        variant: AlertVariant.success,
+        title:
+          uuids.length === 1
+            ? 'The package was successfully removed from the repository.'
+            : `${uuids.length} packages were successfully removed from the repository.`,
+      });
+      queryClient.invalidateQueries({ queryKey: [PACKAGES_KEY, repoUuid] });
+      queryClient.invalidateQueries({ queryKey: [CONTENT_LIST_KEY] });
+      queryClient.invalidateQueries({ queryKey: [CONTENT_ITEM_KEY, repoUuid] });
+    },
+    onError: (err) => {
+      errorNotifier(
+        'Error removing packages from the repository',
+        'An error occurred',
+        err,
+        'bulk-remove-rpms-error',
       );
     },
   });

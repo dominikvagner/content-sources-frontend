@@ -41,6 +41,7 @@ import UploadContent from 'Pages/Repositories/ContentListTable/components/Upload
 import DeleteSnapshotsModal from 'Pages/Repositories/ContentListTable/components/SnapshotListModal/DeleteSnapshotsModal/DeleteSnapshotsModal';
 import AdminFeaturesTable from 'Pages/Repositories/AdminFeaturesTable/AdminFeaturesTable';
 import AssignTemplateModal from '../Pages/Templates/TemplateDetails/components/AssignTemplateModal/AssignTemplateModal';
+import PackagesDeleteModal from 'Pages/Repositories/ContentListTable/components/PackagesDeleteModal/PackagesDeleteModal';
 
 export default function RepositoriesRoutes() {
   const key = useMemo(() => Math.random(), []);
@@ -100,7 +101,13 @@ export default function RepositoriesRoutes() {
               key={`:repoUUID/${PACKAGES_ROUTE}`}
               path={`:repoUUID/${PACKAGES_ROUTE}`}
               element={<PackageModal />}
-            />
+            >
+              {rbac?.repoWrite ? (
+                <Route key={DELETE_ROUTE} path={DELETE_ROUTE} element={<PackagesDeleteModal />} />
+              ) : (
+                ''
+              )}
+            </Route>
           </Route>
           {...features?.admintasks?.enabled && features.admintasks?.accessible
             ? [

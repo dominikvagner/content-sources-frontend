@@ -58,7 +58,14 @@ test.describe('Introspect Repositories', () => {
       const modal = page.getByTestId('rpm_package_modal');
       const row = modal.getByRole('row').filter({ has: page.getByText(testPackage) });
       await Promise.all([
-        expect(modal.locator('tbody')).toHaveCount(8),
+        expect(
+          modal
+            .getByTestId('packages_table')
+            .getByRole('row')
+            .filter({
+              has: page.getByRole('gridcell'),
+            }),
+        ).toHaveCount(8),
         expect((await getRowCellByHeader(page, row, 'Name')).getByText(testPackage)).toBeVisible(),
         expect(
           (await getRowCellByHeader(page, row, 'Version')).getByText(repoVersion),
