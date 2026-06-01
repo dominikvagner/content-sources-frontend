@@ -1,1 +1,2 @@
 _playwright-tests/test-utils/**/*
+.github/dependabot.yml
