@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { useListSystemsByTemplateId } from 'services/Systems/SystemsQueries';
-import TemplateSystemsTab from './TemplateSystemsTab';
+import TemplateSystemsTab, { calculatePageAfterSystemsDelete } from './TemplateSystemsTab';
 import { defaultTemplateSystemsListItem } from 'testingHelpers';
 import type { IDSystemItem } from 'services/Systems/SystemsApi';
 import { useAppContext } from 'middleware/AppContext';
@@ -28,7 +28,7 @@ jest.mock('@tanstack/react-query');
 
 jest.mock('services/Systems/SystemsQueries', () => ({
   useListSystemsByTemplateId: jest.fn(),
-  useDeleteTemplateFromSystems: () => ({ mutate: () => undefined, isLoading: false }),
+  useDeleteTemplateFromSystems: () => ({ mutateAsync: () => Promise.resolve(), isPending: false }),
 }));
 
 jest.mock('middleware/AppContext');
@@ -45,9 +45,9 @@ jest.mock('middleware/AppContext');
 });
 
 (useListSystemsByTemplateId as jest.Mock).mockImplementation(() => ({
-  isLoading: false,
-  isFetching: false,
-  isError: false,
+  isTemplateSystemsLoading: false,
+  isTemplateSystemsFetching: false,
+  isTemplateSystemsError: false,
   data: {
     data: new Array(15).fill(defaultTemplateSystemsListItem).map((item: IDSystemItem, index) => ({
       ...item,
@@ -105,9 +105,9 @@ it('renders system list as read-only with disabled checkboxes when user lacks wr
 
 it("shows empty state with register action when there are no registered systems that match the template's requirements", async () => {
   (useListSystemsByTemplateId as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    isFetching: false,
-    isError: false,
+    isTemplateSystemsLoading: false,
+    isTemplateSystemsFetching: false,
+    isTemplateSystemsError: false,
   }));
 
   (useCompatibleSystems as jest.Mock).mockReturnValue({
@@ -129,9 +129,9 @@ it("shows empty state with register action when there are no registered systems 
 
 it('shows empty state with both assign and register actions when compatible, registered systems are present', async () => {
   (useListSystemsByTemplateId as jest.Mock).mockImplementation(() => ({
-    isLoading: false,
-    isFetching: false,
-    isError: false,
+    isTemplateSystemsLoading: false,
+    isTemplateSystemsFetching: false,
+    isTemplateSystemsError: false,
   }));
 
   (useCompatibleSystems as jest.Mock).mockReturnValue({
@@ -150,4 +150,18 @@ it('shows empty state with both assign and register actions when compatible, reg
   const registerAction = await screen.findByRole('link', { name: 'Register and assign via API' });
   expect(registerAction).toBeInTheDocument();
   expect(registerAction).toHaveAttribute('href', expectedHref);
+});
+
+describe('calculatePageAfterSystemsDelete', () => {
+  it('returns the same page when deletions keep the current page valid', () => {
+    expect(calculatePageAfterSystemsDelete(2, 20, 50, 5)).toBe(2);
+  });
+
+  it('moves to the previous valid page when deleting the last item on page 2', () => {
+    expect(calculatePageAfterSystemsDelete(2, 20, 21, 1)).toBe(1);
+  });
+
+  it('calculates page 3 after deleting 30 systems from total 90 on page 4', () => {
+    expect(calculatePageAfterSystemsDelete(4, 20, 90, 30)).toBe(3);
+  });
 });

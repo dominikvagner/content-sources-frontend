@@ -22,6 +22,7 @@ const useCompatibleSystems = (uuid: string) => {
   const {
     isFetching,
     isError,
+    error,
     data = { data: [], meta: { total_items: 0, limit: 20, offset: 0 } },
     // Filter by the version and arch of the given template (and minor if it is an extended support template)
     // Use default values for other parameters as they're not relevant for this hook
@@ -33,6 +34,7 @@ const useCompatibleSystems = (uuid: string) => {
     hasCompatibleSystems,
     isFetchingCompatibility: isFetching,
     isCompatibilityError: isError,
+    compatibilityError: error,
   };
 };
 

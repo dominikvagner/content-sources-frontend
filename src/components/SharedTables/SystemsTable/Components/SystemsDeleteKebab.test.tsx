@@ -14,7 +14,6 @@ it('renders with no checked systems', async () => {
   render(
     <SystemsDeleteKebab
       selected={selected}
-      deselectAll={jest.fn()}
       deleteFromSystems={jest.fn()}
       isDisabled={selected.length > TEMPLATE_SYSTEMS_UPDATE_LIMIT}
     />,
@@ -34,7 +33,6 @@ it('renders with checked systems', async () => {
   render(
     <SystemsDeleteKebab
       selected={selected}
-      deselectAll={jest.fn()}
       deleteFromSystems={jest.fn()}
       isDisabled={selected.length > TEMPLATE_SYSTEMS_UPDATE_LIMIT}
     />,
@@ -57,7 +55,6 @@ it('prevents unassigning a template when more than 1000 systems are selected', a
   render(
     <SystemsDeleteKebab
       selected={selected}
-      deselectAll={jest.fn()}
       deleteFromSystems={jest.fn()}
       isDisabled={selected.length > TEMPLATE_SYSTEMS_UPDATE_LIMIT}
     />,

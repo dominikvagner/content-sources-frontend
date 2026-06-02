@@ -52,8 +52,8 @@ export const useListSystemsByTemplateId = (
   limit: number,
   searchQuery: string,
   sortBy?: string,
-) =>
-  useQuery({
+) => {
+  const pageQuery = useQuery({
     queryKey: [GET_TEMPLATE_SYSTEMS_KEY, id, page, limit, searchQuery, sortBy],
     queryFn: () => listSystemsByTemplateId(id, page, limit, searchQuery, sortBy),
     placeholderData: keepPreviousData,
@@ -63,9 +63,18 @@ export const useListSystemsByTemplateId = (
     refetchInterval: 20_000,
     meta: {
       title: 'Unable to fetch systems assigned to this template',
-      id: 'systems-list-error',
+      id: 'template-systems-page-query-error',
     },
   });
+
+  return {
+    ...pageQuery,
+    isTemplateSystemsLoading: pageQuery.isLoading,
+    isTemplateSystemsFetching: pageQuery.isFetching,
+    isTemplateSystemsError: pageQuery.isError,
+    templateSystemsError: pageQuery.error,
+  };
+};
 
 export const useAddTemplateToSystemsQuery = (
   queryClient: QueryClient,

@@ -37,10 +37,9 @@ jest.mock('middleware/AppContext', () => ({ useAppContext: () => ({}) }));
 
 it('Render delete modal where there are no systems', () => {
   (useListSystemsByTemplateId as jest.Mock).mockImplementation(() => ({
+    isTemplateSystemsLoading: false,
     data: {
-      isLoading: false,
       data: [],
-      count: 0,
       meta: { total_items: 0 },
     },
   }));
@@ -64,12 +63,15 @@ it('Render delete modal where there are no systems', () => {
 
 it('Render delete modal where template has one system', () => {
   (useListSystemsByTemplateId as jest.Mock).mockImplementation(() => ({
+    isTemplateSystemsLoading: false,
     data: {
-      isLoading: false,
       data: [defaultSystemsListItem],
-      count: 1,
-      meta: { total_items: 0 },
+      meta: { total_items: 1 },
     },
+  }));
+  (useFetchTemplate as jest.Mock).mockImplementation(() => ({
+    isLoading: false,
+    data: { name: 'test' },
   }));
 
   const { queryByText } = render(

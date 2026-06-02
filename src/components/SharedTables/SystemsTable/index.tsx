@@ -53,7 +53,7 @@ interface Props {
   selected: Set<string>;
   editAllowed: boolean;
   setSelected: (id: string) => void;
-  deleteFromSystems: (items: string[]) => void;
+  deleteFromSystems: (items: string[]) => Promise<unknown> | void;
   sortParams?: (columnIndex: number) => ThProps['sort'];
   selectAllToggle: () => void;
   allSelected: boolean;

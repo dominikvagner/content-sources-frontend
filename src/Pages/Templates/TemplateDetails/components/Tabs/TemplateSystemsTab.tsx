@@ -55,13 +55,28 @@ const useStyles = createUseStyles({
     justifyContent: 'space-between',
   },
   // Needed to fix styling when "Add repositories" button is disabled
-  ctions: {
+  actions: {
     display: 'flex',
     flexDirection: 'row',
   },
 });
 
 const perPageKey = 'TemplateSystemsPerPage';
+
+export const calculatePageAfterSystemsDelete = (
+  currentPage: number,
+  perPage: number,
+  totalItems: number,
+  deletedItemsCount: number,
+) => {
+  if (deletedItemsCount <= 0) {
+    return currentPage;
+  }
+
+  const nextTotalItems = Math.max(0, totalItems - deletedItemsCount);
+  const maxPage = Math.max(1, Math.ceil(nextTotalItems / perPage));
+  return Math.min(currentPage, maxPage);
+};
 
 export default function TemplateSystemsTab() {
   const classes = useStyles();
@@ -108,13 +123,17 @@ export default function TemplateSystemsTab() {
     [activeSortIndex, activeSortDirection],
   );
 
-  const { hasCompatibleSystems, isFetchingCompatibility, isCompatibilityError } =
-    useCompatibleSystems(uuid);
+  const {
+    hasCompatibleSystems,
+    isFetchingCompatibility,
+    isCompatibilityError,
+    compatibilityError,
+  } = useCompatibleSystems(uuid);
 
   const {
-    isLoading,
-    error,
-    isError,
+    isTemplateSystemsLoading,
+    templateSystemsError,
+    isTemplateSystemsError,
     data = { data: [], meta: { total_items: 0, limit: 20, offset: 0 } },
   } = useListSystemsByTemplateId(uuid, page, perPage, debouncedSearchQuery, sortString);
 
@@ -156,8 +175,16 @@ export default function TemplateSystemsTab() {
     }
   };
 
-  const deselectAll = () => {
-    setSelected([]);
+  const handleDeleteSystems = async (items: string[]) => {
+    const nextPage = calculatePageAfterSystemsDelete(page, perPage, total_items, items.length);
+    const deletedSystems = new Set(items);
+
+    if (nextPage !== page) {
+      setPage(nextPage);
+    }
+
+    await deleteFromSystems(items);
+    setSelected((prev) => prev.filter((selectedId) => !deletedSystems.has(selectedId)));
   };
 
   const onPerPageSelect = (_, newPerPage, newPage) => {
@@ -166,9 +193,7 @@ export default function TemplateSystemsTab() {
     localStorage.setItem(perPageKey, newPerPage.toString());
   };
 
-  const loadingOrDeleting = isLoading || isDeleting;
-
-  const errorState = isError || isCompatibilityError;
+  const loadingOrDeleting = isTemplateSystemsLoading || isDeleting;
 
   const sortParams = (columnIndex: number): ThProps['sort'] | undefined =>
     columnSortAttributes[columnIndex]
@@ -191,12 +216,12 @@ export default function TemplateSystemsTab() {
   const missingRequirements =
     rbac?.templateWrite && !hasRHELSubscription ? 'subscription (RHEL)' : 'permission';
 
-  if (isLoading || isFetchingCompatibility) {
+  if (isTemplateSystemsLoading || isFetchingCompatibility) {
     return <Loader />;
   }
 
-  if (errorState) {
-    throw error;
+  if (isTemplateSystemsError || isCompatibilityError) {
+    throw templateSystemsError ?? compatibilityError;
   }
 
   return (
@@ -215,7 +240,7 @@ export default function TemplateSystemsTab() {
                 customIcon={<SearchIcon />}
               />
             </InputGroupItem>
-            <FlexItem className={classes.ctions}>
+            <FlexItem className={classes.actions}>
               <ConditionalTooltip
                 content={`You do not have the required ${missingRequirements} to perform this action.`}
                 show={isMissingRequirements}
@@ -244,8 +269,7 @@ export default function TemplateSystemsTab() {
               setDisabled
             >
               <SystemsDeleteKebab
-                deleteFromSystems={deleteFromSystems}
-                deselectAll={deselectAll}
+                deleteFromSystems={handleDeleteSystems}
                 isDisabled={!rbac?.templateWrite || selected.length > TEMPLATE_SYSTEMS_UPDATE_LIMIT}
                 selected={selected}
               />
@@ -286,7 +310,7 @@ export default function TemplateSystemsTab() {
                       id='addSystemsButton'
                       ouiaId='add_systems'
                       variant='primary'
-                      isDisabled={isLoading}
+                      isDisabled={isTemplateSystemsLoading}
                       onClick={() => {
                         const method = hasCompatibleSystems
                           ? '' // If there are some registered systems, open the system list view
@@ -328,7 +352,7 @@ export default function TemplateSystemsTab() {
           allSelected={allSelected}
           perPage={perPage}
           selectAllToggle={selectAllToggle}
-          deleteFromSystems={deleteFromSystems}
+          deleteFromSystems={handleDeleteSystems}
           isLoadingOrDeleting={loadingOrDeleting}
           systemsList={systemsList}
           sortParams={sortParams}

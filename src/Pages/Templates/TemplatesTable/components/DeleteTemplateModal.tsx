@@ -74,11 +74,11 @@ export default function DeleteTemplateModal() {
   }, []);
 
   const {
-    isLoading: isLoading,
+    isTemplateSystemsLoading,
     data: systems = { data: [], meta: { count: 0, limit: 1, offset: 0, total_items: 0 } },
   } = useListSystemsByTemplateId(uuid, 1, 1, '', '');
 
-  const actionTakingPlace = isLoading || isDeleting;
+  const actionTakingPlace = isTemplateSystemsLoading || isDeleting;
 
   return (
     <Modal
@@ -95,7 +95,7 @@ export default function DeleteTemplateModal() {
         titleIconVariant='warning'
       />
       <ModalBody>
-        <Hide hide={!isLoading && !isTemplateLoading}>
+        <Hide hide={!isTemplateSystemsLoading && !isTemplateLoading}>
           <Bullseye>
             <Spinner />
           </Bullseye>
@@ -118,7 +118,7 @@ export default function DeleteTemplateModal() {
             </Flex>
           </Alert>
         </Hide>
-        <Hide hide={isLoading || isTemplateLoading}>
+        <Hide hide={isTemplateSystemsLoading || isTemplateLoading}>
           <Content component='p' className={classes.description}>
             Template <b>{templateData?.name}</b> and all its data will be deleted. This action
             cannot be undone.

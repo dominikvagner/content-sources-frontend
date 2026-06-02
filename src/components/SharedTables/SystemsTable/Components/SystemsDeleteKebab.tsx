@@ -5,17 +5,15 @@ import { useState } from 'react';
 
 interface Props {
   selected: string[];
-  deselectAll: () => void;
-  deleteFromSystems: (items: string[]) => void;
+  deleteFromSystems: (items: string[]) => Promise<unknown> | void;
   isDisabled?: boolean;
 }
 
-const SystemsDeleteKebab = ({ deselectAll, isDisabled, selected, deleteFromSystems }: Props) => {
+const SystemsDeleteKebab = ({ isDisabled, selected, deleteFromSystems }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const onSelect = () => {
     setIsOpen(false);
-    deselectAll();
   };
 
   return (
