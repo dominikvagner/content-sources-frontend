@@ -206,7 +206,7 @@ export default function RedHatRepositoriesStep() {
           </Hide>
         </Flex>
       </Hide>
-      {countIsZero ? (
+      {countIsZero && !isLoading ? (
         <Bullseye data-ouia-component-id='redhat_repositories_table'>
           <EmptyTableState
             notFiltered={searchQuery === ''}

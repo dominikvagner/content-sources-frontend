@@ -40,6 +40,8 @@ export interface AddOrEditTemplateContextInterface {
   setSelectedCustomRepos: (uuidSet: Set<string>) => void;
   redHatCoreRepos: Set<string>;
   hasInvalidSteps: (index: number) => boolean;
+  /** False while fetching and merging an existing template (edit / copy). Always true for add flow. */
+  isSourceTemplateReady: boolean;
   isExtendedSupportAvailable: boolean;
   isEdit?: boolean;
   editUUID?: string;
@@ -49,7 +51,11 @@ export const AddOrEditTemplateContext = createContext({} as AddOrEditTemplateCon
 
 export const AddOrEditTemplateContextProvider = ({ children }: { children: ReactNode }) => {
   const uuid = useSafeUUIDParam('templateUUID');
-  const { data: editTemplateData, isError } = useFetchTemplate(uuid, !!uuid);
+  const {
+    data: editTemplateData,
+    isError,
+    isSuccess: isTemplateQuerySuccess,
+  } = useFetchTemplate(uuid, !!uuid);
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -65,6 +71,7 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
   const [redHatCoreRepos, setRedHatCoreRepos] = useState<Set<string>>(new Set());
   const [selectedRedHatRepos, setSelectedRedHatRepos] = useState<Set<string>>(new Set());
   const [selectedCustomRepos, setSelectedCustomRepos] = useState<Set<string>>(new Set());
+  const [isSourceTemplateReady, setIsSourceTemplateReady] = useState(!uuid);
 
   const hasLoadedEditData = useRef(false);
   const lastLoadedMinorVersion = useRef<string | undefined>();
@@ -164,59 +171,99 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
     }
   }, [coreRepos?.data, uuid, extended_release_version]);
 
-  const { data: existingRepositoryInformation, isLoading } = useContentListQuery(
-    1,
-    10,
-    { uuids: editTemplateData?.repository_uuids },
-    '',
-    [ContentOrigin.ALL],
-    !!uuid && !!editTemplateData?.repository_uuids.length,
-  );
+  const { data: existingRepositoryInformation, isLoading: isReposQueryLoading } =
+    useContentListQuery(
+      1,
+      10,
+      { uuids: editTemplateData?.repository_uuids },
+      '',
+      [ContentOrigin.ALL],
+      !!uuid && !!editTemplateData?.repository_uuids.length,
+    );
 
-  // If editing, we want to load the data from the existing template
+  // Hydrate wizard state when editing/copying — block the wizard until done so step validation/nav match loaded data.
   useEffect(() => {
-    const shouldLoadEditData =
-      uuid &&
-      !!editTemplateData &&
-      !isLoading &&
-      !!existingRepositoryInformation &&
-      !hasLoadedEditData.current;
+    if (!uuid) {
+      setIsSourceTemplateReady(true);
+      return;
+    }
 
-    if (shouldLoadEditData) {
+    if (isError) {
+      // Exit the loading state when the query has errored so the UI
+      // doesn't stay in a perpetual "loading" spinner state.
+      setIsSourceTemplateReady(true);
+      return;
+    }
+
+    if (!isTemplateQuerySuccess || !editTemplateData) {
+      setIsSourceTemplateReady(false);
+      return;
+    }
+
+    if (hasLoadedEditData.current) {
+      setIsSourceTemplateReady(true);
+      return;
+    }
+
+    const repoUuidList = editTemplateData.repository_uuids ?? [];
+
+    if (repoUuidList.length === 0) {
       const { extended_release, extended_release_version } = editTemplateData;
 
       if (extended_release && extended_release_version) {
         lastLoadedMinorVersion.current = extended_release_version;
       }
 
-      const startingState = {
+      setTemplateRequest({
         ...editTemplateData,
         extended_release: extended_release || STANDARD_STREAM.label,
-      };
-
-      setTemplateRequest(startingState);
-
-      const redHatReposToAdd: string[] = [];
-      const customReposToAdd: string[] = [];
-
-      existingRepositoryInformation?.data.forEach((item) => {
-        if (item.org_id === '-1') {
-          redHatReposToAdd.push(item.uuid);
-        } else {
-          customReposToAdd.push(item.uuid);
-        }
       });
-
-      if (redHatReposToAdd.length) {
-        setSelectedRedHatRepos(new Set([...selectedRedHatRepos, ...redHatReposToAdd]));
-      }
-
-      if (customReposToAdd.length) {
-        setSelectedCustomRepos(new Set(customReposToAdd));
-      }
+      setSelectedRedHatRepos(new Set());
+      setSelectedCustomRepos(new Set());
       hasLoadedEditData.current = true;
+      setIsSourceTemplateReady(true);
+      return;
     }
-  }, [editTemplateData, isLoading, existingRepositoryInformation]);
+
+    if (isReposQueryLoading || !existingRepositoryInformation) {
+      setIsSourceTemplateReady(false);
+      return;
+    }
+
+    const { extended_release, extended_release_version } = editTemplateData;
+
+    if (extended_release && extended_release_version) {
+      lastLoadedMinorVersion.current = extended_release_version;
+    }
+
+    setTemplateRequest({
+      ...editTemplateData,
+      extended_release: extended_release || STANDARD_STREAM.label,
+    });
+
+    const redHatReposToAdd: string[] = [];
+    const customReposToAdd: string[] = [];
+
+    for (const item of existingRepositoryInformation.data ?? []) {
+      if (item.org_id === '-1') {
+        redHatReposToAdd.push(item.uuid);
+      } else {
+        customReposToAdd.push(item.uuid);
+      }
+    }
+
+    setSelectedRedHatRepos(new Set(redHatReposToAdd));
+    setSelectedCustomRepos(new Set(customReposToAdd));
+
+    hasLoadedEditData.current = true;
+    setIsSourceTemplateReady(true);
+  }, [
+    uuid,
+    editTemplateData,
+    isReposQueryLoading,
+    isTemplateQuerySuccess,
+    existingRepositoryInformation,
+  ]);
 
   const templateRequestDependencies = useMemo(
     () => [...selectedCustomRepos, ...selectedRedHatRepos],
@@ -247,6 +294,7 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
         setSelectedCustomRepos,
         redHatCoreRepos,
         hasInvalidSteps,
+        isSourceTemplateReady,
         isExtendedSupportAvailable,
         isEdit: !!uuid,
         editUUID: uuid,

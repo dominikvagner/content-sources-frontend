@@ -82,7 +82,8 @@ const AddOrEditTemplateBase = () => {
   // Store the original 'from' value on mount (before step navigation changes location.state)
   const fromRef = useRef(location.state?.from);
 
-  const { isEdit, templateRequest, hasInvalidSteps, editUUID } = useAddOrEditTemplateContext();
+  const { isEdit, isCopy, templateRequest, hasInvalidSteps, editUUID, isSourceTemplateReady } =
+    useAddOrEditTemplateContext();
 
   // useSafeUUIDParam in AddOrEditTemplateContext already validates the UUID
   // If in edit mode and UUID is invalid, it will be an empty string
@@ -174,7 +175,13 @@ const AddOrEditTemplateBase = () => {
                 key='os-and-architecture-key'
                 footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(1) }}
               >
-                <OSAndArchitectureStep />
+                {(isEdit) && !isSourceTemplateReady ? (
+                  <Bullseye>
+                    <Spinner size='xl' />
+                  </Bullseye>
+                ) : (
+                  <OSAndArchitectureStep />
+                )}
               </WizardStep>,
               <WizardStep
                 isDisabled={hasInvalidSteps(1)}
