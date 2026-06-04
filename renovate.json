@@ -5,6 +5,7 @@
     "schedule": [
         "on Monday after 3am and before 10am"
     ],
+    "minimumReleaseAge": "5 days",
     "ignorePaths": [
       ".pre-commit-config.yaml"
     ],
