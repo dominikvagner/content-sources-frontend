@@ -156,12 +156,12 @@ export default function RepositoriesRoutes() {
               <Route key='1' path={ADD_ROUTE} element={<AddOrEditTemplateModal />} />
               <Route
                 key='2'
-                path={`:templateUUID/${EDIT_ROUTE}`}
+                path={`${EDIT_ROUTE}/:templateUUID`}
                 element={<AddOrEditTemplateModal />}
               />
               <Route
                 key='3'
-                path={`:templateUUID/${DELETE_ROUTE}`}
+                path={`${DELETE_ROUTE}/:templateUUID`}
                 element={<DeleteTemplateModal />}
               />
             </>

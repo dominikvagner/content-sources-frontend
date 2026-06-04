@@ -415,7 +415,7 @@ const TemplatesTable = () => {
                                 className: isMissingRequirements ? classes.disabledButton : '',
                                 title: 'Edit',
                                 onClick: () =>
-                                  navigate(`${uuid}/edit`, { state: { from: 'table' } }),
+                                  navigate(`${EDIT_ROUTE}/${uuid}`, { state: { from: 'table' } }),
                                 isDisabled: isMissingRequirements,
                                 tooltipProps: isMissingRequirements
                                   ? {
@@ -431,7 +431,7 @@ const TemplatesTable = () => {
                               { isSeparator: true },
                               {
                                 title: 'Delete',
-                                onClick: () => navigate(`${uuid}/${DELETE_ROUTE}`),
+                                onClick: () => navigate(`${DELETE_ROUTE}/${uuid}`),
                               },
                             ]}
                           />
