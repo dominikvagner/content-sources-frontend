@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import TemplatesTable from './TemplatesTable';
 import { useTemplateList } from 'services/Templates/TemplateQueries';
 import { useTemplateSystemCounts } from 'services/Systems/SystemsQueries';
@@ -28,7 +28,8 @@ jest.mock('Hooks/useRootPath', () => () => 'someUrl');
 
 jest.mock('middleware/AppContext', () => ({
   useAppContext: () => ({
-    rbac: { repoWrite: true, templateRead: true },
+    rbac: { repoWrite: true, templateRead: true, templateWrite: true },
+    subscriptions: { red_hat_enterprise_linux: true },
     setContentOrigin: () => {},
   }),
 }));
@@ -90,6 +91,30 @@ it('expect TemplatesTable to render a single row', () => {
 
   expect(queryByText(defaultTemplateItem.name)).toBeInTheDocument();
   expect(queryByText(formatDateDDMMMYYYY(defaultTemplateItem.date))).toBeInTheDocument();
+});
+
+it('expect TemplatesTable to render all action items', async () => {
+  (useTemplateList as jest.Mock).mockImplementation(() => ({
+    data: {
+      data: [defaultTemplateItem],
+      meta: { limit: 10, offset: 0, count: 1 },
+      isLoading: false,
+    },
+  }));
+  mockSystemCountsDefault();
+
+  const { getByRole, queryByText } = render(
+    <ReactQueryTestWrapper>
+      <TemplatesTable />
+    </ReactQueryTestWrapper>,
+  );
+
+  fireEvent.click(getByRole('button', { name: 'Kebab toggle' }));
+  await waitFor(() => {
+    expect(queryByText('Edit')).toBeInTheDocument();
+    expect(queryByText('Copy')).toBeInTheDocument();
+    expect(queryByText('Delete')).toBeInTheDocument();
+  });
 });
 
 it('expect TemplatesTable to display the system count for a template', () => {

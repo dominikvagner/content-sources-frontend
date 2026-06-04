@@ -37,7 +37,13 @@ import TemplateFilters from './components/TemplateFilters';
 import { formatDateDDMMMYYYY, formatDateUTC } from 'helpers';
 import Header from 'components/Header/Header';
 import useRootPath from 'Hooks/useRootPath';
-import { DELETE_ROUTE, SYSTEMS_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
+import {
+  COPY_ROUTE,
+  DELETE_ROUTE,
+  EDIT_ROUTE,
+  SYSTEMS_ROUTE,
+  TEMPLATES_ROUTE,
+} from 'Routes/constants';
 import useDistributionDetails from '../../../Hooks/useDistributionDetails';
 import { useTemplateList } from 'services/Templates/TemplateQueries';
 import { useTemplateSystemCounts } from 'services/Systems/SystemsQueries';
@@ -425,6 +431,24 @@ const TemplatesTable = () => {
                                       position: TooltipPosition.left,
                                       triggerRef: () =>
                                         document.getElementById('actions-column-edit') ||
+                                        document.body,
+                                    }
+                                  : undefined,
+                              },
+                              {
+                                id: 'actions-column-copy',
+                                className: isMissingRequirements ? classes.disabledButton : '',
+                                title: 'Copy',
+                                onClick: () =>
+                                  navigate(`${COPY_ROUTE}/${uuid}`, { state: { from: 'table' } }),
+                                isDisabled: isMissingRequirements,
+                                tooltipProps: isMissingRequirements
+                                  ? {
+                                      isVisible: isMissingRequirements,
+                                      content: `You do not have the required ${missingRequirements} to perform this action.`,
+                                      position: TooltipPosition.left,
+                                      triggerRef: () =>
+                                        document.getElementById('actions-column-copy') ||
                                         document.body,
                                     }
                                   : undefined,

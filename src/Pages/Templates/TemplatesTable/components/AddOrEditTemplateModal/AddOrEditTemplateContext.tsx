@@ -17,7 +17,7 @@ import {
   DistributionMinorVersion,
   ExtendedReleaseStream,
 } from 'services/Content/ContentApi';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useFetchTemplate, useTemplateNameAvailability } from 'services/Templates/TemplateQueries';
 import useRootPath from 'Hooks/useRootPath';
 import { formatDateForPicker, isDateValid } from 'helpers';
@@ -47,6 +47,7 @@ export interface AddOrEditTemplateContextInterface {
   isNameCheckPending: boolean;
   isExtendedSupportAvailable: boolean;
   isEdit?: boolean;
+  isCopy?: boolean;
   editUUID?: string;
 }
 
@@ -59,6 +60,10 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
     isError,
     isSuccess: isTemplateQuerySuccess,
   } = useFetchTemplate(uuid, !!uuid);
+
+  const location = useLocation();
+  const isCopy = location.pathname.includes('/copy');
+  const isEdit = !!uuid && !isCopy;
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -321,7 +326,8 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
         isNameTaken,
         isNameCheckPending: nameCheckEnabled && isNameCheckPending,
         isExtendedSupportAvailable,
-        isEdit: !!uuid,
+        isEdit,
+        isCopy,
         editUUID: uuid,
       }}
     >

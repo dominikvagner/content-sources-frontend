@@ -31,5 +31,6 @@ it('expect TemplateActionDropdown to render all buttons', async () => {
 
   await waitFor(() => fireEvent.click(queryByText('Actions') as Element));
   expect(queryByText('Edit')).toBeInTheDocument();
+  expect(queryByText('Copy')).toBeInTheDocument();
   expect(queryByText('Delete')).toBeInTheDocument();
 });

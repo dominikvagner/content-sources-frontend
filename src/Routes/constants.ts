@@ -2,6 +2,7 @@ export const REPOSITORIES_ROUTE = 'repositories';
 export const ADMIN_TASKS_ROUTE = 'admin-tasks';
 export const TEMPLATES_ROUTE = 'templates';
 export const CONTENT_ROUTE = 'content';
+export const COPY_ROUTE = 'copy';
 export const SNAPSHOTS_ROUTE = 'snapshots';
 export const SYSTEMS_ROUTE = 'systems';
 export const DETAILS_ROUTE = 'details';

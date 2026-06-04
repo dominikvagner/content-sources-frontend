@@ -94,15 +94,19 @@ const AddOrEditTemplateBase = () => {
 
   // useSafeUUIDParam in AddOrEditTemplateContext already validates the UUID
   // If in edit mode and UUID is invalid, it will be an empty string
-  if (isEdit && !editUUID) throw new Error('UUID is invalid');
+  if ((isEdit || isCopy) && !editUUID) throw new Error('UUID is invalid');
 
   const tabParam = urlSearchParams.get('tab');
   const initialIndex =
-    tabParam && stepIdToIndex[tabParam] ? stepIdToIndex[tabParam] : DEFAULT_STEP_INDEX;
+    tabParam && stepIdToIndex[tabParam]
+      ? stepIdToIndex[tabParam]
+      : isCopy
+        ? stepIdToIndex['detail']
+        : DEFAULT_STEP_INDEX;
 
   useEffect(() => {
     if (!urlSearchParams.get('tab')) {
-      setUrlSearchParams({ tab: DEFAULT_STEP_ID }, { replace: true });
+      setUrlSearchParams({ tab: isCopy ? 'detail' : DEFAULT_STEP_ID }, { replace: true });
     }
   }, []);
 
@@ -111,7 +115,7 @@ const AddOrEditTemplateBase = () => {
   const onCancel = () => {
     if (fromRef.current === 'table') {
       navigate(`${rootPath}/${TEMPLATES_ROUTE}`);
-    } else if (isEdit && editUUID) {
+    } else if ((isEdit || isCopy) && editUUID) {
       navigate(`${rootPath}/${TEMPLATES_ROUTE}/${editUUID}`);
     } else {
       navigate(`${rootPath}/${TEMPLATES_ROUTE}`);
@@ -145,7 +149,7 @@ const AddOrEditTemplateBase = () => {
       onClose={isEdit && isEmpty(templateRequest) ? onCancel : undefined}
       disableFocusTrap
     >
-      {isEdit && isEmpty(templateRequest) ? (
+      {(isEdit || isCopy) && isEmpty(templateRequest) ? (
         <Bullseye className={classes.minHeightForSpinner}>
           <Spinner size='xl' />
         </Bullseye>
@@ -182,7 +186,7 @@ const AddOrEditTemplateBase = () => {
                 key='os-and-architecture-key'
                 footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(1) }}
               >
-                {(isEdit) && !isSourceTemplateReady ? (
+                {(isEdit || isCopy) && !isSourceTemplateReady ? (
                   <Bullseye>
                     <Spinner size='xl' />
                   </Bullseye>
@@ -226,7 +230,13 @@ const AddOrEditTemplateBase = () => {
             id='detail'
             status={isSourceTemplateReady && isNameTaken ? 'error' : 'default'}
           >
-            <DetailStep />
+            {(isEdit || isCopy) && !isSourceTemplateReady ? (
+              <Bullseye>
+                <Spinner size='xl' />
+              </Bullseye>
+            ) : (
+              <DetailStep />
+            )}
           </WizardStep>
           <WizardStep
             isDisabled={hasInvalidSteps(5)}

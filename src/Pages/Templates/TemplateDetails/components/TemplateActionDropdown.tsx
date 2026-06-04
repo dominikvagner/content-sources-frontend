@@ -8,7 +8,7 @@ import {
   TooltipPosition,
 } from '@patternfly/react-core';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { DELETE_ROUTE, EDIT_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
+import { COPY_ROUTE, DELETE_ROUTE, EDIT_ROUTE, TEMPLATES_ROUTE } from 'Routes/constants';
 import ConditionalTooltip from 'components/ConditionalTooltip/ConditionalTooltip';
 import { useAppContext } from 'middleware/AppContext';
 import { createUseStyles } from 'react-jss';
@@ -38,6 +38,10 @@ export default function TemplateActionDropdown() {
     switch (value) {
       case 'edit':
         navigate(`${baseRoute}/${uuid}/${EDIT_ROUTE}`, { state: { from: 'details' } });
+        setIsOpen(false);
+        break;
+      case 'copy':
+        navigate(`${baseRoute}/${uuid}/${COPY_ROUTE}`, { state: { from: 'details' } });
         setIsOpen(false);
         break;
       case 'delete':
@@ -90,6 +94,22 @@ export default function TemplateActionDropdown() {
           }
         >
           Edit
+        </DropdownItem>
+        <DropdownItem
+          className={isMissingRequirements ? classes.disabledButton : ''}
+          value='copy'
+          isDisabled={isMissingRequirements}
+          tooltipProps={
+            isMissingRequirements
+              ? {
+                  isVisible: isMissingRequirements,
+                  content: `You do not have the required ${missingRequirements} to perform this action.`,
+                  position: TooltipPosition.left,
+                }
+              : undefined
+          }
+        >
+          Copy
         </DropdownItem>
         <DropdownItem value='delete'>Delete</DropdownItem>
       </DropdownList>

@@ -9,6 +9,7 @@ import {
   ADMIN_TASKS_ROUTE,
   ADVISORIES_ROUTE,
   CONTENT_ROUTE,
+  COPY_ROUTE,
   DELETE_ROUTE,
   EDIT_ROUTE,
   PACKAGES_ROUTE,
@@ -146,6 +147,9 @@ export default function RepositoriesRoutes() {
           {rbac?.templateWrite && subscriptions?.red_hat_enterprise_linux ? (
             <Route path={`${EDIT_ROUTE}`} element={<AddOrEditTemplateModal />} />
           ) : null}
+          {rbac?.templateWrite && subscriptions?.red_hat_enterprise_linux ? (
+            <Route path={`${COPY_ROUTE}`} element={<AddOrEditTemplateModal />} />
+          ) : null}
           {rbac?.templateWrite ? (
             <Route path={`${DELETE_ROUTE}`} element={<DeleteTemplateModal />} />
           ) : null}
@@ -163,6 +167,11 @@ export default function RepositoriesRoutes() {
                 key='3'
                 path={`${DELETE_ROUTE}/:templateUUID`}
                 element={<DeleteTemplateModal />}
+              />
+              <Route
+                key='4'
+                path={`${COPY_ROUTE}/:templateUUID`}
+                element={<AddOrEditTemplateModal />}
               />
             </>
           ) : null}
