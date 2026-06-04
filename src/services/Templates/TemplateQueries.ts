@@ -15,6 +15,7 @@ import {
   getTemplateErrata,
   getTemplateSnapshots,
   getTemplatesForSnapshots,
+  isTemplateNameTaken,
 } from './TemplateApi';
 import useNotification from 'Hooks/useNotification';
 import { AlertVariant } from '@patternfly/react-core';
@@ -25,6 +26,7 @@ export const GET_TEMPLATE_PACKAGES_KEY = 'GET_TEMPLATE_PACKAGES_KEY';
 export const TEMPLATE_ERRATA_KEY = 'TEMPLATE_ERRATA_KEY';
 export const TEMPLATE_SNAPSHOTS_KEY = 'TEMPLATE_SNAPSHOTS_KEY';
 export const TEMPLATES_FOR_SNAPSHOTS = 'TEMPLATES_BY_SNAPSHOTS_KEY';
+export const TEMPLATE_NAME_AVAILABILITY_KEY = 'TEMPLATE_NAME_AVAILABILITY_KEY';
 
 const TEMPLATE_LIST_POLLING_TIME = 15000; // 15 seconds
 const TEMPLATE_FETCH_POLLING_TIME = 5000; // 5 seconds
@@ -161,6 +163,24 @@ export const useTemplateList = (
     placeholderData: keepPreviousData,
     staleTime: 20000,
   });
+
+export const useTemplateNameAvailability = (name: string, excludeUuid?: string) => {
+  const trimmedName = name.trim();
+  const enabled = trimmedName.length > 0 && trimmedName.length <= 255;
+
+  const {
+    data: isNameTaken = false,
+    isFetching,
+    isFetched,
+  } = useQuery({
+    queryKey: [TEMPLATE_NAME_AVAILABILITY_KEY, trimmedName, excludeUuid],
+    queryFn: () => isTemplateNameTaken(trimmedName, excludeUuid),
+    enabled,
+    staleTime: 5_000,
+  });
+
+  return { isNameTaken, isFetching, isFetched };
+};
 
 export const useCreateTemplateQuery = (queryClient: QueryClient, request: TemplateRequest) => {
   const errorNotifier = useErrorNotification();

@@ -18,10 +18,11 @@ import {
   ExtendedReleaseStream,
 } from 'services/Content/ContentApi';
 import { useNavigate } from 'react-router-dom';
-import { useFetchTemplate } from 'services/Templates/TemplateQueries';
+import { useFetchTemplate, useTemplateNameAvailability } from 'services/Templates/TemplateQueries';
 import useRootPath from 'Hooks/useRootPath';
-import { isDateValid } from 'helpers';
+import { formatDateForPicker, isDateValid } from 'helpers';
 import useSafeUUIDParam from 'Hooks/useSafeUUIDParam';
+import useDebounce from 'Hooks/useDebounce';
 import { getRedHatCoreRepoUrls, isExtendedSupportTemplate } from '../../helpers';
 import { STANDARD_STREAM } from '../../constants';
 import { useAppContext } from 'middleware/AppContext';
@@ -42,6 +43,8 @@ export interface AddOrEditTemplateContextInterface {
   hasInvalidSteps: (index: number) => boolean;
   /** False while fetching and merging an existing template (edit / copy). Always true for add flow. */
   isSourceTemplateReady: boolean;
+  isNameTaken: boolean;
+  isNameCheckPending: boolean;
   isExtendedSupportAvailable: boolean;
   isEdit?: boolean;
   editUUID?: string;
@@ -107,21 +110,41 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
     isExtendedSupportAvailable &&
     isExtendedSupportTemplate(extended_release, extended_release_version);
 
+  const debouncedName = useDebounce(templateRequest.name?.trim() ?? '', 400);
+  const nameCheckEnabled = debouncedName.length > 0 && debouncedName.length <= 255;
+  const {
+    isNameTaken,
+    isFetching: isNameCheckPending,
+    isFetched: isNameCheckFetched,
+  } = useTemplateNameAvailability(debouncedName, isEdit ? uuid : undefined);
+
   // Step validation //
 
   const stepValidationSequence = useMemo(() => {
-    const { arch, date, name, version, use_latest, extended_release_version } = templateRequest;
+    const { arch, date, version, use_latest, extended_release_version } = templateRequest;
     const isPlatformDefined = arch && version;
+    const isNameFormatValid = debouncedName.length > 0 && debouncedName.length <= 255;
+    const isNameCheckComplete = !nameCheckEnabled || (isNameCheckFetched && !isNameCheckPending);
+    const isNameUnique = !isNameTaken;
 
     return [
       true, // [0] No step
       usesExtendedSupportStream ? isPlatformDefined && extended_release_version : isPlatformDefined, // [1] "OS and architecture" step
       !!selectedRedHatRepos.size, // [2] "Red Hat repositories" step
       true, // [3] "Other repositories" step - optional step
-      use_latest || isDateValid(date ?? ''), // [4] "Setup date" step
-      !!name && name.length < 256, // [5] "Detail" step
+      use_latest || isDateValid(date ? formatDateForPicker(date) : ''), // [4] "Setup date" step
+      isNameFormatValid && isNameUnique && isNameCheckComplete, // [5] "Detail" step
     ] as boolean[];
-  }, [templateRequest, selectedRedHatRepos.size, usesExtendedSupportStream]);
+  }, [
+    templateRequest,
+    selectedRedHatRepos.size,
+    usesExtendedSupportStream,
+    debouncedName,
+    nameCheckEnabled,
+    isNameTaken,
+    isNameCheckFetched,
+    isNameCheckPending,
+  ]);
 
   const hasInvalidSteps = useCallback(
     (stepIndex: number) => {
@@ -295,6 +318,8 @@ export const AddOrEditTemplateContextProvider = ({ children }: { children: React
         redHatCoreRepos,
         hasInvalidSteps,
         isSourceTemplateReady,
+        isNameTaken,
+        isNameCheckPending: nameCheckEnabled && isNameCheckPending,
         isExtendedSupportAvailable,
         isEdit: !!uuid,
         editUUID: uuid,

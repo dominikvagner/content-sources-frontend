@@ -91,6 +91,8 @@ export const TemplateValidationSchema = Yup.object().shape({
   description: Yup.string().max(255, 'Too Long!'),
 });
 
+export const TEMPLATE_NAME_TAKEN_MESSAGE = 'A template with this name already exists.';
+
 const dateToMonthYear = (date: string | number | Date): string =>
   new Date(date).toLocaleDateString('en-US', {
     month: 'long',

@@ -219,3 +219,14 @@ export const createTemplate: (request: TemplateRequest) => Promise<TemplateItem>
   const { data } = await axios.post('/api/content-sources/v1.0/templates/', request);
   return data;
 };
+
+export const isTemplateNameTaken = async (name: string, excludeUuid?: string): Promise<boolean> => {
+  const { data } = await axios.get<TemplateCollectionResponse>(
+    `/api/content-sources/v1/templates/?${objectToUrlParams({
+      offset: '0',
+      limit: '2',
+      name,
+    })}`,
+  );
+  return data.data.some((t) => t.uuid !== excludeUuid);
+};

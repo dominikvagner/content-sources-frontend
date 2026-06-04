@@ -82,8 +82,15 @@ const AddOrEditTemplateBase = () => {
   // Store the original 'from' value on mount (before step navigation changes location.state)
   const fromRef = useRef(location.state?.from);
 
-  const { isEdit, isCopy, templateRequest, hasInvalidSteps, editUUID, isSourceTemplateReady } =
-    useAddOrEditTemplateContext();
+  const {
+    isEdit,
+    isCopy,
+    templateRequest,
+    hasInvalidSteps,
+    editUUID,
+    isSourceTemplateReady,
+    isNameTaken,
+  } = useAddOrEditTemplateContext();
 
   // useSafeUUIDParam in AddOrEditTemplateContext already validates the UUID
   // If in edit mode and UUID is invalid, it will be an empty string
@@ -217,6 +224,7 @@ const AddOrEditTemplateBase = () => {
             footer={{ ...sharedFooterProps, isNextDisabled: hasInvalidSteps(5) }}
             name='Detail'
             id='detail'
+            status={isSourceTemplateReady && isNameTaken ? 'error' : 'default'}
           >
             <DetailStep />
           </WizardStep>

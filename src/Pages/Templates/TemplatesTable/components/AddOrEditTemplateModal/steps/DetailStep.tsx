@@ -10,12 +10,20 @@ import {
 } from '@patternfly/react-core';
 import { useAddOrEditTemplateContext } from '../AddOrEditTemplateContext';
 import { useState } from 'react';
-import { TemplateValidationSchema } from '../../../helpers';
+import { TemplateValidationSchema, TEMPLATE_NAME_TAKEN_MESSAGE } from '../../../helpers';
 import CustomHelperText from 'components/CustomHelperText/CustomHelperText';
 
 export default function DetailStep() {
-  const { templateRequest, setTemplateRequest } = useAddOrEditTemplateContext();
+  const { templateRequest, setTemplateRequest, isNameTaken } = useAddOrEditTemplateContext();
   const [errors, setErrors] = useState({ name: '', description: '' });
+
+  const trimmedName = templateRequest.name?.trim() ?? '';
+  const nameCheckEnabled = trimmedName.length > 0 && trimmedName.length <= 255;
+
+  const isDuplicate = isNameTaken && !errors.name && nameCheckEnabled;
+  const duplicateNameError = isDuplicate ? TEMPLATE_NAME_TAKEN_MESSAGE : '';
+
+  const nameError = errors.name || duplicateNameError;
 
   const setFieldValues = (value: string, field: 'name' | 'description') => {
     setTemplateRequest((prev) => ({ ...prev, [field]: value }));
@@ -46,7 +54,7 @@ export default function DetailStep() {
             label='Name'
             ouiaId='input_name'
             type='text'
-            validated={errors.name ? 'error' : 'default'}
+            validated={nameError ? 'error' : 'default'}
             onChange={(_event, value) => setFieldValues(value, 'name')}
             value={templateRequest?.name || ''}
             placeholder='Enter name'
@@ -56,7 +64,7 @@ export default function DetailStep() {
               }
             }}
           />
-          <CustomHelperText hide={!errors.name} textValue={errors.name} />
+          <CustomHelperText hide={!nameError} textValue={nameError} />
         </FormGroup>
         <FormGroup label='Description'>
           <TextArea
