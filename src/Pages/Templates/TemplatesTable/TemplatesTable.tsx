@@ -334,6 +334,7 @@ const TemplatesTable = () => {
                           <FlexItem>
                             <Button
                               variant='link'
+                              isInline
                               onClick={() => navigate(`${rootPath}/${TEMPLATES_ROUTE}/${uuid}`)}
                             >
                               {name}
