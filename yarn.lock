@@ -1153,10 +1153,10 @@
     lazy-ass "1.6.0"
     ramda "0.26.1"
 
-"@currents/playwright@2.1.1":
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/@currents/playwright/-/playwright-2.1.1.tgz#4e6a77a640df2ff2c60a4700408f49a866cba272"
-  integrity sha512-3JBLgOfTNdTQ1BAvvEujXwf35ZIQDf1BltXoEJxctR0ZKsMv6djC9sciJkBPe6DGRZSEfl4IYWz1pmkgIcWheA==
+"@currents/playwright@2.1.4":
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@currents/playwright/-/playwright-2.1.4.tgz#58411802021f63140999caca4e0d2fd376e28958"
+  integrity sha512-ahH4K8zJcrWJgD1/M6/pFsmqVufj2ML05NkI0UI6GeUuOe+aJu1BPu5mH9a8f0sCbQLg2jYuk2MPo19ttkv8nw==
   dependencies:
     "@babel/code-frame" "^7.29.0"
     "@commander-js/extra-typings" "^13.1.0"
@@ -1166,7 +1166,7 @@
     axios-retry "4.5.0"
     chalk "^4.1.2"
     commander "^13.1.0"
-    date-fns "^4.1.0"
+    date-fns "^4.3.0"
     debug "^4.4.3"
     dotenv "^17.4.2"
     execa "^9.6.0"
@@ -1189,10 +1189,10 @@
     safe-regex2 "^5.1.1"
     source-map-support "^0.5.21"
     stack-utils "^2.0.6"
-    tmp "^0.2.5"
+    tmp "^0.2.6"
     tmp-promise "^3.0.3"
     ts-pattern "^5.8.0"
-    ws "^8.20.1"
+    ws "^8.21.0"
 
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
@@ -2168,18 +2168,7 @@
     "@parcel/watcher-win32-ia32" "2.5.6"
     "@parcel/watcher-win32-x64" "2.5.6"
 
-"@patternfly/react-component-groups@^6.0.0":
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/@patternfly/react-component-groups/-/react-component-groups-6.4.0.tgz#f657eefb059cd41ff91af2e273e14bf8c48f77a2"
-  integrity sha512-vg0761nQ/7hfggbp6+XowRcQQSd9oIToh77+4lmsyrs41MkA5ppQIPBCZ4lUZW87kmEPhkHqglpJcVfsrrIM/g==
-  dependencies:
-    "@patternfly/react-core" "^6.0.0"
-    "@patternfly/react-icons" "^6.0.0"
-    "@patternfly/react-styles" "^6.0.0"
-    "@patternfly/react-table" "^6.0.0"
-    react-jss "^10.10.0"
-
-"@patternfly/react-component-groups@^6.1.0":
+"@patternfly/react-component-groups@^6.0.0", "@patternfly/react-component-groups@^6.1.0":
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/@patternfly/react-component-groups/-/react-component-groups-6.5.0.tgz#8a2e839b638978f93a22a59012b3cb8532709a74"
   integrity sha512-uvrAuUixZW618gsQY06nOcQWZclsCtOa5mixi6KQKOyrpH9GgtrihJ/fVJsA1a5HcZzC4SKIdd3wkXArs/vxEg==
@@ -2405,10 +2394,10 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@pkgr/core@^0.2.9":
-  version "0.2.9"
-  resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.2.9.tgz#d229a7b7f9dac167a156992ef23c7f023653f53b"
-  integrity sha512-QNqXyfVS2wm9hweSYD2O7F0G06uurj9kZ96TRQE5Y9hU7+tgdZwIkbAKc5Ocy1HxEY2kuDQa6cQ1WRs/O5LFKA==
+"@pkgr/core@^0.3.6":
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.3.6.tgz#3569708bd4be4d8870ba32bf1c456dac81600d97"
+  integrity sha512-SEeaJLb3qBNF/OaXnaR1NmmBbFYk1zC0ZH/52fATcRPLFg/p791YrcyFFy44Bo9sLaGuSuLp5Q6axbb/O+v/RA==
 
 "@playwright/test@~1.60.0":
   version "1.60.0"
@@ -2525,10 +2514,10 @@
     js-yaml "^4.1.0"
     node-fetch "2.6.7"
 
-"@redhat-cloud-services/frontend-components-config@^6.10.2":
-  version "6.10.2"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components-config/-/frontend-components-config-6.10.2.tgz#e55b4dede6a6361bd3bc379e07a420d9e47e588c"
-  integrity sha512-U8Pq8KmYnc56gH2Qd3KwdyAoRGxKLnt+Xw7o+PNwmdHhsI+ENH2M5+G02XyyzxTxQzqew2rXBHwLVe0zPtF+Gw==
+"@redhat-cloud-services/frontend-components-config@^6.11.2":
+  version "6.11.2"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components-config/-/frontend-components-config-6.11.2.tgz#2b837b6c8bb50e977a2f8ca2027b0e2186e0b450"
+  integrity sha512-0y6HuJgKDoFuimZxYKflkzgF3fGI8J5bbqNb7Ofxp9yn+tGKvE3HplcD96kWS5owFOr0ojOhTM/ss8+wiDhKUA==
   dependencies:
     "@pmmmwh/react-refresh-webpack-plugin" "^0.5.15"
     "@redhat-cloud-services/frontend-components-config-utilities" "^4.9.0"
@@ -2575,18 +2564,18 @@
     webpack-dev-server "5.2.3"
     yargs "^17.6.2"
 
-"@redhat-cloud-services/frontend-components-notifications@^6.6.3":
-  version "6.6.3"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components-notifications/-/frontend-components-notifications-6.6.3.tgz#7321e0133cc4b4008f68dc39b89b43988525f984"
-  integrity sha512-21pfUowHV3jHkskaeMnCxgUQHa3af08RJKnJTVdqVjkeNDL+Vvg4Da2ocnO5BLUNa4VJkER8ig9IcxXIjdd/aQ==
+"@redhat-cloud-services/frontend-components-notifications@^6.9.1":
+  version "6.9.1"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components-notifications/-/frontend-components-notifications-6.9.1.tgz#e7841b55f488a5cbef26b49c6593cf4c55b93f86"
+  integrity sha512-//Scle866A+3mMZtjx9yP210uootEIndq7ZwKp+RdqHmwKVJR25h6Cqvrxx6/980NE6IPMQGHNaY773TpDi0Vg==
   dependencies:
     "@redhat-cloud-services/frontend-components" "^7.0.13"
     "@redhat-cloud-services/frontend-components-utilities" "^7.0.0"
 
-"@redhat-cloud-services/frontend-components-utilities@^7.0.0", "@redhat-cloud-services/frontend-components-utilities@^7.3.2":
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components-utilities/-/frontend-components-utilities-7.3.2.tgz#d4a2a77af0cda1758f3720d53236fbd4a233f25f"
-  integrity sha512-wWnV2ZKgUWiklP5R0rgYApfG8NeXnnxi+qpF6ZZhsVZnI11ls12WLeQlcYL+a2vZcD/o0vLUOGFhzmgdgaxaDw==
+"@redhat-cloud-services/frontend-components-utilities@^7.0.0", "@redhat-cloud-services/frontend-components-utilities@^7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components-utilities/-/frontend-components-utilities-7.4.0.tgz#afad1e23f2e0ebee0dbb79be1cdb4547907a4fa5"
+  integrity sha512-rn8n3ClaSmecKGL645rknF3CaNLMMUZjkYoYNkYSS6bp4/eC31tFY36KDG9gPIap13CcgUPZJ+Ca/p+TASfolA==
   dependencies:
     "@redhat-cloud-services/rbac-client" "^6.0.1"
     "@redhat-cloud-services/types" "^3.0.0"
@@ -2598,10 +2587,10 @@
     p-map "^7.0.2"
     react-content-loader "^6.2.0"
 
-"@redhat-cloud-services/frontend-components@^7.0.13", "@redhat-cloud-services/frontend-components@^7.4.3":
-  version "7.4.3"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components/-/frontend-components-7.4.3.tgz#72e8188e535ca4ed38b6ca2beefaeb059e04a696"
-  integrity sha512-Rozi/HFRbZiH8hQMlFAbJsQWKOJaL35eC5xC//aJ9wcjiccotaGYlxuI7J2JAKcfvO3W9pkzoEVFizpYB4s/+w==
+"@redhat-cloud-services/frontend-components@^7.0.13", "@redhat-cloud-services/frontend-components@^7.7.1":
+  version "7.7.1"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/frontend-components/-/frontend-components-7.7.1.tgz#61b70273c39077fc7daf69aba5728e898d5f7803"
+  integrity sha512-KpmSAI1EdNWsE4ZMcVsKpGAsrAj1SnpUPLDRZOImygFAVeg6GvAvTqfmPYy3DrcGzT+IIgkJqC3Oy+hhyuZllA==
   dependencies:
     "@patternfly/react-component-groups" "^6.0.0"
     "@redhat-cloud-services/frontend-components-utilities" "^7.0.0"
@@ -2627,22 +2616,22 @@
     "@redhat-cloud-services/javascript-clients-shared" "^2.0.5"
     tslib "^2.6.2"
 
-"@redhat-cloud-services/tsc-transform-imports@^1.0.26", "@redhat-cloud-services/tsc-transform-imports@^1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/tsc-transform-imports/-/tsc-transform-imports-1.1.2.tgz#4124baff242508d62bcfae29c719bcc779d714d6"
-  integrity sha512-age6chkrO7bZlYS6w0FGvUJxSG4FP4LI2Z5BVob/POSaiJHMIHmFxKykTRf2Vcy8EJwyBRLzGls8cwTrIby8aA==
+"@redhat-cloud-services/tsc-transform-imports@^1.0.26", "@redhat-cloud-services/tsc-transform-imports@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/tsc-transform-imports/-/tsc-transform-imports-1.2.1.tgz#201079e9b43eb903d6daea13b0be9e6ba2518eb0"
+  integrity sha512-XcMWPfABA5UqCGMg81xmJSp5pMaH8Fk5hwA2bzrBvNTzJimXpFwEgTZS5ZTLod6MCLcmTSfA5wRcXDCQqjdESw==
   dependencies:
     glob "10.5.0"
 
-"@redhat-cloud-services/types@^3.0.0", "@redhat-cloud-services/types@^3.5.2":
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/types/-/types-3.5.2.tgz#3cefc61222eb2e59d51600664c5df564843d3b06"
-  integrity sha512-cYdpvMZx1Jt+ia7IDaQDJ3ZD+8uuorjq0gFKUTsM7EHRfbBUxwRTs5bkMeJ0Jxkm0vGdH9gptid+X3oUIcf2FQ==
+"@redhat-cloud-services/types@^3.0.0", "@redhat-cloud-services/types@^3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@redhat-cloud-services/types/-/types-3.6.0.tgz#b51b0f35ab13012525cc04ae05a1c6faaff07d87"
+  integrity sha512-ise3Z8ybLuMpK1L4tQdisZ+G4D81Ad2jAqiq/cn2b8dpvp/c6dqNxQ6a3OUJ8z47fMW7RyW6T4aewMeoTcbjRA==
 
-"@remix-run/router@1.23.2":
-  version "1.23.2"
-  resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.23.2.tgz#156c4b481c0bee22a19f7924728a67120de06971"
-  integrity sha512-Ic6m2U/rMjTkhERIa/0ZtXJP17QUi2CbWE7cqx4J58M8aA3QTfW+2UlQ4psvTX9IO1RfNVhK3pcpdjej7L+t2w==
+"@remix-run/router@1.23.3":
+  version "1.23.3"
+  resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.23.3.tgz#957c098d4393d301a8aa7dccf3ef28ea5430e36a"
+  integrity sha512-4An71tdz9X8+3sI4Qqqd2LWd9vS39J7sqd9EU4Scw7TJE/qB10Flv/UuqbPVgfQV9XoK8Np6jNquZitnZq5i+Q==
 
 "@scalprum/core@^0.9.1", "@scalprum/core@^0.9.2":
   version "0.9.2"
@@ -5218,15 +5207,15 @@ date-fns@^2.29.1:
   dependencies:
     "@babel/runtime" "^7.21.0"
 
-date-fns@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-4.1.0.tgz#64b3d83fff5aa80438f5b1a633c2e83b8a1c2d14"
-  integrity sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==
+date-fns@^4.3.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-4.4.0.tgz#806539edf45c616b2b76b5f78b88c56ed3c7e036"
+  integrity sha512-+1UMbeh68lH1SegH83CGWwpb6OHHbpSgr3+s5Eww5M4CAgswBpoWS0AjTOfEJ33HiYKz1hdj/KTFprzXHmq/6w==
 
-dayjs@^1.11.20, dayjs@^1.11.7:
-  version "1.11.20"
-  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.20.tgz#88d919fd639dc991415da5f4cb6f1b6650811938"
-  integrity sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==
+dayjs@^1.11.21, dayjs@^1.11.7:
+  version "1.11.21"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.21.tgz#57f87562e62de76f3c704bd2b8d522fc33068eb2"
+  integrity sha512-98IT+HOahAisibz/yjKbzuOBwYcjJ7BCLPzARyHiyEBmRz4fatF+KPJszEHXsGYjUG234aH/cOjW1wwTbKUZlA==
 
 debounce-promise@^3.1.0:
   version "3.1.2"
@@ -5865,13 +5854,13 @@ eslint-plugin-playwright@^2.10.4:
   dependencies:
     globals "^17.3.0"
 
-eslint-plugin-prettier@^5.5.5:
-  version "5.5.5"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.5.5.tgz#9eae11593faa108859c26f9a9c367d619a0769c0"
-  integrity sha512-hscXkbqUZ2sPithAuLm5MXL+Wph+U7wHngPBv9OMWwlP8iaflyxpjTYZkmdgB4/vPIhemRlBEoLrH7UC1n7aUw==
+eslint-plugin-prettier@^5.5.6:
+  version "5.5.6"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.5.6.tgz#363ebe4d769bce157ccdd8129ce3efd91dc62564"
+  integrity sha512-ifetmTcxWfz+4qRW3pH/ujdTq2jQIj59AxJMIN26K5avYgU8dxycUETQonWiW+wPrYXA0j3Try0l1CnwVQtDqQ==
   dependencies:
     prettier-linter-helpers "^1.0.1"
-    synckit "^0.11.12"
+    synckit "^0.11.13"
 
 eslint-plugin-react@^7.37.2:
   version "7.37.5"
@@ -10020,20 +10009,20 @@ react-refresh@^0.14.0:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.2.tgz#3833da01ce32da470f1f936b9d477da5c7028bf9"
   integrity sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==
 
-react-router-dom@^6.30.3:
-  version "6.30.3"
-  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-6.30.3.tgz#42ae6dc4c7158bfb0b935f162b9621b29dddf740"
-  integrity sha512-pxPcv1AczD4vso7G4Z3TKcvlxK7g7TNt3/FNGMhfqyntocvYKj+GCatfigGDjbLozC4baguJ0ReCigoDJXb0ag==
+react-router-dom@^6.30.4:
+  version "6.30.4"
+  resolved "https://registry.yarnpkg.com/react-router-dom/-/react-router-dom-6.30.4.tgz#f7167bf3da6c7d9132130ea985dd06def25e84d5"
+  integrity sha512-q4HvNl+mmDdkS0g+MqiBZNteQJCuimWoOyHMy4T/RQLAn9Z29+E91QXRaxOujeMl2HTzRSS0KFPd7lxX3PjV0Q==
   dependencies:
-    "@remix-run/router" "1.23.2"
-    react-router "6.30.3"
+    "@remix-run/router" "1.23.3"
+    react-router "6.30.4"
 
-react-router@6.30.3:
-  version "6.30.3"
-  resolved "https://registry.yarnpkg.com/react-router/-/react-router-6.30.3.tgz#994b3ccdbe0e81fe84d4f998100f62584dfbf1cf"
-  integrity sha512-XRnlbKMTmktBkjCLE8/XcZFlnHvr2Ltdr1eJX4idL55/9BbORzyZEaIkBFDhFGCEWBBItsVrDxwx3gnisMitdw==
+react-router@6.30.4:
+  version "6.30.4"
+  resolved "https://registry.yarnpkg.com/react-router/-/react-router-6.30.4.tgz#638f35176527bd243d96d81d35d33b757bad46c2"
+  integrity sha512-SVUsDe+DybHM/WmYKIVYhZh1o5Dcuf16yM6WjG02Q9XVFMZIJyHYhwrr6bFBXZkVP6z69kNkMyBCujt8FaFLJA==
   dependencies:
-    "@remix-run/router" "1.23.2"
+    "@remix-run/router" "1.23.3"
 
 react18-json-view@^0.2.8:
   version "0.2.10"
@@ -11113,12 +11102,12 @@ symbol-tree@^3.2.4:
   resolved "https://registry.yarnpkg.com/symbol-tree/-/symbol-tree-3.2.4.tgz#430637d248ba77e078883951fb9aa0eed7c63fa2"
   integrity sha512-9QNk5KwDF+Bvz+PyObkmSYjI5ksVUYtjW7AU22r2NKcfLJcXp96hkDWU3+XndOsUb+AQ9QhfzfCT2O+CNWT5Tw==
 
-synckit@^0.11.12:
-  version "0.11.12"
-  resolved "https://registry.yarnpkg.com/synckit/-/synckit-0.11.12.tgz#abe74124264fbc00a48011b0d98bdc1cffb64a7b"
-  integrity sha512-Bh7QjT8/SuKUIfObSXNHNSK6WHo6J1tHCqJsuaFDP7gP0fkzSfTxI8y85JrppZ0h8l0maIgc2tfuZQ6/t3GtnQ==
+synckit@^0.11.13:
+  version "0.11.13"
+  resolved "https://registry.yarnpkg.com/synckit/-/synckit-0.11.13.tgz#062a5ea57d81befc35892f8254de5c567e97c80a"
+  integrity sha512-eNRKgb3z66Yp3D2CixVujOUvXLFUTij/zVnV8KRyvFdQwpz7I5DS8UfRkTeLzb64u+dkzDSdelE24izu+zSSUg==
   dependencies:
-    "@pkgr/core" "^0.2.9"
+    "@pkgr/core" "^0.3.6"
 
 tabbable@^6.3.0:
   version "6.4.0"
@@ -11253,7 +11242,7 @@ tmp-promise@^3.0.3:
   dependencies:
     tmp "^0.2.0"
 
-tmp@^0.2.0, tmp@^0.2.5:
+tmp@^0.2.0, tmp@^0.2.6:
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.2.7.tgz#26f4db11d1601ce8012dcb8a798ece1c06a99059"
   integrity sha512-e0votIpp4Uo2AJYSzVHV6xCcawuiez3DzqDAbrTc3YxBkplN6e+dM13ZeIcZnDg/QpSuU2zfZ3rzwY8ukEnaXw==
@@ -12146,7 +12135,7 @@ write-file-atomic@^4.0.2:
     imurmurhash "^0.1.4"
     signal-exit "^3.0.7"
 
-ws@^8.11.0, ws@^8.18.0, ws@^8.18.1, ws@^8.19.0, ws@^8.20.1:
+ws@^8.11.0, ws@^8.18.0, ws@^8.18.1, ws@^8.19.0, ws@^8.21.0:
   version "8.21.0"
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.21.0.tgz#012e413fc07429945121b0c153158c4343086951"
   integrity sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g==
