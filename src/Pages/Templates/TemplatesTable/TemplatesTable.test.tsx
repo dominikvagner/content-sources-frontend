@@ -1,10 +1,14 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
+import { useNavigate } from 'react-router-dom';
 import TemplatesTable from './TemplatesTable';
 import { useTemplateList } from 'services/Templates/TemplateQueries';
 import { useTemplateSystemCounts } from 'services/Systems/SystemsQueries';
 import { ReactQueryTestWrapper, defaultTemplateItem } from 'testingHelpers';
 import { formatDateDDMMMYYYY } from 'helpers';
 import { useChrome } from '@redhat-cloud-services/frontend-components/useChrome';
+import { COPY_ROUTE, DELETE_ROUTE, EDIT_ROUTE } from 'Routes/constants';
+
+const mockNavigate = jest.fn();
 
 jest.mock('services/Templates/TemplateQueries', () => ({
   useTemplateList: jest.fn(),
@@ -45,6 +49,11 @@ jest.mock('@unleash/proxy-client-react', () => ({
 (useChrome as jest.Mock).mockImplementation(() => ({
   getEnvironment: () => 'stage',
 }));
+
+beforeEach(() => {
+  mockNavigate.mockClear();
+  (useNavigate as jest.Mock).mockReturnValue(mockNavigate);
+});
 
 const mockSystemCountsDefault = () => {
   (useTemplateSystemCounts as jest.Mock).mockImplementation(() => ({
@@ -114,6 +123,60 @@ it('expect TemplatesTable to render all action items', async () => {
     expect(queryByText('Edit')).toBeInTheDocument();
     expect(queryByText('Copy')).toBeInTheDocument();
     expect(queryByText('Delete')).toBeInTheDocument();
+  });
+});
+
+describe('TemplatesTable action navigation', () => {
+  const renderTableWithRow = () => {
+    (useTemplateList as jest.Mock).mockImplementation(() => ({
+      data: {
+        data: [defaultTemplateItem],
+        meta: { limit: 10, offset: 0, count: 1 },
+        isLoading: false,
+      },
+    }));
+    mockSystemCountsDefault();
+
+    const view = render(
+      <ReactQueryTestWrapper>
+        <TemplatesTable />
+      </ReactQueryTestWrapper>,
+    );
+
+    fireEvent.click(view.getByRole('button', { name: 'Kebab toggle' }));
+
+    return view;
+  };
+
+  it('navigates to edit route with table state', async () => {
+    const { queryByText } = renderTableWithRow();
+
+    await waitFor(() => expect(queryByText('Edit')).toBeInTheDocument());
+    fireEvent.click(queryByText('Edit') as Element);
+
+    expect(mockNavigate).toHaveBeenCalledWith(`${EDIT_ROUTE}/${defaultTemplateItem.uuid}`, {
+      state: { from: 'table' },
+    });
+  });
+
+  it('navigates to copy route with table state', async () => {
+    const { queryByText } = renderTableWithRow();
+
+    await waitFor(() => expect(queryByText('Copy')).toBeInTheDocument());
+    fireEvent.click(queryByText('Copy') as Element);
+
+    expect(mockNavigate).toHaveBeenCalledWith(`${COPY_ROUTE}/${defaultTemplateItem.uuid}`, {
+      state: { from: 'table' },
+    });
+  });
+
+  it('navigates to delete route from table', async () => {
+    const { queryByText } = renderTableWithRow();
+
+    await waitFor(() => expect(queryByText('Delete')).toBeInTheDocument());
+    fireEvent.click(queryByText('Delete') as Element);
+
+    expect(mockNavigate).toHaveBeenCalledWith(`${DELETE_ROUTE}/${defaultTemplateItem.uuid}`);
   });
 });
 
