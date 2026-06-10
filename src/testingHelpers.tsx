@@ -6,6 +6,7 @@ import {
   PopularRepository,
   RepositoryParamsResponse,
   SnapshotByDateResponse,
+  SnapshotDetail,
   SnapshotForDate,
   SnapshotItem,
   ValidationResponse,
@@ -585,6 +586,21 @@ export const defaultPackageItem: Package = {
   release: '6.el9_fruit',
   epoch: '0',
   summary: 'Core libraries for 389 Banana Server',
+};
+
+export const defaultRemovedPackageItem: Package = {
+  ...defaultPackageItem,
+  version: '1.2.2',
+  release: '5.el9_fruit',
+};
+
+export const defaultSnapshotDetailItem: SnapshotDetail = {
+  ...defaultSnapshotItem,
+  repository_path: defaultSnapshotItem.distribution_path,
+  added_packages: [defaultPackageItem],
+  removed_packages: [defaultRemovedPackageItem],
+  url: '',
+  detected_os_version: '9',
 };
 
 export const defaultErrataItem: ErrataItem = {

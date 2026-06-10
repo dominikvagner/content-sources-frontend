@@ -240,15 +240,27 @@ export type ContentCounts = {
   'rpm.repo_metadata_file'?: number;
 };
 
-export interface SnapshotItem {
+interface SnapshotBase {
   uuid: string;
   created_at: string;
-  distribution_path: string;
   content_counts: ContentCounts;
   added_counts: ContentCounts;
   removed_counts: ContentCounts;
   repository_name: string;
   repository_uuid: string;
+}
+
+export interface SnapshotItem extends SnapshotBase {
+  distribution_path: string;
+}
+
+export interface SnapshotDetail extends SnapshotBase {
+  repository_path?: string;
+  distribution_path?: string;
+  url?: string;
+  detected_os_version?: string;
+  added_packages?: Package[];
+  removed_packages?: Package[];
 }
 
 export type SnapshotByDateResponse = {
@@ -510,6 +522,16 @@ export const getSnapshotList: (
       limit: limit?.toString(),
       sort_by: sortBy,
     })}`,
+  );
+  return data;
+};
+
+export const getSnapshotDetail: (
+  repo_uuid: string,
+  snapshot_uuid: string,
+) => Promise<SnapshotDetail> = async (repo_uuid: string, snapshot_uuid: string) => {
+  const { data } = await axios.get(
+    `/api/content-sources/v1.0/repositories/${repo_uuid}/snapshots/${snapshot_uuid}`,
   );
   return data;
 };

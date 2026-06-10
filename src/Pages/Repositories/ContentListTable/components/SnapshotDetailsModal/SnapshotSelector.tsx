@@ -7,7 +7,7 @@ import {
   MenuToggle,
 } from '@patternfly/react-core';
 import { createUseStyles } from 'react-jss';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useGetSnapshotList } from 'services/Content/ContentQueries';
 import { useMemo, useState } from 'react';
 import useRootPath from 'Hooks/useRootPath';
@@ -27,6 +27,7 @@ export function SnapshotSelector() {
   const classes = useStyles();
   const rootPath = useRootPath();
   const navigate = useNavigate();
+  const [urlSearchParams] = useSearchParams();
   const [selectorOpen, setSelectorOpen] = useState(false);
   const { repoUUID: uuid = '', snapshotUUID = '' } = useParams();
 
@@ -48,7 +49,12 @@ export function SnapshotSelector() {
   }, [data?.data]);
 
   const setSelected = (selectedDate: string) => {
-    navigate(`${rootPath}/${REPOSITORIES_ROUTE}/${uuid}/snapshots/${dateMapper[selectedDate]}`);
+    const activeTab = urlSearchParams.get('tab');
+    navigate(
+      `${rootPath}/${REPOSITORIES_ROUTE}/${uuid}/snapshots/${dateMapper[selectedDate]}${
+        activeTab ? `?tab=${activeTab}` : ''
+      }`,
+    );
   };
 
   return (

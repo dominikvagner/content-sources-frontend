@@ -15,6 +15,10 @@ jest.mock('./Tabs/SnapshotErrataTab', () => ({
   SnapshotErrataTab: () => <div>Errata tab body</div>,
 }));
 
+jest.mock('./Tabs/SnapshotChangesTab', () => ({
+  SnapshotChangesTab: () => <div>Changes tab body</div>,
+}));
+
 jest.mock('./SnapshotSelector', () => ({
   SnapshotSelector: () => <div>Snapshot selector</div>,
 }));
@@ -95,13 +99,46 @@ describe('SnapshotDetailsModal', () => {
     });
   });
 
+  it('syncs changes tab from search params on mount', async () => {
+    window.history.replaceState({}, '', `/?tab=${SnapshotDetailTab.CHANGES}`);
+
+    render(<SnapshotDetailsModal />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('tabpanel', { name: 'Snapshot changes detail tab' }),
+      ).toBeInTheDocument();
+    });
+  });
+
   it('updates search params when switching tabs', async () => {
     const user = userEvent.setup();
 
     render(<SnapshotDetailsModal />);
 
-    await user.click(screen.getByRole('tab', { name: 'Snapshot errata detail tab' }));
+    await user.click(screen.getByRole('tab', { name: 'Snapshot changes detail tab' }));
 
-    expect(mockSetSearchParams).toHaveBeenCalledWith({ tab: SnapshotDetailTab.ERRATA });
+    expect(mockSetSearchParams).toHaveBeenCalledWith({ tab: SnapshotDetailTab.CHANGES });
+  });
+
+  it('renders tabs in the expected order', () => {
+    render(<SnapshotDetailsModal />);
+
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+      'Packages',
+      'Changes',
+      'Advisories',
+    ]);
+  });
+
+  it('clears search params when switching back to packages', async () => {
+    const user = userEvent.setup();
+    window.history.replaceState({}, '', `/?tab=${SnapshotDetailTab.CHANGES}`);
+
+    render(<SnapshotDetailsModal />);
+
+    await user.click(screen.getByRole('tab', { name: 'Snapshot package detail tab' }));
+
+    expect(mockSetSearchParams).toHaveBeenCalledWith({});
   });
 });

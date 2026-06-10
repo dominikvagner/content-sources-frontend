@@ -1,4 +1,5 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import SnapshotListModal from './SnapshotListModal';
 import {
   ReactQueryTestWrapper,
@@ -8,6 +9,9 @@ import {
 } from 'testingHelpers';
 import { useFetchContent, useGetSnapshotList } from 'services/Content/ContentQueries';
 import { ContentOrigin } from 'services/Content/ContentApi';
+import { SnapshotDetailTab } from '../SnapshotDetailsModal/SnapshotDetailsModal';
+
+const mockNavigate = jest.fn();
 
 jest.mock('Hooks/useRootPath', () => () => 'someUrl');
 
@@ -19,7 +23,7 @@ jest.mock('services/Content/ContentQueries', () => ({
 }));
 
 jest.mock('react-router-dom', () => ({
-  useNavigate: jest.fn(),
+  useNavigate: () => mockNavigate,
   Outlet: () => <></>,
   useParams: () => ({
     repoUUID: 'some-uuid',
@@ -34,6 +38,7 @@ jest.mock('middleware/AppContext', () => ({
 }));
 
 it('Render 1 item', () => {
+  mockNavigate.mockClear();
   (useFetchContent as jest.Mock).mockImplementation(() => ({
     data: defaultContentItemWithSnapshot,
   }));
@@ -59,6 +64,7 @@ it('Render 1 item', () => {
 });
 
 it('Render 20 items', () => {
+  mockNavigate.mockClear();
   (useFetchContent as jest.Mock).mockImplementation(() => ({
     data: defaultContentItemWithSnapshot,
   }));
@@ -92,4 +98,61 @@ it('Render 20 items', () => {
   expect(
     getByText((defaultSnapshotItem.content_counts['rpm.package'] as number)?.toString()),
   ).toBeInTheDocument();
+});
+
+it('navigates to the changes tab from the change column', async () => {
+  const user = userEvent.setup();
+  mockNavigate.mockClear();
+  (useFetchContent as jest.Mock).mockImplementation(() => ({
+    data: defaultContentItemWithSnapshot,
+  }));
+  (useGetSnapshotList as jest.Mock).mockImplementation(() => ({
+    data: {
+      meta: defaultMetaItem,
+      data: [defaultSnapshotItem],
+    },
+    isLoading: false,
+    isFetching: false,
+  }));
+
+  render(
+    <ReactQueryTestWrapper>
+      <SnapshotListModal />
+    </ReactQueryTestWrapper>,
+  );
+
+  await user.click(screen.getByRole('button', { name: 'View snapshot changes' }));
+
+  expect(mockNavigate).toHaveBeenCalledWith(
+    `someUrl/repositories/some-uuid/snapshots/${defaultSnapshotItem.uuid}?tab=${SnapshotDetailTab.CHANGES}`,
+  );
+});
+
+it('disables the changes link when a snapshot has no package changes', () => {
+  mockNavigate.mockClear();
+  (useFetchContent as jest.Mock).mockImplementation(() => ({
+    data: defaultContentItemWithSnapshot,
+  }));
+  (useGetSnapshotList as jest.Mock).mockImplementation(() => ({
+    data: {
+      meta: defaultMetaItem,
+      data: [
+        {
+          ...defaultSnapshotItem,
+          added_counts: { ...defaultSnapshotItem.added_counts, 'rpm.package': 0 },
+          removed_counts: { ...defaultSnapshotItem.removed_counts, 'rpm.package': 0 },
+        },
+      ],
+    },
+    isLoading: false,
+    isFetching: false,
+  }));
+
+  render(
+    <ReactQueryTestWrapper>
+      <SnapshotListModal />
+    </ReactQueryTestWrapper>,
+  );
+
+  expect(screen.getByRole('button', { name: 'View snapshot changes' })).toBeDisabled();
 });

@@ -337,83 +337,104 @@ const SnapshotListModal = () => {
                         removed_counts,
                       }: SnapshotItem,
                       index: number,
-                    ) => (
-                      <Tr key={created_at + index} data-uuid={snap_uuid}>
-                        <Hide
-                          hide={
-                            !rbac?.repoWrite || isRedHatRepository || isEPELRepository || count < 2
-                          }
-                        >
-                          <Td
-                            select={{
-                              rowIndex: index,
-                              onSelect: (_event, isSelecting) =>
-                                onSelectSnapshot(snap_uuid, isSelecting),
-                              isSelected: checkedSnapshots.has(snap_uuid),
-                            }}
-                          />
-                        </Hide>
-                        <Td>{formatDateDDMMMYYYY(created_at, true)}</Td>
-                        <Td>
-                          <ChangedArrows
-                            addedCount={added_counts?.['rpm.package'] || 0}
-                            removedCount={removed_counts?.['rpm.package'] || 0}
-                          />
-                        </Td>
-                        <Td>
-                          <Button
-                            variant='link'
-                            ouiaId='snapshot_package_count_button'
-                            isInline
-                            isDisabled={!content_counts?.['rpm.package']}
-                            onClick={() =>
-                              navigate(
-                                `${rootPath}/${REPOSITORIES_ROUTE}/${uuid}/snapshots/${snap_uuid}`,
-                              )
+                    ) => {
+                      const addedPackageCount = added_counts?.['rpm.package'] || 0;
+                      const removedPackageCount = removed_counts?.['rpm.package'] || 0;
+                      const hasPackageChanges = Boolean(addedPackageCount || removedPackageCount);
+
+                      return (
+                        <Tr key={created_at + index} data-uuid={snap_uuid}>
+                          <Hide
+                            hide={
+                              !rbac?.repoWrite ||
+                              isRedHatRepository ||
+                              isEPELRepository ||
+                              count < 2
                             }
                           >
-                            {content_counts?.['rpm.package'] || 0}
-                          </Button>
-                        </Td>
-                        <Td>
-                          <Button
-                            variant='link'
-                            ouiaId='snapshot_advisory_count_button'
-                            isInline
-                            isDisabled={!content_counts?.['rpm.advisory']}
-                            onClick={() =>
-                              navigate(
-                                `${rootPath}/${REPOSITORIES_ROUTE}/${uuid}/snapshots/${snap_uuid}?tab=${SnapshotDetailTab.ERRATA}`,
-                              )
-                            }
-                          >
-                            {content_counts?.['rpm.advisory'] || 0}
-                          </Button>
-                        </Td>
-                        <Td>
-                          <RepoConfig repoUUID={uuid} snapUUID={snap_uuid} latest={false} />
-                        </Td>
-                        <Hide hide={!rowActions(snap_uuid)?.length}>
-                          <Td isActionCell>
-                            <ConditionalTooltip
-                              content={
-                                count < 2
-                                  ? `You can't delete the last snapshot in a repository`
-                                  : 'You do not have the required permissions to perform this action.'
+                            <Td
+                              select={{
+                                rowIndex: index,
+                                onSelect: (_event, isSelecting) =>
+                                  onSelectSnapshot(snap_uuid, isSelecting),
+                                isSelected: checkedSnapshots.has(snap_uuid),
+                              }}
+                            />
+                          </Hide>
+                          <Td>{formatDateDDMMMYYYY(created_at, true)}</Td>
+                          <Td>
+                            <Button
+                              variant='link'
+                              ouiaId='snapshot_changes_count_button'
+                              isInline
+                              aria-label='View snapshot changes'
+                              onClick={() =>
+                                navigate(
+                                  `${rootPath}/${REPOSITORIES_ROUTE}/${uuid}/snapshots/${snap_uuid}?tab=${SnapshotDetailTab.CHANGES}`,
+                                )
                               }
-                              show={
-                                !isRedHatRepository &&
-                                !isEPELRepository &&
-                                (!rbac?.repoWrite || count < 2)
-                              }
-                              setDisabled
                             >
-                              <ActionsColumn items={rowActions(snap_uuid)} />
-                            </ConditionalTooltip>
+                              <ChangedArrows
+                                addedCount={addedPackageCount}
+                                removedCount={removedPackageCount}
+                              />
+                            </Button>
                           </Td>
-                        </Hide>
-                      </Tr>
-                    ),
+                          <Td>
+                            <Button
+                              variant='link'
+                              ouiaId='snapshot_package_count_button'
+                              isInline
+                              isDisabled={!content_counts?.['rpm.package']}
+                              onClick={() =>
+                                navigate(
+                                  `${rootPath}/${REPOSITORIES_ROUTE}/${uuid}/snapshots/${snap_uuid}`,
+                                )
+                              }
+                            >
+                              {content_counts?.['rpm.package'] || 0}
+                            </Button>
+                          </Td>
+                          <Td>
+                            <Button
+                              variant='link'
+                              ouiaId='snapshot_advisory_count_button'
+                              isInline
+                              isDisabled={!content_counts?.['rpm.advisory']}
+                              onClick={() =>
+                                navigate(
+                                  `${rootPath}/${REPOSITORIES_ROUTE}/${uuid}/snapshots/${snap_uuid}?tab=${SnapshotDetailTab.ERRATA}`,
+                                )
+                              }
+                            >
+                              {content_counts?.['rpm.advisory'] || 0}
+                            </Button>
+                          </Td>
+                          <Td>
+                            <RepoConfig repoUUID={uuid} snapUUID={snap_uuid} latest={false} />
+                          </Td>
+                          <Hide hide={!rowActions(snap_uuid)?.length}>
+                            <Td isActionCell>
+                              <ConditionalTooltip
+                                content={
+                                  count < 2
+                                    ? `You can't delete the last snapshot in a repository`
+                                    : 'You do not have the required permissions to perform this action.'
+                                }
+                                show={
+                                  !isRedHatRepository &&
+                                  !isEPELRepository &&
+                                  (!rbac?.repoWrite || count < 2)
+                                }
+                                setDisabled
+                              >
+                                <ActionsColumn items={rowActions(snap_uuid)} />
+                              </ConditionalTooltip>
+                            </Td>
+                          </Hide>
+                        </Tr>
+                      );
+                    },
                   )}
                 </Tbody>
               </Table>

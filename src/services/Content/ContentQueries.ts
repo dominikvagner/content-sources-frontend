@@ -37,6 +37,7 @@ import {
   ContentOrigin,
   getRepoConfigFile,
   triggerSnapshot,
+  getSnapshotDetail,
   getSnapshotsByDate,
   getSnapshotPackages,
   getSnapshotErrata,
@@ -67,6 +68,7 @@ export const CREATE_PARAMS_KEY = 'CREATE_PARAMS_KEY';
 export const PACKAGES_KEY = 'PACKAGES_KEY';
 export const SNAPSHOT_PACKAGES_KEY = 'SNAPSHOT_PACKAGES_KEY';
 export const SNAPSHOT_ERRATA_KEY = 'SNAPSHOT_ERRATA_KEY';
+export const SNAPSHOT_DETAIL_KEY = 'SNAPSHOT_DETAIL_KEY';
 export const LIST_SNAPSHOTS_KEY = 'LIST_SNAPSHOTS_KEY';
 export const CONTENT_ITEM_KEY = 'CONTENT_ITEM_KEY';
 export const REPO_CONFIG_FILE_KEY = 'REPO_CONFIG_FILE_KEY';
@@ -646,6 +648,18 @@ export const useGetSnapshotList = (uuid: string, page: number, limit: number, so
     },
   });
 
+export const useGetSnapshotDetailQuery = (repo_uuid: string, snapshot_uuid: string) =>
+  useQuery({
+    queryKey: [SNAPSHOT_DETAIL_KEY, repo_uuid, snapshot_uuid],
+    queryFn: () => getSnapshotDetail(repo_uuid, snapshot_uuid),
+    placeholderData: keepPreviousData,
+    staleTime: 60000,
+    meta: {
+      title: 'Unable to find snapshot details with the given UUID.',
+      id: 'snapshot-detail-error',
+    },
+  });
+
 export const useGetPackagesQuery = (
   uuid: string,
   page: number,
@@ -893,6 +907,7 @@ export const useBulkDeleteSnapshotsMutate = (
       queryClient.invalidateQueries({ queryKey: [LIST_SNAPSHOTS_KEY] });
       queryClient.invalidateQueries({ queryKey: [SNAPSHOT_ERRATA_KEY] });
       queryClient.invalidateQueries({ queryKey: [SNAPSHOT_PACKAGES_KEY] });
+      queryClient.invalidateQueries({ queryKey: [SNAPSHOT_DETAIL_KEY] });
       queryClient.invalidateQueries({ queryKey: [REPO_CONFIG_FILE_KEY] });
       queryClient.invalidateQueries({ queryKey: [LATEST_REPO_CONFIG_FILE_KEY] });
     },

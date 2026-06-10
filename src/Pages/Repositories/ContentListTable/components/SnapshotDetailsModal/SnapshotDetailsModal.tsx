@@ -21,6 +21,7 @@ import { createUseStyles } from 'react-jss';
 import { SnapshotSelector } from './SnapshotSelector';
 import { REPOSITORIES_ROUTE } from 'Routes/constants';
 import { SnapshotErrataTab } from './Tabs/SnapshotErrataTab';
+import { SnapshotChangesTab } from './Tabs/SnapshotChangesTab';
 import { modalTableSurfaceStyles } from 'helpers';
 
 const useStyles = createUseStyles({
@@ -38,8 +39,12 @@ const useStyles = createUseStyles({
 
 export enum SnapshotDetailTab {
   PACKAGES = 'packages',
+  CHANGES = 'changes',
   ERRATA = 'errata',
 }
+
+const isSnapshotDetailTab = (value: string | null): value is SnapshotDetailTab =>
+  Object.values(SnapshotDetailTab).includes(value as SnapshotDetailTab);
 
 export default function SnapshotDetailsModal() {
   const { contentOrigin } = useAppContext();
@@ -48,20 +53,22 @@ export default function SnapshotDetailsModal() {
   const [urlSearchParams, setUrlSearchParams] = useSearchParams();
   const rootPath = useRootPath();
   const navigate = useNavigate();
-  const [activeTabKey, setActiveTabKey] = useState<string | number>(0);
+  const activeTab = urlSearchParams.get('tab');
+  const [activeTabKey, setActiveTabKey] = useState<SnapshotDetailTab>(SnapshotDetailTab.PACKAGES);
 
   useEffect(() => {
-    if (urlSearchParams.get('tab') === SnapshotDetailTab.ERRATA) {
-      setActiveTabKey(1);
-    }
-  }, []);
+    setActiveTabKey(isSnapshotDetailTab(activeTab) ? activeTab : SnapshotDetailTab.PACKAGES);
+  }, [activeTab]);
 
   const handleTabClick = (
     _: React.MouseEvent<HTMLElement, MouseEvent>,
     tabIndex: string | number,
   ) => {
-    setUrlSearchParams(tabIndex ? { tab: SnapshotDetailTab.ERRATA } : {});
-    setActiveTabKey(tabIndex);
+    const selectedTab = isSnapshotDetailTab(String(tabIndex))
+      ? (tabIndex as SnapshotDetailTab)
+      : SnapshotDetailTab.PACKAGES;
+    setUrlSearchParams(selectedTab === SnapshotDetailTab.PACKAGES ? {} : { tab: selectedTab });
+    setActiveTabKey(selectedTab);
   };
 
   const onClose = () =>
@@ -100,7 +107,7 @@ export default function SnapshotDetailsModal() {
               aria-label='Snapshot detail tabs'
             >
               <Tab
-                eventKey={0}
+                eventKey={SnapshotDetailTab.PACKAGES}
                 ouiaId='packages_tab'
                 title={<TabTitleText>Packages</TabTitleText>}
                 aria-label='Snapshot package detail tab'
@@ -108,7 +115,15 @@ export default function SnapshotDetailsModal() {
                 <SnapshotPackagesTab />
               </Tab>
               <Tab
-                eventKey={1}
+                eventKey={SnapshotDetailTab.CHANGES}
+                ouiaId='changes_tab'
+                title={<TabTitleText>Changes</TabTitleText>}
+                aria-label='Snapshot changes detail tab'
+              >
+                <SnapshotChangesTab />
+              </Tab>
+              <Tab
+                eventKey={SnapshotDetailTab.ERRATA}
                 ouiaId='advisories_tab'
                 title={<TabTitleText>Advisories</TabTitleText>}
                 aria-label='Snapshot errata detail tab'
